@@ -7,7 +7,7 @@ module.exports = {
   resolve: {
     modules: [path.join(__dirname, '../'), 'node_modules'],
     alias: {
-      api: path.resolve(__dirname, './src/services/api.js'),
+      api: path.resolve(__dirname, './src/api.js'),
       styles: path.resolve(__dirname, './src/styles'),
       components: path.resolve(__dirname, './src/components'),
       dva: 'dva-no-router',
