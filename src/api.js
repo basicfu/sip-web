@@ -1,11 +1,7 @@
-import { stringify } from 'qs';
-import request from '../utils/request';
+import request from './utils/request';
 
 const api = '/api';
 const base = '/base';
-
-export async function test() { return request('/test/users'); }
-
 
 // export async function login(params) { return request(`${prefix}${system}/user/login`, { method: 'POST', body: params }); }
 // export async function register(params) { return request(`${prefix}${system}/user/register`, { method: 'POST', body: params }); }

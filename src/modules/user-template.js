@@ -4,7 +4,7 @@ import {
   insertUserTemplate,
   updateUserTemplate,
   deleteUserTemplate,
-} from '@api';
+} from 'api';
 
 const modal = {
   namespace: 'userTemplate',

@@ -27,6 +27,7 @@ module.exports = {
     },
   },
   rules: {
+    'import/no-unresolved': 'off',
     'linebreak-style': 'off', // Don't play nicely with Windows
     'arrow-body-style': 'off', // Incompatible with prettier
     'arrow-parens': 'off', // Incompatible with prettier

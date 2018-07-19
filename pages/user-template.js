@@ -5,10 +5,10 @@ import { Grid, Snackbar } from '@material-ui/core';
 import classNames from 'classnames';
 import { connect } from 'dva';
 import TableTemlate from '../src/components/TableTemlate';
-import ModalTemplate from '../src/components/ModalTemplate';
+import ModalTemplate from 'components/ModalTemplate';
 import Button from '@material-ui/core/Button';
 import SearchIcon from '@material-ui/icons/Search';
-import styles from '../src/styles/user-template';
+import styles from 'styles/user-template';
 
 const namespace = 'userTemplate';
 

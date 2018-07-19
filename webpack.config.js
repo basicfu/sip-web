@@ -7,25 +7,16 @@ module.exports = {
   resolve: {
     modules: [path.join(__dirname, '../'), 'node_modules'],
     alias: {
-      '@material-ui/core': path.resolve(__dirname, './packages/material-ui/src'),
-      '@material-ui/docs': path.resolve(__dirname, './packages/material-ui-docs/src'),
-      '@material-ui/icons': path.resolve(__dirname, './packages/material-ui-icons/src'),
-      '@material-ui/lab': path.resolve(__dirname, './packages/material-ui-lab/src'),
-      docs: path.resolve(__dirname, './'),
+      api: path.resolve(__dirname, './src/services/api.js'),
+      styles: path.resolve(__dirname, './src/styles'),
+      components: path.resolve(__dirname, './src/components'),
+      dva: 'dva-no-router',
     },
   },
   output: {
     path: path.join(__dirname, 'build'),
     filename: 'bundle.js',
     publicPath: '/build/',
-  },
-  devServer: {
-    proxy: {
-      '/api': {
-        target: 'http://sip-dev.dmka.cn',
-        pathRewrite: { '^/api': '' },
-      },
-    },
   },
   module: {
     rules: [
