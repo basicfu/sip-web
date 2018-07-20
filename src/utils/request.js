@@ -1,4 +1,5 @@
 import fetch from 'dva/fetch';
+import notify from 'notify';
 
 export default function request(url, options) {
   const defaultOptions = {
@@ -23,33 +24,28 @@ export default function request(url, options) {
       body = newOptions.body;
       headers = { ...headers, 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' };
     }
-  }else {
-    if (newOptions.body) {
-      for (let key of Object.keys(newOptions.body)) {
+  } else if (newOptions.body) {
+      for (const key of Object.keys(newOptions.body)) {
         if (key) {
           const value = newOptions.body[key];
-          let s = encodeURIComponent(value);
-          const inc = url.includes("?") ? "&" : "?";
+          const s = encodeURIComponent(value);
+          const inc = url.includes('?') ? '&' : '?';
           url += `${inc}${key}=${s}`;
         }
       }
     }
-  }
   newOptions.headers = headers;
   newOptions.body = body;
-  // url="http://sip-dev.dmka.cn/dict/dict/all";
-  console.log(url)
   return fetch(url, newOptions)
-    .then((response) => {
+    .then(response => {
       if (response.status !== 200) {
-        // message.error('服务器开小差了，请稍候再来呦！');
+        notify.error('服务器开小差了，请稍候再来呦！');
         return { success: false };
-      } else {
-        console.log('hello')
+      }
         return response.json().then((result) => {
           if (result.success === false) {
             if (result.msg !== undefined && result.msg !== '') {
-              // message.error(result.msg);
+              notify.error(result.msg);
             }
             if (result.code === 5) {
               window.localStorage.removeItem('auth');
@@ -58,14 +54,12 @@ export default function request(url, options) {
             return { success: false };
           }
           if (result.msg !== undefined && result.msg !== '') {
-            // message.success(result.msg);
+            notify.success(result.msg);
           }
           return result;
         });
-      }
     })
     .catch((error) => {
-      console.log('hello123')
       const { response } = error;
       let msg;
       if (response && response instanceof Object) {
@@ -74,7 +68,7 @@ export default function request(url, options) {
       } else {
         msg = error.message || '网络错误';
       }
-      // message.error(msg);
+      notify.error(msg);
       return { success: false };
     });
 }

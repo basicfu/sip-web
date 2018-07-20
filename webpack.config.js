@@ -9,8 +9,10 @@ module.exports = {
     alias: {
       api: path.resolve(__dirname, './src/api.js'),
       styles: path.resolve(__dirname, './src/styles'),
+      utils: path.resolve(__dirname, './src/utils'),
       components: path.resolve(__dirname, './src/components'),
       dva: 'dva-no-router',
+      notify: path.resolve(__dirname, './src/utils/notify'),
     },
   },
   output: {

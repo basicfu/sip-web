@@ -15,6 +15,7 @@ const modal = {
     selectedRowKeys: [],
     modalVisible: false,
     item: {},
+    message:'Material-UI v1.4.0 is out 🎉. <a style=\\"color: white;\\" target=\\"_blank\\" href=\\"https://github.com/mui-org/material-ui/releases/tag/v1.4.0\\">the release note</a>.',
   },
   effects: {
     * all(_, { call, put }) {

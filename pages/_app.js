@@ -22,6 +22,9 @@ import Typography from '@material-ui/core/Typography';
 import Notifications from '../src/components/Notifications';
 import GithubIcon from '@material-ui/docs/svgIcons/GitHub';
 import { loadCSS } from 'fg-loadcss/src/loadCSS';
+import NProgress from 'nprogress';
+import Router from 'next/router';
+import Button from '@material-ui/core/Button/Button';
 // Inject the insertion-point-jss after docssearch
 if (process.browser) {
   loadCSS(
@@ -33,6 +36,17 @@ if (process.browser) {
     document.querySelector('#insertion-point-jss'),
   );
 }
+Router.onRouteChangeStart = () => {
+  NProgress.start();
+};
+
+Router.onRouteChangeComplete = () => {
+  NProgress.done();
+};
+
+Router.onRouteChangeError = () => {
+  NProgress.done();
+};
 if (process.browser && !global.__INSERTION_POINT__) {
   global.__INSERTION_POINT__ = true;
   const styleNode = document.createComment('insertion-point-jss');
@@ -328,4 +342,4 @@ export default compose(
   withStyles(styles),
   withRedux(getOrCreateStore),
 )(MyApp);
-// export default withRedux(createDvaStore)withStyles(styles)(MyApp);
+// export default withRedux(getOrCreateStore)(withStyles(styles)(MyApp));

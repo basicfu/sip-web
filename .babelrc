@@ -9,21 +9,6 @@
     ["@babel/transform-runtime", { "polyfill": false, "useBuiltIns": true }]
   ],
   "env": {
-    "coverage": {
-      "plugins": [
-        "istanbul",
-        [
-          "module-resolver",
-          {
-            "root": ["./"],
-            "alias": {
-              "@material-ui/core": "./packages/material-ui/src",
-              "@material-ui/icons": "./packages/material-ui-icons/src"
-            }
-          }
-        ]
-      ]
-    },
     "development": {
       "sourceMaps": "both",
       "plugins": [
@@ -34,8 +19,10 @@
             "alias": {
               "api":"./src/api.js",
               "styles":"./src/styles",
+              "utils": "./src/utils",
               "components":"./src/components",
-              "dva": "dva-no-router"
+              "dva": "dva-no-router",
+              "notify": "./src/utils/notify"
             }
           }
         ]
