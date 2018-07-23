@@ -136,7 +136,7 @@ const styles = theme => ({
 const pages = [
   {
     pathname: '/test',
-    title: '测试1',
+    title: '测试1'
   },
   {
     pathname: '/user-template',
@@ -178,14 +178,13 @@ class MyApp extends App {
   };
 
   handleDrawerOpen = () => {
-    this.setState({ mobileOpen: true, disablePermanent: true });
+    const {mobileOpen, disablePermanent} = this.state
+    this.setState({mobileOpen: !mobileOpen, disablePermanent: !disablePermanent});
   };
 
   handleDrawerClose = () => {
-    this.setState({
-      mobileOpen: false,
-      disablePermanent: false,
-    });
+    const {mobileOpen, disablePermanent} = this.state
+    // this.setState({mobileOpen: !mobileOpen, disablePermanent: !disablePermanent});
   };
 
   // pageContext = null;
@@ -207,7 +206,7 @@ class MyApp extends App {
 
 
   getChildContext() {
-    const { router } = this.props;
+    const {router} = this.props;
     let pathname = router.pathname;
     if (pathname !== '/') {
       // The leading / is only added to support static hosting (resolve /index.html).
@@ -228,7 +227,8 @@ class MyApp extends App {
   }
 
   render() {
-    const { children, Component, pageProps, store, router, classes } = this.props;
+    const {children, Component, pageProps, store, classes} = this.props;
+    console.log(this.state.disablePermanent,this.state.mobileOpen)
     return (
       <div>
         <Provider store={store}>
@@ -245,73 +245,58 @@ class MyApp extends App {
               sheetsManager={this.pageContext.sheetsManager}
             >
               {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-              <CssBaseline />
+              <CssBaseline/>
               {/* Pass pageContext to the _document though the renderPage enhancer
                 to render collected styles on server side. */}
               <div
                 className={classes.root}
-                style={{
-                  flexGrow: 1,
-                  zIndex: 1,
-                  position: 'relative',
-                  display: 'flex',
-                }}>
+                style={{flexGrow: 1, zIndex: 1, position: 'relative', display: 'flex'}}>
                 {/* 头部 */}
-                <NProgressBar />
+                <NProgressBar/>
                 <AppBar
                   position="absolute"
-                  style={this.state.mobileOpen ?
-                    {
-                      width: 'calc(100% - 230px)',
-                      transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms,margin 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
-                      marginLeft: '230px',
-                    }
-                    : { width: '100%', zIndex: 1201 }}
-                  className={this.state.mobileOpen ? classes.appBarShift : classes.appBar}
+                  style={!this.state.mobileOpen ? {width: 'calc(100% - 230px)', marginLeft: '230px'} : {
+                    width: '100%', zIndex: 1201
+                  }}
+                  className={!this.state.mobileOpen ? classes.appBarShift : classes.appBar}
                 >
                   <Toolbar disableGutters={!this.state.mobileOpen}>
                     <IconButton
                       color="inherit"
                       aria-label="open drawer"
                       onClick={this.handleDrawerOpen}>
-                      <MenuIcon />
+                      <MenuIcon/>
                     </IconButton>
-                    <div className={classes.grow} />
-                    <AppSearch />
+                    <div className={classes.grow}/>
                     <Tooltip id="appbar-github" title="GitHub repository" enterDelay={300}>
-                      <IconButton component="a" color="inherit">
-                        <GithubIcon />
+                      <IconButton component="a" color="inherit" style={{position: 'absolute', right: '0'}}>
+                        <GithubIcon/>
                       </IconButton>
                     </Tooltip>
                   </Toolbar>
                 </AppBar>
-                <div style={this.state.mobileOpen ?
-                  {
-                    width: '230px',
-                    position: 'relative',
-                  }
-                  : { width: '40px', position: 'relative' }}>
+                <div style={!this.state.mobileOpen ? {width: '230px', position: 'relative'} : {
+                  width: '70px',
+                  position: 'relative'
+                }}>
                   <AppDrawer
-                    classes={this.state.disablePermanent ?
-                      { paper: classes.drawerPaper } : { paper: classes.drawerPaperClose }
-                    }
+                    classes={this.state.disablePermanent ? {paper: classes.drawerPaper} : {paper: classes.drawerPaperClose}}
                     disablePermanent={this.state.disablePermanent}
                     onClose={this.handleDrawerClose}
                     onOpen={this.handleDrawerOpen}
                     variant="permanent"
+                    props={this.props}
                     mobileOpen={this.state.mobileOpen}
                   />
                 </div>
-                <Notifications />
+                <Notifications/>
                 <main
                   className={classes.content}
-                  style={this.state.mobileOpen ?
-                    {
-                      marginLeft: '20px 0 0 50px',
-                      position: 'relative',
-                    }
-                    : { margin: '20px 0 0 100px', position: 'relative' }}>
-                  <div className={classes.toolbar} style={{ minHeight: '68px' }} />
+                  style={!this.state.mobileOpen ? {
+                    marginLeft: '20px 0 0 50px',
+                    position: 'relative'
+                  } : {margin: '20px 0 0 100px', position: 'relative'}}>
+                  <div className={classes.toolbar} style={{minHeight: '68px'}}/>
                   <Typography>{children}</Typography>
                   <Component pageContext={this.pageContext} {...pageProps} />
                 </main>

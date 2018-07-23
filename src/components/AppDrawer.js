@@ -1,16 +1,14 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Drawer from '@material-ui/core/Drawer';
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
-import Hidden from '@material-ui/core/Hidden';
 import AppDrawerNavItem from './AppDrawerNavItem';
 import Link from './Link';
-import { pageToTitle } from '../utils/helpers';
+import {pageToTitle} from '../utils/helpers';
 
 const styles = theme => ({
   paper: {
@@ -40,41 +38,60 @@ const styles = theme => ({
   anchor: {
     color: theme.palette.text.secondary,
   },
+  button: {
+    '&:hover': {
+      backgroundColor: 'transparent',
+    },
+  },
+  active: {
+    color: theme.palette.primary.main,
+    fontWeight: theme.typography.fontWeightMedium,
+    '&:hover': {
+      backgroundColor: 'transparent',
+    },
+    '&:avtive': {
+      backgroundColor: 'transparent',
+    },
+    '@global': {
+      '&.MuiButton:hover': {
+        backgroundColor: 'transparent',
+      }
+    }
+  },
 });
 
 // eslint-disable-next-line react/prop-types
-function renderNavItems({ pages, ...params }) {
+function renderNavItems({pages, ...params}) {
   return (
     <List>
       {pages.reduce(
-        // eslint-disable-next-line no-use-before-define
-        (items, page) => reduceChildRoutes({ items, page, ...params }),
-        [],
+        /*// eslint-disable-next-line no-use-before-define*/
+      (items, page) => reduceChildRoutes({ items, page, ...params }),
+      [],
       )}
     </List>
   );
 }
-
-function reduceChildRoutes({ props, activePage, items, page, depth }) {
+function reduceChildRoutes({props, activePage, items, page, depth}) {
   if (page.displayNav === false) {
     return items;
   }
 
   if (page.children && page.children.length > 1) {
     const title = pageToTitle(page);
-    const openImmediately = activePage.pathname.indexOf(page.pathname) === 0;
-
+    const openImmediately = page.pathname.indexOf(page.pathname) === 0;
     items.push(
-      <AppDrawerNavItem depth={depth} key={title} openImmediately={openImmediately} title={title}>
-        {renderNavItems({ props, pages: page.children, activePage, depth: depth + 1 })}
+      <AppDrawerNavItem button  depth={depth} key={title} openImmediately={openImmediately} title={title} router={props.props.router} disablePermanent={props.disablePermanent}>
+        {renderNavItems({props, pages: page.children, activePage, depth: depth + 1})}
       </AppDrawerNavItem>,
     );
   } else {
     const title = pageToTitle(page);
     page = page.children && page.children.length === 1 ? page.children[0] : page;
-
     items.push(
       <AppDrawerNavItem
+        router={props.props.router}
+        disablePermanent={props.disablePermanent}
         depth={depth}
         key={title}
         title={title}
@@ -93,9 +110,10 @@ function reduceChildRoutes({ props, activePage, items, page, depth }) {
 const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
 function AppDrawer(props, context) {
-  const { classes, className, disablePermanent, mobileOpen, onClose, onOpen } = props;
+  const {classes, className, disablePermanent, mobileOpen, onClose, onOpen} = props;
   const drawer = (
-    <div className={classes.nav}>
+    <div className={classes.nav}
+         style={!mobileOpen ? {width: '230px', position: 'relative'} : {width: '70px', position: 'relative'}}>
       <div className={classes.toolbarIe11}>
         <div className={classes.toolbar}>
           <Link className={classes.title} href="/" onClick={onClose}>
@@ -110,44 +128,18 @@ function AppDrawer(props, context) {
           ) : null}
         </div>
       </div>
-      <Divider />
-      {renderNavItems({ props, pages: context.pages, activePage: context.activePage, depth: 0 })}
+      <Divider/>
+      {renderNavItems({props, classes, className, pages: context.pages, activePage: context.activePage, depth: 0})}
     </div>
   );
 
   return (
     <div className={className}>
-      <Hidden lgUp={!disablePermanent}>
-        <SwipeableDrawer
-          classes={{
-            paper: classNames(classes.paper, 'algolia-drawer'),
-          }}
-          disableBackdropTransition={!iOS}
-          variant="temporary"
-          open={mobileOpen}
-          onOpen={onOpen}
-          onClose={onClose}
-          ModalProps={{
-            keepMounted: true,
-          }}
-        >
-          {drawer}
-        </SwipeableDrawer>
-      </Hidden>
-      {disablePermanent ? null : (
-        <Hidden mdDown implementation="css">
-          <Drawer
-            style={mobileOpen ?
-              {width: '230px',
-                position: 'relative'}
-              :{width: '40px',position: 'relative'}}
-            variant="permanent"
-            open
-          >
-            {drawer}
-          </Drawer>
-        </Hidden>
-      )}
+      <Drawer
+        style={!mobileOpen ? {width: '230px', position: 'relative'} : {width: '70px', position: 'relative'}}
+        variant="permanent"
+        open
+      >{drawer}</Drawer>
     </div>
   );
 }
@@ -155,14 +147,14 @@ function AppDrawer(props, context) {
 AppDrawer.propTypes = {
   classes: PropTypes.object.isRequired,
   className: PropTypes.string,
-  disablePermanent: PropTypes.bool.isRequired,
+  // disablePermanent: PropTypes.bool.isRequired,
   mobileOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onOpen: PropTypes.func.isRequired,
 };
 
 AppDrawer.contextTypes = {
-  activePage: PropTypes.object.isRequired,
+  // activePage: PropTypes.object.isRequired,
   pages: PropTypes.array.isRequired,
 };
 

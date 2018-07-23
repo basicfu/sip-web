@@ -45,7 +45,6 @@ function Link(props) {
     variant,
     ...other
   } = props;
-
   let ComponentRoot;
   const className = classNames(classes.root, classes[variant], classNameProp);
   let RootProps;
@@ -67,7 +66,7 @@ function Link(props) {
     children = (
       <a
         className={classNames(className, {
-          // [activeClassName]: router.pathname === href && activeClassName,
+          [activeClassName]: router && router.pathname === href && activeClassName,
         })}
         onClick={onClick}
         {...other}
