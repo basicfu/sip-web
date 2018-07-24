@@ -30,17 +30,25 @@
     },
     "production": {
       "plugins": [
+        "babel-plugin-preval",
+        [
+          "module-resolver",
+          {
+            "alias": {
+              "api":"./src/api.js",
+              "styles":"./src/styles",
+              "utils": "./src/utils",
+              "components":"./src/components",
+              "dva": "dva-no-router",
+              "notify": "./src/utils/notify"
+            }
+          }
+        ],
         "transform-react-constant-elements",
         "transform-dev-warning",
         ["react-remove-properties", { "properties": ["data-mui-test"] }],
-        [
-          "transform-react-remove-prop-types",
-          {
-            "mode": "wrap"
-          }
-        ]
-      ],
-      "ignore": ["**/*.test*"]
-    }
+        ["transform-react-remove-prop-types", { "mode": "remove" }]
+      ]
+    },
   }
 }

@@ -27,6 +27,10 @@ if (process.browser) {
     'https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css',
     document.querySelector('#insertion-point-jss'),
   );
+  loadCSS(
+    '/static/assets/index.css',
+    document.querySelector('#insertion-point-jss'),
+  );
 }
 Router.onRouteChangeStart = () => {
   NProgress.start();

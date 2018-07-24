@@ -11,6 +11,7 @@ const base = '/base';
 // export async function updateUser(params) { return request(`${prefix}${system}/user/update`, { method: 'POST', body: params }); }
 
 export async function user() { return request(`${prefix}${base}/user`, { method: 'GET' }); }
+export async function login(params) { return request(`${prefix}${base}/user/login`, { method: 'POST', body: params }); }
 
 // 用户模版
 export async function allUserTemplate(params) { return request(`${prefix}${base}/user-template/all`, { method: 'GET', body: params }); }
