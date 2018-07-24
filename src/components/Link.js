@@ -32,6 +32,8 @@ const styles = theme => ({
 });
 
 function Link(props) {
+  console.log(props.title+"-"+props.href);
+  console.log(props.activePage);
   const {
     activeClassName,
     children: childrenProp,
@@ -43,8 +45,10 @@ function Link(props) {
     prefetch,
     router,
     variant,
+    activePage,
     ...other
   } = props;
+
   let ComponentRoot;
   const className = classNames(classes.root, classes[variant], classNameProp);
   let RootProps;
@@ -63,10 +67,11 @@ function Link(props) {
       prefetch,
       passHref: true,
     };
+    console.log(activePage && props.title + "-" + props.href === activePage.name + "-" + activePage.path && activeClassName);
     children = (
       <a
         className={classNames(className, {
-          [activeClassName]: router && router.pathname === href && activeClassName,
+          [activeClassName]: activePage&&props.title+"-"+props.href === activePage.name+"-"+activePage.path && activeClassName,
         })}
         onClick={onClick}
         {...other}
@@ -81,7 +86,6 @@ function Link(props) {
       className,
     };
   }
-
   return <ComponentRoot {...RootProps}>{children}</ComponentRoot>;
 }
 

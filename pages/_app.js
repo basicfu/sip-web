@@ -3,28 +3,20 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
 import { getOrCreateStore } from '../src/utils/store';
-import { withStyles, MuiThemeProvider } from '@material-ui/core/styles';
+import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
 import compose from 'recompose/compose';
 import find from 'lodash/find';
-import PropTypes from 'prop-types';
-import Tooltip from '@material-ui/core/Tooltip';
 import getPageContext from '../src/utils/getPageContext';
-import NProgressBar from '@material-ui/docs/NProgressBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import JssProvider from 'react-jss/lib/JssProvider';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import AppDrawer from '../src/components/AppDrawer';
-import AppSearch from '../src/components/AppSearch';
-import Typography from '@material-ui/core/Typography';
 import Notifications from '../src/components/Notifications';
-import GithubIcon from '@material-ui/docs/svgIcons/GitHub';
 import { loadCSS } from 'fg-loadcss/src/loadCSS';
 import NProgress from 'nprogress';
+import Navbar from 'components/Navbar';
 import Router from 'next/router';
-import Button from '@material-ui/core/Button/Button';
+import Sidebar from 'components/Sidebar';
+import { getActivePage } from 'utils/utils';
+
 // Inject the insertion-point-jss after docssearch
 if (process.browser) {
   loadCSS(
@@ -47,6 +39,7 @@ Router.onRouteChangeComplete = () => {
 Router.onRouteChangeError = () => {
   NProgress.done();
 };
+// Inject the insertion-point-jss after docssearch
 if (process.browser && !global.__INSERTION_POINT__) {
   global.__INSERTION_POINT__ = true;
   const styleNode = document.createComment('insertion-point-jss');
@@ -58,13 +51,19 @@ if (process.browser && !global.__INSERTION_POINT__) {
 }
 const drawerWidth = 230;
 const styles = theme => ({
-  root: {
+  rootr: {
     flexGrow: 1,
-    zIndex: 1,
-    overflow: 'hidden',
-    position: 'relative',
+  },
+  flex: {
+    flexGrow: 1,
+  },
+  root: {
+    // flexGrow: 1,
+    // zIndex: 1,
+    // overflow: 'hidden',
+    // position: 'relative',
     display: 'flex',
-    width: '100%',
+    // width: '100%',
   },
   grow: {
     flex: '1 1 auto',
@@ -110,8 +109,8 @@ const styles = theme => ({
     }),
   },
   menuButton: {
-    marginLeft: 12,
-    marginRight: 36,
+    marginLeft: -12,
+    marginRight: 20,
   },
   hide: {
     display: 'none',
@@ -127,41 +126,13 @@ const styles = theme => ({
     },
   },
   content: {
+    display: 'flex',
+    backgroundColor: theme.palette.background.default,
+    // padding: theme.spacing.unit * 3,
     flexGrow: 1,
-    // backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3,
-
+    marginTop: 64,
   },
 });
-const pages = [
-  {
-    pathname: '/test',
-    title: '测试1'
-  },
-  {
-    pathname: '/user-template',
-    title: '模版1',
-  },
-];
-
-function findActivePage(currentPages, router) {
-  const activePage = find(currentPages, page => {
-    if (page.children) {
-      return router.pathname.indexOf(page.pathname) === 0;
-    }
-    // Should be an exact match if no children
-    return router.pathname === page.pathname;
-  });
-  if (!activePage) {
-    return null;
-  }
-  // We need to drill down
-  if (activePage.pathname !== router.pathname) {
-    return findActivePage(activePage.children, router);
-  }
-  return activePage;
-}
-
 class MyApp extends App {
   static childContextTypes: { pages: *, activePage: * };
 
@@ -175,19 +146,23 @@ class MyApp extends App {
   state = {
     mobileOpen: false,
     disablePermanent: false,
+    open: true,
+  };
+
+  handleClick = () => {
+    this.setState(state => ({ open: !state.open }));
   };
 
   handleDrawerOpen = () => {
-    const {mobileOpen, disablePermanent} = this.state
-    this.setState({mobileOpen: !mobileOpen, disablePermanent: !disablePermanent});
+    this.setState({ mobileOpen: true, disablePermanent: true });
   };
 
   handleDrawerClose = () => {
-    const {mobileOpen, disablePermanent} = this.state
-    // this.setState({mobileOpen: !mobileOpen, disablePermanent: !disablePermanent});
+    this.setState({
+      mobileOpen: false,
+      disablePermanent: false,
+    });
   };
-
-  // pageContext = null;
 
   componentDidMount() {
     // Remove the server-side injected CSS.
@@ -205,124 +180,55 @@ class MyApp extends App {
   }
 
 
-  getChildContext() {
-    const {router} = this.props;
-    let pathname = router.pathname;
-    if (pathname !== '/') {
-      // The leading / is only added to support static hosting (resolve /index.html).
-      // We remove it to normalize the pathname.pages
-      pathname = pathname.replace(/\/$/, '');
-    }
-    findActivePage(pages, {
-      ...router,
-      pathname,
-    });
-    return {
-      pages,
-      activePage: findActivePage(pages, {
-        ...router,
-        pathname,
-      }),
-    };
-  }
-
   render() {
-    const {children, Component, pageProps, store, classes} = this.props;
-    console.log(this.state.disablePermanent,this.state.mobileOpen)
+    const { Component, pageProps, store, router } = this.props;
+    const activePage = getActivePage(router.pathname, getOrCreateStore().getState().global.user.menus);
     return (
-      <div>
         <Provider store={store}>
-          {/* Wrap every page in Jss and Theme providers */}
           <JssProvider
             jss={this.pageContext.jss}
             registry={this.pageContext.sheetsRegistry}
             generateClassName={this.pageContext.generateClassName}
           >
-            {/* MuiThemeProvider makes the theme available down the React
-              tree thanks to React context. */}
             <MuiThemeProvider
               theme={this.pageContext.theme}
               sheetsManager={this.pageContext.sheetsManager}
             >
-              {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-              <CssBaseline/>
-              {/* Pass pageContext to the _document though the renderPage enhancer
-                to render collected styles on server side. */}
-              <div
-                className={classes.root}
-                style={{flexGrow: 1, zIndex: 1, position: 'relative', display: 'flex'}}>
-                {/* 头部 */}
-                <NProgressBar/>
-                <AppBar
-                  position="absolute"
-                  style={!this.state.mobileOpen ? {width: 'calc(100% - 230px)', marginLeft: '230px'} : {
-                    width: '100%', zIndex: 1201
-                  }}
-                  className={!this.state.mobileOpen ? classes.appBarShift : classes.appBar}
-                >
-                  <Toolbar disableGutters={!this.state.mobileOpen}>
-                    <IconButton
-                      color="inherit"
-                      aria-label="open drawer"
-                      onClick={this.handleDrawerOpen}>
-                      <MenuIcon/>
-                    </IconButton>
-                    <div className={classes.grow}/>
-                    <Tooltip id="appbar-github" title="GitHub repository" enterDelay={300}>
-                      <IconButton component="a" color="inherit" style={{position: 'absolute', right: '0'}}>
-                        <GithubIcon/>
-                      </IconButton>
-                    </Tooltip>
-                  </Toolbar>
-                </AppBar>
-                <div style={!this.state.mobileOpen ? {width: '230px', position: 'relative'} : {
-                  width: '70px',
-                  position: 'relative'
-                }}>
-                  <AppDrawer
-                    classes={this.state.disablePermanent ? {paper: classes.drawerPaper} : {paper: classes.drawerPaperClose}}
-                    disablePermanent={this.state.disablePermanent}
-                    onClose={this.handleDrawerClose}
-                    onOpen={this.handleDrawerOpen}
-                    variant="permanent"
-                    props={this.props}
-                    mobileOpen={this.state.mobileOpen}
-                  />
-                </div>
-                <Notifications/>
-                <main
-                  className={classes.content}
-                  style={!this.state.mobileOpen ? {
-                    marginLeft: '20px 0 0 50px',
-                    position: 'relative'
-                  } : {margin: '20px 0 0 100px', position: 'relative'}}>
-                  <div className={classes.toolbar} style={{minHeight: '68px'}}/>
-                  <Typography>{children}</Typography>
+              <CssBaseline />
+              <Notifications />
+               <Navbar />
+               {/* <span dangerouslySetInnerHTML={{__html:'<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px"\n' +*/}
+                   {/* '\t height="24px" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">\n' +*/}
+                   {/* '<g id="Bounding_Boxes">\n' +*/}
+                   {/* '\t<path fill="none" d="M0,0h24v24H0V0z"/>\n' +*/}
+                   {/* '</g>\n' +*/}
+                   {/* '<g id="Outline">\n' +*/}
+                   {/* '\t<g id="ui_x5F_spec_x5F_header">\n' +*/}
+                   {/* '\t</g>\n' +*/}
+                   {/* '\t<path fill="#ff0000" d="M17.27,6.73l-4.24,10.13l-1.32-3.42l-0.32-0.83l-0.82-0.32l-3.43-1.33L17.27,6.73 M21,3L3,10.53v0.98l6.84,2.65L12.48,21\n' +*/}
+                   {/* '\t\th0.98L21,3L21,3z"/>\n' +*/}
+                   {/* '</g>\n' +*/}
+                   {/* '</svg>\n'}}> */}
+               {/* </span> */}
+              <main style={{ marginTop: 64 }}>
+                <Sidebar
+                  router={router}
+                  activePage={activePage}
+                  onClose={this.handleDrawerClose}
+                  onOpen={this.handleDrawerOpen}
+                  variant="permanent"
+                  mobileOpen
+                />
+                <div style={{ position: 'fixed', left: 260 }}>
                   <Component pageContext={this.pageContext} {...pageProps} />
-                </main>
-              </div>
+                </div>
+              </main>
             </MuiThemeProvider>
           </JssProvider>
         </Provider>
-      </div>
     );
   }
 }
-
-MyApp.propTypes = {
-  pageContext: PropTypes.object,
-  router: PropTypes.object.isRequired,
-  classes: PropTypes.object.isRequired,
-  // children: PropTypes.node.isRequired,
-};
-
-MyApp.childContextTypes = {
-  pages: PropTypes.array,
-  activePage: PropTypes.object,
-};
-MyApp.contextTypes = {
-  // pathname: PropTypes.string.isRequired,
-};
 export default compose(
   withStyles(styles),
   withRedux(getOrCreateStore),

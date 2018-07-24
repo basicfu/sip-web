@@ -1,3 +1,5 @@
+import { user } from 'api';
+
 const model = {
   namespace: 'global',
   state: {
@@ -8,13 +10,25 @@ const model = {
       type: 'success',
       duration: 2000,
     },
+    user: {
+      menus: [],
+    },
   },
   subscriptions: {
-    // setup({ dispatch }) {
-    //
-    // },
+    setup({ dispatch }) {
+      if (typeof window !== 'undefined') {
+        dispatch({ type: 'user' });
+      }
+    },
   },
-  effects: {},
+  effects: {
+    * user({ _ }, { call, put }) {
+      const response = yield call(user);
+      if (response.success) {
+        yield put({ type: 'updateState', payload: { user: { ...response.data } } });
+      }
+    },
+  },
   reducers: {
     closeNotify(state) {
       return { ...state, notify: { ...state.notify, visible: false } };

@@ -8,7 +8,7 @@ const handle = app.getRequestHandler();
 
 const devProxy = {
   '/api': {
-    target: 'http://127.0.0.1:7100/',
+    target: 'http://wutong.sip-dev.dmka.cn/',
     pathRewrite: { '^/api': '/' },
     changeOrigin: true,
   },

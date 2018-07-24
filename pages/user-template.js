@@ -137,8 +137,8 @@ class UserTemplate extends React.Component {
       handleCancel: this.handleCancel.bind(this),
     };
     return (
-      <div className={classes.root}>
-        <div className={classes.container} style={{backgroundColor:'#ff0000'}}>
+      <div>
+        <div >
           <Button className={classes.button}>Default</Button>
           <Button color="primary" className={classes.button}>
             Primary
