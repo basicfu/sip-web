@@ -1,17 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Grid, Snackbar } from '@material-ui/core';
-import classNames from 'classnames';
-import { connect } from 'dva';
+import {withStyles} from '@material-ui/core/styles';
+import {connect} from 'dva';
 import CustomTable from 'components/CustomTable';
-import ModalTemplate from 'components/ModalTemplate';
-import Notifications from 'components/Notifications';
-import Button from '@material-ui/core/Button';
-import SearchIcon from '@material-ui/icons/Search';
 import styles from 'styles/user-template';
 import notify from 'notify';
-import CustomDialog from "components/CustomDialog";
 
 const namespace = 'userTemplate';
 
