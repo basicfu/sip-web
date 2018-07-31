@@ -198,6 +198,7 @@ class MyApp extends App {
               theme={this.pageContext.theme}
               sheetsManager={this.pageContext.sheetsManager}
             >
+              <div id={'dialog'} />
               <CssBaseline />
               <Notifications />
                <Navbar />
@@ -223,7 +224,7 @@ class MyApp extends App {
                   variant="permanent"
                   mobileOpen
                 />
-                <div style={{ position: 'fixed', left: 260 }}>
+                <div style={{ position: 'fixed', left: 260, width: 'calc(100% - 260px)' }}>
                   <Component pageContext={this.pageContext} {...pageProps} />
                 </div>
               </main>

@@ -9,13 +9,12 @@ import {
 const modal = {
   namespace: 'userTemplate',
   state: {
+    namespace:'userTemplate',
     data: {},
     modalType: '',
     loading: false,
-    selectedRowKeys: [],
     modalVisible: false,
     item: {},
-    message:'Material-UI v1.4.0 is out 🎉. <a style=\\"color: white;\\" target=\\"_blank\\" href=\\"https://github.com/mui-org/material-ui/releases/tag/v1.4.0\\">the release note</a>.',
   },
   effects: {
     * all(_, { call, put }) {
@@ -29,10 +28,11 @@ const modal = {
     },
     * list({ payload }, { call, put }) {
       const data = payload;
-      delete data.total;
+      // delete data.total;
+      // 暂时写死清空默认table
       yield put({
         type: 'updateState',
-        payload: { loading: true, modalVisible: false, selectedRowKeys: [] },
+        payload: { loading: true, modalVisible: false, table: {} },
       });
       const response = yield call(listUserTemplate, data);
       yield put({ type: 'updateState', payload: { loading: false } });
