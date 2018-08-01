@@ -1,9 +1,13 @@
 import React from 'react';
-import {withStyles} from '@material-ui/core/styles';
-import {connect} from 'dva';
+import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'dva';
 import CustomTable from 'components/CustomTable';
+import ModalTemplate from 'components/ModalTemplate';
+import { formatDateTime, formatFlag } from 'utils';
 import styles from 'styles/user-template';
 import notify from 'notify';
+import Input from '@material-ui/core/Input/Input';
+import Switch from '@material-ui/core/Switch/Switch';
 
 const namespace = 'userTemplate';
 
@@ -21,7 +25,6 @@ class UserTemplate extends React.Component {
     const { dispatch, selectedRowKeys, columnItem } = this.props;
     switch (modalType) {
       case 'insert':
-        // Notifications.shello()
         notify.info('值不能为空');
         // dispatch({ type: `${namespace}/updateState`, payload: { loading: true,message:Math.random().toString() } });
         dispatch({ type: `${namespace}/updateState`, payload: { openVisible: true, modalType, columnItem: {} } });
@@ -63,14 +66,32 @@ class UserTemplate extends React.Component {
     });
   };
 
-  handleInput = name => event => {
-    this.props.dispatch({
-      type: `${namespace}/updateState`,
-      payload: {
-        search: { name: event.target.value },
-      },
-    });
-  };
+  renderColumns=(text, id, table, item, key) => {
+    const add = table.status === 'add';
+    const edit = table.status === 'edit' && item[key] === table.selected[0];
+    switch (id) {
+      case 'name':
+      case 'enName':
+      case 'extra':
+      case 'defaultValue':
+      case 'sort':
+        if (edit) {
+          return <Input defaultValue={item[id]} />;
+        }
+        return text;
+      case 'required':
+        if (edit) {
+          return <Switch
+            checked
+            value="checkedB"
+            color="primary"
+          />;
+        }
+        return formatFlag(text);
+      default:
+        break;
+    }
+  }
 
   render() {
     const { classes, data, openVisible } = this.props;
@@ -79,21 +100,21 @@ class UserTemplate extends React.Component {
       handleMenuClick: mt => this.handleMenuClick(mt),
       handleCancel: mt => this.handleCancel(mt),
       columns: [
-        { id: 'name', label: '字段名' },
-        { id: 'enName', label: '字段英文名' },
+        { id: 'name', label: '字段名', render: this.renderColumns },
+        { id: 'enName', label: '字段英文名', render: this.renderColumns },
         { id: 'type', label: '字段类型' },
-        { id: 'extra', label: '扩展信息' },
-        { id: 'defaultValue', label: '默认值' },
-        { id: 'required', label: '是否必填' },
-        { id: 'sort', label: '顺序' },
-        { id: 'cdate', label: '创建时间' },
-        { id: 'udate', label: '更新时间' },
+        { id: 'extra', label: '扩展信息', render: this.renderColumns },
+        { id: 'defaultValue', label: '默认值', render: this.renderColumns },
+        { id: 'required', label: '是否必填', render: this.renderColumns },
+        { id: 'sort', label: '顺序', render: this.renderColumns },
+        { id: 'cdate', label: '创建时间', render: formatDateTime },
+        { id: 'udate', label: '更新时间', render: formatDateTime },
       ],
     };
     return (
       <div>
         <CustomTable {...tableProps} />
-        {/*<CustomDialog />*/}
+        {/* <ModalTemplate /> */}
       </div>
     );
   }

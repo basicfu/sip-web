@@ -15,7 +15,7 @@ import NProgress from 'nprogress';
 import Navbar from 'components/Navbar';
 import Router from 'next/router';
 import Sidebar from 'components/Sidebar';
-import { getActivePage } from 'utils/utils';
+import { getActivePage } from 'utils';
 
 // Inject the insertion-point-jss after docssearch
 if (process.browser) {

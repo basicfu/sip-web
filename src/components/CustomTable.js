@@ -24,6 +24,8 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import dialog from 'utils/dialog';
+import ReactDOM from 'react-dom';
+import CustomDialogDelete from 'components/CustomDialog';
 
 const CustomTableCell = withStyles(theme => ({
   head: {
@@ -63,7 +65,7 @@ const toolbarStyles = theme => ({
 });
 
 let EnhancedTableToolbar = props => {
-  const { numSelected, classes, onDelete } = props;
+  const { numSelected, classes, onAdd, onEdit, onDelete } = props;
 
   return (
     <Toolbar
@@ -87,19 +89,19 @@ let EnhancedTableToolbar = props => {
         {numSelected > 0 ? (
           <div className={classes.iconGroup}>
             <Tooltip title="修改">
-              <IconButton color={'primary'}>
+              <IconButton color={'primary'} onClick={() => onEdit()}>
                 <EditOutlinedIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="删除">
-              <IconButton onClick={() => onDelete()} color={'secondary'}>
+              <IconButton color={'secondary'} onClick={() => onDelete()}>
                 <DeleteOutlinedIcon />
               </IconButton>
             </Tooltip>
           </div>
         ) : (
           <Tooltip title="添加">
-            <Button mini variant="fab" color="secondary" aria-label="Add">
+            <Button mini variant="fab" color="secondary" onClick={() => onAdd()}>
               <AddOutlinedIcon />
             </Button>
           </Tooltip>
@@ -194,7 +196,28 @@ TablePaginationActions.propTypes = {
 const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: true })(
   TablePaginationActions,
 );
-
+function getDomWidth(text) {
+  if (typeof window !== 'undefined') {
+    const span = document.createElement('span');
+    const result = {};
+    result.width = span.offsetWidth;
+    result.height = span.offsetHeight;
+    span.style.visibility = 'hidden';
+    span.style.fontSize = '0.8125rem';
+    span.style.fontFamily = '"Roboto", "Helvetica", "Arial", sans-serif';
+    span.style.display = 'inline-block';
+    document.body.appendChild(span);
+    if (typeof span.textContent !== 'undefined') {
+      span.textContent = text;
+    } else {
+      span.innerText = text;
+    }
+    const width = parseFloat(window.getComputedStyle(span).width) - result.width;
+    document.body.removeChild(span);
+    return width;
+  }
+  return 0;
+}
 const styles = {
   root: {
     width: '100%',
@@ -263,7 +286,21 @@ class CustomTable extends React.Component {
     dispatch({ type: `${namespace}/list`, payload: { pageNum, pageSize: event.target.value } });
   };
 
-  handleDelete = event => {
+  // 添加默认值
+  handleAdd =() => {
+    const { props: { key, name, dispatch, data } } = this.props;
+    const table = data[name || 'table'] || {};
+    dispatch({ type: `${data.namespace}/updateState`, payload: { table: { ...table, status: 'add' } } });
+  };
+
+  // 赋值当前选中项
+  handleEdit =() => {
+    const { props: { key, name, dispatch, data } } = this.props;
+    const table = data[name || 'table'] || {};
+    dispatch({ type: `${data.namespace}/updateState`, payload: { table: { ...table, status: 'edit' } } });
+  };
+
+  handleDelete = () => {
     const { props: { dispatch, name, data } } = this.props;
     dialog.warning({ onOk() { dispatch({ type: `${data.namespace}/delete`, payload: { ids: data[name || 'table'].selected } }); } });
   };
@@ -280,10 +317,45 @@ class CustomTable extends React.Component {
     const selected = table.selected || [];
     const key = props.key || 'id';
     const { rowsPerPageOptions, rowsPerPage } = this.state;
+    // 计算自适应宽度
+    let totalPart = 0;
+    columns.forEach(column => {
+      const widths = list.map(it => getDomWidth(column.render ? column.render(it[column.id], column.id, table, it, key) : it[column.id]));
+      if (widths && widths.length > 0) {
+        totalPart += widths.reduce((a, b) => a + b) / list.length;
+      }
+    });
+    const totalPerRate = 100 / totalPart;
+    const headerWidths = [];
+    const headerMinWidths = [];
+    const contentWidths = [];
+    columns.forEach(column => {
+      let contentRate = 0;
+      headerMinWidths.push((column.label.length * 12) + 10);
+      const totalHeader = (columns.map(it => it.label).join('').length * 12);
+      let headerRate = 0;
+      if (totalHeader !== 0) {
+        headerRate = (column.label.length * 12) * (100 / totalHeader);
+      }
+      headerWidths.push(headerRate.toFixed(2));
+      const widths = list.map(it => getDomWidth(column.render ? column.render(it[column.id], column.id, table, it, key) : it[column.id]));
+      if (widths && widths.length > 0) {
+        const total = widths.reduce((a, b) => a + b);
+        contentRate = total / list.length * totalPerRate;
+      }
+      if (contentRate !== 0) {
+        contentRate = (headerRate + contentRate) / 2;
+      } else {
+        // 需要重新计算contentRate=headerRate
+      }
+      contentWidths.push(contentRate.toFixed(2));
+    });
     return (
       <Paper className={classes.root}>
         <EnhancedTableToolbar
           numSelected={selected.length}
+          onAdd={this.handleAdd}
+          onEdit={this.handleEdit}
           onDelete={this.handleDelete}
         />
         <div className={classes.tableWrapper}>
@@ -299,7 +371,7 @@ class CustomTable extends React.Component {
                 </CustomTableCell>
                 {columns.map((column, columnIndex) => {
                   return (
-                    <CustomTableCell key={columnIndex}>
+                    <CustomTableCell key={columnIndex} style={{ minWidth: `${headerMinWidths[columnIndex]}px`, width: `${contentWidths[columnIndex]}%` }}>
                       {column.label}
                     </CustomTableCell>
                   );
@@ -313,7 +385,7 @@ class CustomTable extends React.Component {
                   <TableRow
                     hover
                     onClick={event => this.handleClick(event, item[key])}
-                    role="checkbox"
+                    // onDoubleClick={event=>alert('1234')}
                     aria-checked={isSelected}
                     tabIndex={-1}
                     key={item[key]}
@@ -325,7 +397,7 @@ class CustomTable extends React.Component {
                     {columns.map((column, columnIndex) => {
                       return (
                         <CustomTableCell key={columnIndex} style={{ textAlign: column.align || undefined }}>
-                          <label>{item[column.id]}</label>
+                          {column.render ? column.render(item[column.id], column.id, table, item, key) : item[column.id]}
                         </CustomTableCell>);
                     })}
                   </TableRow>

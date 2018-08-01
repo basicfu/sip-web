@@ -86,66 +86,66 @@ class ModalTemplate extends React.Component {
     });
   };
   okSubmit = () => {
-    const { props: { dispatch, modalType, columnItem }, namespace } = this.props;
-    const newState = this.state;
-    switch (modalType) {
-      case 'insert':
-        if (newState.name === '' || newState.name === undefined) {
-          return alert('请输入字段名');
-        }
-        else if (newState.enName === '' || newState.enName === undefined) {
-          return alert('请输入英文字段名');
-        }
-        else if (newState.type === '' || newState.type === undefined) {
-          return alert('请输入字段类型');
-        }
-        else if (newState.extra === '' || newState.extra === undefined) {
-          return alert('请输入扩展信息');
-        }
-        dispatch({
-          type: `${namespace}/insert`,
-          payload: {
-            data: newState,
-          },
-        });
-        break;
-      case 'update':
-        if (columnItem.name === '' || columnItem.name === undefined) {
-          return alert('请输入字段名');
-        }
-        else if (columnItem.enName === '' || columnItem.enName === undefined) {
-          return alert('请输入英文字段名');
-        }
-        else if (columnItem.type === '' || columnItem.type === undefined) {
-          return alert('请输入字段类型');
-        }
-        else if (columnItem.extra === '' || columnItem.extra === undefined) {
-          return alert('请输入扩展信息');
-        }
-        for (let i in newState) {
-          if (!newState[i] && newState[i] !== 0) {
-            delete newState[i];
-          }
-        }
-        dispatch({
-          type: `${namespace}/update`,
-          payload: {
-            data: { ...columnItem, ...newState },
-          }
-        });
-        break;
-      default:
-        break;
-    }
+    // const { props: { dispatch, modalType, columnItem }, namespace } = this.props;
+    // const newState = this.state;
+    // switch (modalType) {
+    //   case 'insert':
+    //     if (newState.name === '' || newState.name === undefined) {
+    //       return alert('请输入字段名');
+    //     }
+    //     else if (newState.enName === '' || newState.enName === undefined) {
+    //       return alert('请输入英文字段名');
+    //     }
+    //     else if (newState.type === '' || newState.type === undefined) {
+    //       return alert('请输入字段类型');
+    //     }
+    //     else if (newState.extra === '' || newState.extra === undefined) {
+    //       return alert('请输入扩展信息');
+    //     }
+    //     dispatch({
+    //       type: `${namespace}/insert`,
+    //       payload: {
+    //         data: newState,
+    //       },
+    //     });
+    //     break;
+    //   case 'update':
+    //     if (columnItem.name === '' || columnItem.name === undefined) {
+    //       return alert('请输入字段名');
+    //     }
+    //     else if (columnItem.enName === '' || columnItem.enName === undefined) {
+    //       return alert('请输入英文字段名');
+    //     }
+    //     else if (columnItem.type === '' || columnItem.type === undefined) {
+    //       return alert('请输入字段类型');
+    //     }
+    //     else if (columnItem.extra === '' || columnItem.extra === undefined) {
+    //       return alert('请输入扩展信息');
+    //     }
+    //     for (let i in newState) {
+    //       if (!newState[i] && newState[i] !== 0) {
+    //         delete newState[i];
+    //       }
+    //     }
+    //     dispatch({
+    //       type: `${namespace}/update`,
+    //       payload: {
+    //         data: { ...columnItem, ...newState },
+    //       }
+    //     });
+    //     break;
+    //   default:
+    //     break;
+    // }
   };
 
   render() {
-    const { props: { openVisible, modalType, columnItem }, classes } = this.props;
+    const { props, classes } = this.props;
     const { name, enName, type, extra, defaultValue, required, sort } = this.state;
     return (
       <div className={classes.container}>
         <Dialog
-          open={openVisible}
+          open={true}
           onClose={() => this.props.handleCancel()}
           aria-labelledby="form-dialog-title"
         >
@@ -159,36 +159,24 @@ class ModalTemplate extends React.Component {
                 id="required"
                 label="字段名"
                 fullWidth
-                error={(modalType === 'insert' && name === ''
-                  || modalType === 'update' && columnItem.name === '') ? true : false}
-                defaultValue={modalType === 'insert' ? name : columnItem.name}
                 onChange={this.handleChange('name')}
               />
               <TextField
                 id="enName"
                 label="字段英文名"
                 fullWidth
-                error={(modalType === 'insert' && enName === ''
-                  || modalType === 'update' && columnItem.enName === '') ? true : false}
-                defaultValue={modalType === 'insert' ? enName : columnItem.enName}
                 onChange={this.handleChange('enName')}
               />
               <TextField
                 id="type"
                 label="字段类型"
                 fullWidth
-                error={(modalType === 'insert' && type === ''
-                  || modalType === 'update' && columnItem.type === '') ? true : false}
-                defaultValue={modalType === 'insert' ? type : columnItem.type}
                 onChange={this.handleChange('type')}
               />
               <TextField
                 id="extra"
                 label="扩展信息"
                 fullWidth
-                error={(modalType === 'insert' && extra === ''
-                  || modalType === 'update' && columnItem.extra === '') ? true : false}
-                defaultValue={modalType === 'insert' ? extra : columnItem.extra}
                 onChange={this.handleChange('extra')}
               />
               <TextField
@@ -209,7 +197,7 @@ class ModalTemplate extends React.Component {
                 id="sort"
                 label="顺序"
                 fullWidth
-                defaultValue={modalType === 'insert' ? sort : columnItem.sort}
+                // defaultValue={modalType === 'insert' ? sort : columnItem.sort}
                 onChange={this.handleChange('sort')}
               />
             </form>

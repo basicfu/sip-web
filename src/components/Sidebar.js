@@ -78,7 +78,7 @@ function reduceChildRoutes({ props, activePage, items, page, depth, router }) {
   const title = page.name;
   const key = page.name + page.path;
   if (page.children && page.children.length > 0) {
-    const openImmediately = activePage.pathname&&activePage.pathname.indexOf(page.path) === 0;
+    const openImmediately = activePage.pathname && activePage.pathname.indexOf(page.path) === 0;
 
     items.push(
       <AppDrawerNavItem depth={depth} key={key} openImmediately={openImmediately} title={title} activePage={activePage}>
@@ -109,7 +109,8 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    const { classes,activePage, data: { menus }, router } = this.props;
+    const { classes, activePage, data, router } = this.props;
+    const menus = data.menus || [];
     return (
       <Drawer variant="permanent" open classes={{ paper: classes.drawerPaper }}>
         {renderNavItems({ props: this.props, pages: menus, activePage, depth: 0 })}
