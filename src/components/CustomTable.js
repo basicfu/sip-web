@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -18,6 +18,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import ClearIcon from '@material-ui/icons/Clear';
+import DoneIcon from '@material-ui/icons/Done';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
@@ -44,7 +46,7 @@ const toolbarStyles = theme => ({
     theme.palette.type === 'light'
       ? {
         color: theme.palette.secondary.main,
-        backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+        backgroundColor: lighten(theme.palette.secondary.light, 0.90),
       }
       : {
         color: theme.palette.text.primary,
@@ -62,10 +64,16 @@ const toolbarStyles = theme => ({
   iconGroup: {
     display: 'flex',
   },
+  rowDoneIcon: {
+    color: '#4caf50',
+  },
+  rowClearIcon: {
+    color: '#ba68c8',
+  },
 });
 
 let EnhancedTableToolbar = props => {
-  const { numSelected, classes, onAdd, onEdit, onDelete } = props;
+  const { numSelected, classes, addOrEdit, onAdd, onEdit, onDelete, onDone, onClear } = props;
 
   return (
     <Toolbar
@@ -88,6 +96,20 @@ let EnhancedTableToolbar = props => {
       <div className={classes.actions}>
         {numSelected > 0 ? (
           <div className={classes.iconGroup}>
+            {addOrEdit &&
+            <Fragment>
+              <Tooltip title="确定">
+                <IconButton color={'primary'} className={classes.rowDoneIcon} onClick={() => onDone()}>
+                  <DoneIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="取消">
+                <IconButton color={'secondary'} className={classes.rowClearIcon} onClick={() => onClear()}>
+                  <ClearIcon />
+                </IconButton>
+              </Tooltip>
+            </Fragment>
+            }
             <Tooltip title="修改">
               <IconButton color={'primary'} onClick={() => onEdit()}>
                 <EditOutlinedIcon />
@@ -229,11 +251,40 @@ const styles = {
     paddingRight: '20px',
   },
 };
-
+// TODO 性能待优化
+let timerId;
 class CustomTable extends React.Component {
   state = {
     rowsPerPage: 20,
     rowsPerPageOptions: [20, 50, 100],
+  }
+
+  componentDidMount() {
+    window.addEventListener('keyup', (e) => {
+      // esc 暂只重置第一个table
+      if (e.keyCode === 27) {
+        const { props: { key, name, dispatch, data } } = this.props;
+        const list = data.data.list || [];
+        if (list.length > 0 && list[0][key || 'id'] === -1) {
+          list.shift();
+          dispatch({ type: `${data.namespace}/updateState`, payload: { [name || 'table']: {}, data: { ...data.data, list } } });
+        } else {
+          dispatch({ type: `${data.namespace}/updateState`, payload: { [name || 'table']: {} } });
+        }
+      } else if (e.keyCode === 13) {
+        const { props: { key, name, dispatch, data } } = this.props;
+        const list = data.data.list || [];
+        const table = data[name || 'table'] || {};
+        const addOrEdit = table.status === 'add' || table.status === 'edit';
+        if (addOrEdit) {
+          this.handleDone();
+        }
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    clearTimeout(timerId);
   }
 
   handleSelectAllClick = (event, checked) => {
@@ -249,20 +300,26 @@ class CustomTable extends React.Component {
     dispatch({ type: `${namespace}/updateState`, payload: { [name || 'table']: { selected: [] } } });
   };
 
+  // 处理单击/双击冲突事件
   handleClick = (event, id) => {
-    const { props: { key, name, dispatch, data } } = this.props;
-    const list = data.data.list || [];
-    const table = data[name || 'table'] || {};
-    const selected = table.selected || [];
-    const item = list.filter(it => it[key || 'id'] === id)[0];
-    if (selected.indexOf(id) === -1) {
-      dispatch({ type: `${data.namespace}/updateState`, payload: { [name || 'table']: { selected: [id], item } } });
-    } else {
-      dispatch({ type: `${data.namespace}/updateState`, payload: { [name || 'table']: { selected: [], item: {} } } });
-    }
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      const { props: { key, name, dispatch, data } } = this.props;
+      const list = data.data.list || [];
+      const table = data[name || 'table'] || {};
+      const selected = table.selected || [];
+      const addOrEdit = table.status === 'add' || table.status === 'edit';
+      const item = list.filter(it => it[key || 'id'] === id)[0];
+      if (selected.indexOf(id) === -1) {
+        dispatch({ type: `${data.namespace}/updateState`, payload: { [name || 'table']: { selected: [id], item } } });
+      } else if (!addOrEdit) {
+        dispatch({ type: `${data.namespace}/updateState`, payload: { [name || 'table']: { selected: [], item: {} } } });
+      }
+    }, 200);
   };
 
   handleCheckbox = (event, id) => {
+    clearTimeout(timerId);
     const { props: { name, dispatch, data } } = this.props;
     const table = data[name || 'table'] || {};
     const selected = table.selected || [];
@@ -288,26 +345,71 @@ class CustomTable extends React.Component {
 
   // 添加默认值
   handleAdd =() => {
-    const { props: { key, name, dispatch, data } } = this.props;
+    const { props: { name, dispatch, data } } = this.props;
     const table = data[name || 'table'] || {};
-    dispatch({ type: `${data.namespace}/updateState`, payload: { table: { ...table, status: 'add' } } });
+    const list = data.data.list || [];
+    const addOrEdit = table.status === 'add' || table.status === 'edit';
+    if (!addOrEdit) {
+      const preItem = {
+        id: -1,
+          required: false,
+        sort: 0,
+      };
+      list.unshift(preItem);
+      dispatch({ type: `${data.namespace}/updateState`, payload: { data: { ...data.data, list }, table: { ...table, selected: [preItem.id], item: preItem, status: 'add' } } });
+    }
   };
 
   // 赋值当前选中项
   handleEdit =() => {
-    const { props: { key, name, dispatch, data } } = this.props;
+    const { props: { name, dispatch, data } } = this.props;
     const table = data[name || 'table'] || {};
     dispatch({ type: `${data.namespace}/updateState`, payload: { table: { ...table, status: 'edit' } } });
   };
 
+  // 双击事件
+  handleDoubleClick = (event, id) => {
+    clearTimeout(timerId);
+    const { props: { key, name, dispatch, data } } = this.props;
+    const list = data.data.list || [];
+    const table = data[name || 'table'] || {};
+    const item = list.filter(it => it[key || 'id'] === id)[0];
+    dispatch({ type: `${data.namespace}/updateState`, payload: { table: { ...table, selected: [id], item, status: 'edit' } } });
+  };
+
   handleDelete = () => {
     const { props: { dispatch, name, data } } = this.props;
-    dialog.warning({ onOk() { dispatch({ type: `${data.namespace}/delete`, payload: { ids: data[name || 'table'].selected } }); } });
+    dialog.warning({ onOk() { dispatch({ type: `${data.namespace}/delete`, payload: data[name || 'table'].selected }); } });
   };
-  // handleDoubleClick = event => {
-  //   const { props: { dispatch, data: { namespace, data: { page: { pageNum } } } } } = this.props;
-  //   dispatch({ type: `${namespace}/list`, payload: { pageNum, pageSize: event.target.value } });
-  // };
+
+  // insert
+  handleDone=() => {
+    const { props: { key, name, dispatch, data } } = this.props;
+    const table = data[name || 'table'] || {};
+    const item = table.item || {};
+    const add = table.status === 'add';
+    const edit = table.status === 'edit';
+    if (add) {
+      delete item[key || 'id'];
+      dispatch({ type: `${data.namespace}/insert`, payload: { ...item } });
+    } else if (edit) {
+      dispatch({ type: `${data.namespace}/update`, payload: { ...item } });
+    }
+  }
+
+  // cancel
+  handleClear=() => {
+    const { props: { key, name, dispatch, data } } = this.props;
+    const list = data.data.list || [];
+    const table = data[name || 'table'] || {};
+    const item = table.item || {};
+    if (item[key || 'id'] === -1) {
+      list.shift();
+      dispatch({ type: `${data.namespace}/updateState`, payload: { table: { ...table, selected: [], item: {}, status: '' }, data: { ...data.data, list } } });
+    } else {
+      dispatch({ type: `${data.namespace}/updateState`, payload: { table: { ...table, status: '' } } });
+    }
+  }
 
   render() {
     const { classes, columns, props } = this.props;
@@ -315,33 +417,44 @@ class CustomTable extends React.Component {
     const page = props.data.data.page || {};
     const table = props.data[props.name || 'table'] || {};
     const selected = table.selected || [];
+    const addOrEdit = table.status === 'add' || table.status === 'edit';
     const key = props.key || 'id';
     const { rowsPerPageOptions, rowsPerPage } = this.state;
+    const handleItemChange = (itemKey, itemValue) => {
+      // TODO 保存会闪原数据
+      props.dispatch({ type: `${props.data.namespace}/updateState`, payload: { [props.name || 'table']: { ...table, item: { ...table.item, [itemKey]: itemValue } } } });
+    };
     // 计算自适应宽度
+    let calcList = [...list];
+    if (addOrEdit) {
+      calcList = calcList.filter(it => it[key] !== selected[0]);
+    }
     let totalPart = 0;
     columns.forEach(column => {
-      const widths = list.map(it => getDomWidth(column.render ? column.render(it[column.id], column.id, table, it, key) : it[column.id]));
+      const widths = calcList.map(it => getDomWidth(column.render ? column.render(it[column.id], column.id, table, it, key) : it[column.id]));
       if (widths && widths.length > 0) {
-        totalPart += widths.reduce((a, b) => a + b) / list.length;
+        totalPart += widths.reduce((a, b) => a + b) / calcList.length;
       }
     });
     const totalPerRate = 100 / totalPart;
-    const headerWidths = [];
     const headerMinWidths = [];
     const contentWidths = [];
-    columns.forEach(column => {
+    columns.forEach((column, index) => {
       let contentRate = 0;
-      headerMinWidths.push((column.label.length * 12) + 10);
+      if (index === columns.length - 1) {
+        headerMinWidths.push((column.label.length * 12) + 10 + 28);
+      } else {
+        headerMinWidths.push((column.label.length * 12) + 10);
+      }
       const totalHeader = (columns.map(it => it.label).join('').length * 12);
       let headerRate = 0;
       if (totalHeader !== 0) {
         headerRate = (column.label.length * 12) * (100 / totalHeader);
       }
-      headerWidths.push(headerRate.toFixed(2));
-      const widths = list.map(it => getDomWidth(column.render ? column.render(it[column.id], column.id, table, it, key) : it[column.id]));
+      const widths = calcList.map(it => getDomWidth(column.render ? column.render(it[column.id], column.id, table, it, key) : it[column.id]));
       if (widths && widths.length > 0) {
         const total = widths.reduce((a, b) => a + b);
-        contentRate = total / list.length * totalPerRate;
+        contentRate = total / calcList.length * totalPerRate;
       }
       if (contentRate !== 0) {
         contentRate = (headerRate + contentRate) / 2;
@@ -357,6 +470,9 @@ class CustomTable extends React.Component {
           onAdd={this.handleAdd}
           onEdit={this.handleEdit}
           onDelete={this.handleDelete}
+          onDone={this.handleDone}
+          onClear={this.handleClear}
+          addOrEdit={addOrEdit}
         />
         <div className={classes.tableWrapper}>
           <Table className={classes.table} aria-labelledby="tableTitle">
@@ -379,13 +495,13 @@ class CustomTable extends React.Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {list.map(item => {
+              {list.map((item, itemIndex) => {
                 const isSelected = selected.indexOf(item[key]) !== -1;
                 return (
                   <TableRow
                     hover
                     onClick={event => this.handleClick(event, item[key])}
-                    // onDoubleClick={event=>alert('1234')}
+                    onDoubleClick={event => this.handleDoubleClick(event, item[key])}
                     aria-checked={isSelected}
                     tabIndex={-1}
                     key={item[key]}
@@ -397,7 +513,7 @@ class CustomTable extends React.Component {
                     {columns.map((column, columnIndex) => {
                       return (
                         <CustomTableCell key={columnIndex} style={{ textAlign: column.align || undefined }}>
-                          {column.render ? column.render(item[column.id], column.id, table, item, key) : item[column.id]}
+                          {column.render ? column.render(item[column.id], column.id, table, item, key, handleItemChange) : item[column.id]}
                         </CustomTableCell>);
                     })}
                   </TableRow>

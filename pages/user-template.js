@@ -66,8 +66,9 @@ class UserTemplate extends React.Component {
     });
   };
 
-  renderColumns=(text, id, table, item, key) => {
-    const add = table.status === 'add';
+  renderColumns=(text, id, table, item, key,onChange) => {
+    const { classes } = this.props;
+    const add = table.status === 'add' && item[key] === -1;
     const edit = table.status === 'edit' && item[key] === table.selected[0];
     switch (id) {
       case 'name':
@@ -75,13 +76,14 @@ class UserTemplate extends React.Component {
       case 'extra':
       case 'defaultValue':
       case 'sort':
-        if (edit) {
-          return <Input defaultValue={item[id]} />;
+        if (add || edit) {
+          return <Input defaultValue={item[id]} className={classes.input} onChange={e=>onChange(id,e.target.value)} />;
         }
         return text;
       case 'required':
-        if (edit) {
+        if (add || edit) {
           return <Switch
+style={{ width: '100%' }}
             checked
             value="checkedB"
             color="primary"

@@ -41,21 +41,21 @@ const modal = {
       }
     },
     * insert({ payload }, { call, put }) {
-      const { success } = yield call(insertUserTemplate, payload.data);
+      const { success } = yield call(insertUserTemplate, payload);
       if (success) {
-        yield put({ type: 'list', payload: payload.page });
+        yield put({ type: 'list' });
       }
     },
     * update({ payload }, { call, put }) {
-      const { success } = yield call(updateUserTemplate, payload.data);
+      const { success } = yield call(updateUserTemplate, payload);
       if (success) {
-        yield put({ type: 'list', payload: payload.page });
+        yield put({ type: 'list' });
       }
     },
     * delete({ payload }, { call, put }) {
-      const { success } = yield call(deleteUserTemplate, payload.ids);
+      const { success } = yield call(deleteUserTemplate, payload);
       if (success) {
-        yield put({ type: 'list', payload: payload.page });
+        yield put({ type: 'list' });
       }
     },
   },
