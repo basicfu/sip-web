@@ -1,7 +1,7 @@
-import { user } from 'api';
+import { allDict, user } from 'api';
+import Router from 'next/router';
 
 const model = {
-  namespace: 'global',
   state: {
     notify: {
       key: 1,
@@ -13,11 +13,25 @@ const model = {
     user: {
       menus: [],
     },
+    dict: {},
+    auth: {},
   },
   subscriptions: {
     setup({ dispatch }) {
       if (typeof window !== 'undefined') {
-        dispatch({ type: 'user' });
+        const auth = window.localStorage.getItem('auth');
+        if (auth) {
+          // 异步防止客户端和服务端渲染不一致
+          new Promise((resolve) => {
+            resolve();
+          }).then(() => {
+            dispatch({ type: 'updateState', payload: { auth: JSON.parse(auth) || {} } });
+          });
+          dispatch({ type: 'user' });
+          dispatch({ type: 'dict' });
+        } else if (Router.pathname !== '/login') {
+          Router.push('/login');
+        }
       }
     },
   },
@@ -28,6 +42,17 @@ const model = {
         yield put({ type: 'updateState', payload: { user: { ...response.data } } });
       }
     },
+    * dict(_, { call, put }) {
+      const response = yield call(allDict);
+      if (response.success) {
+        const dicts = response.data.children;
+        const dict = {};
+        dicts.forEach(it => {
+          dict[it.value] = it;
+        });
+        yield put({ type: 'updateState', payload: { dict } });
+      }
+    },
   },
   reducers: {
     closeNotify(state) {
@@ -36,9 +61,6 @@ const model = {
     openNotify(state, { payload }) {
       const key = state.notify.key + 1;
       return { ...state, notify: { ...state.notify, visible: true, key, ...payload } };
-    },
-    updateState(state, { payload }) {
-      return { ...state, ...payload };
     },
   },
 

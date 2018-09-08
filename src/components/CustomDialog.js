@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -20,7 +20,7 @@ const styles = {
   },
 };
 
-class CustomDialogDelete extends React.Component {
+class CustomDialog extends React.Component {
   handleClose = () => {
     ReactDOM.unmountComponentAtNode(document.querySelector('#dialog'));
   };
@@ -30,18 +30,37 @@ class CustomDialogDelete extends React.Component {
     this.handleClose();
   }
 
+  renderChildren() {
+    const { classes, type, data: { title, children } } = this.props;
+    if (type === 'warning') {
+      return (
+        <DialogTitle>
+          <Warning className={classes.warning} />
+          {title || '确定要删除吗?'}
+        </DialogTitle>
+      );
+    }
+    if (type === 'content') {
+      return (
+        <Fragment>
+          <DialogTitle>
+            添加
+          </DialogTitle>
+          {children}
+        </Fragment>
+      );
+    }
+  }
+
   render() {
-    const { classes, data: { title } } = this.props;
+    const { classes, type, data: { title } } = this.props;
     return (
         <Dialog
           classes={{ paper: classes.paper }}
           open
           onClose={this.handleClose}
         >
-          <DialogTitle>
-            <Warning className={classes.warning} />
-            {title || '确定要删除吗?'}
-          </DialogTitle>
+          {this.renderChildren}
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">
               取消
@@ -54,4 +73,4 @@ class CustomDialogDelete extends React.Component {
     );
   }
 }
-export default withStyles(styles)(CustomDialogDelete);
+export default withStyles(styles)(CustomDialog);

@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import CustomDialogDelete from 'components/CustomDialog';
+import CustomDialog from 'components/CustomDialog';
 
 export default {
   warning(data) {
-    ReactDOM.render(<CustomDialogDelete data={data} />, document.querySelector('#dialog'));
+    ReactDOM.render(<CustomDialog data={data} type='warning' />, document.querySelector('#dialog'));
+  },
+  content(data) {
+    ReactDOM.render(<CustomDialog data={data} type='content' />, document.querySelector('#dialog'));
   },
 };

@@ -8,6 +8,7 @@ module.exports = {
     modules: [path.join(__dirname, '../'), 'node_modules'],
     alias: {
       api: path.resolve(__dirname, './src/api.js'),
+      config: path.resolve(__dirname, './src/config.js'),
       styles: path.resolve(__dirname, './src/styles'),
       utils: path.resolve(__dirname, './src/utils'),
       components: path.resolve(__dirname, './src/components'),

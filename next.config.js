@@ -1,21 +1,21 @@
 const webpack = require('webpack');
-const pkg = require('./package.json');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { findPages } = require('./src/utils/find');
 
-process.env.LIB_VERSION = pkg.version;
 
 module.exports = {
   webpack: config => {
+    const env = {};
+    Object.keys(process.env).forEach(key => {
+      env[key] = JSON.stringify(process.env[key]);
+    });
+    // noinspection JSUnresolvedFunction
     const plugins = config.plugins.concat([
       new webpack.DefinePlugin({
-        'process.env': {
-          LIB_VERSION: JSON.stringify(process.env.LIB_VERSION),
-        },
+        'process.env': env,
       }),
     ]);
-
-    if (process.env.DOCS_STATS_ENABLED) {
+    if (process.env.STATS_ENABLED) {
       plugins.push(
         // For all options see https://github.com/th0r/webpack-bundle-analyzer#as-plugin
         new BundleAnalyzerPlugin({
@@ -26,7 +26,6 @@ module.exports = {
         }),
       );
     }
-
     return Object.assign({}, config, {
       plugins,
       node: {

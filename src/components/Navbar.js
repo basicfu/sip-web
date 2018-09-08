@@ -8,11 +8,19 @@ import Tooltip from '@material-ui/core/Tooltip';
 import MenuIcon from '@material-ui/icons/Menu';
 import GithubIcon from '@material-ui/docs/svgIcons/GitHub';
 import Notifications from './Notifications';
-import {Typography} from "@material-ui/core";
+import { Typography } from '@material-ui/core';
+import Menu from '@material-ui/core/Menu/Menu';
+import MenuItem from '@material-ui/core/MenuItem/MenuItem';
+import Popper from '@material-ui/core/Popper/Popper';
+import Grow from '@material-ui/core/Grow/Grow';
+import Paper from '@material-ui/core/Paper/Paper';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener/ClickAwayListener';
+import MenuList from '@material-ui/core/MenuList/MenuList';
 
 const styles = theme => ({
   root: {
     display: 'flex',
+    height: 64,
   },
   grow: {
     flex: '1 1 auto',
@@ -26,8 +34,26 @@ const styles = theme => ({
 });
 
 class Navbar extends React.Component {
+  state = {
+    open: false,
+  };
+
+
+  handleOpen = () => {
+    this.setState({ open: true });
+  }
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
+
+  handleLogout = () => {
+    this.props.dispatch({ type: 'user/logout' });
+  };
+
   render() {
-    const { classes } = this.props;
+    const { classes, data } = this.props;
+    const { open } = this.state;
     return (
       <div className={classes.root}>
         <AppBar className={classes.appBar}>
@@ -43,15 +69,50 @@ class Navbar extends React.Component {
               Service Integration Platform
             </Typography>
             <div className={classes.grow} />
-            <Tooltip id="appbar-github" title="GitHub repository" enterDelay={300}>
-              <IconButton
-                component="a"
-                color="inherit"
-                aria-labelledby="appbar-github"
-              >
-                <GithubIcon />
-              </IconButton>
-            </Tooltip>
+             {data.auth.username&&
+            <IconButton
+              aria-owns={open ? 'menu-appbar' : null}
+              color="inherit"
+              buttonRef={node => {
+                this.anchorEl = node;
+              }}
+              onMouseOver={this.handleOpen}
+              onMouseOut={this.handleClose}
+              aria-labelledby="appbar-github"
+            >
+              <GithubIcon />
+            </IconButton>
+             }
+
+              <Popper
+                open={open}
+                anchorEl={this.anchorEl}
+                transition
+                disablePortal
+                onMouseOver={this.handleOpen}
+                onMouseOut={this.handleClose}>
+                {({ TransitionProps, placement }) => (
+                  <Grow
+                    {...TransitionProps}
+                    id="menu-list-grow"
+                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                  >
+                    <Paper>
+                      <ClickAwayListener onClickAway={this.handleClose}>
+                        <MenuList>
+                          {data.auth.username && <MenuItem disabled>basicfu</MenuItem>}
+                          <MenuItem onClick={this.handleClose}>修改密码</MenuItem>
+                          <MenuItem onClick={this.handleLogout}>退出</MenuItem>
+                        </MenuList>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                )}
+              </Popper>
+            {/* //写div有警告 */}
+            {/* {data.auth.username && <div className={classes.grow}> */}
+
+                                   {/* </div>} */}
           </Toolbar>
         </AppBar>
         <Notifications />

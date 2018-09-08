@@ -32,8 +32,6 @@ const styles = theme => ({
 });
 
 function Link(props) {
-  console.log(props.title+"-"+props.href);
-  console.log(props.activePage);
   const {
     activeClassName,
     children: childrenProp,
@@ -67,7 +65,6 @@ function Link(props) {
       prefetch,
       passHref: true,
     };
-    console.log(activePage && props.title + "-" + props.href === activePage.name + "-" + activePage.path && activeClassName);
     children = (
       <a
         className={classNames(className, {

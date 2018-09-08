@@ -7,23 +7,11 @@ import {
 } from 'api';
 
 const modal = {
-  namespace: 'userTemplate',
-  state: {
-    namespace:'userTemplate',
-    data: {},
-    modalType: '',
-    loading: false,
-    modalVisible: false,
-    item: {},
-  },
   effects: {
     * all(_, { call, put }) {
       const response = yield call(allUserTemplate);
       if (response.success) {
-        yield put({
-          type: 'updateState',
-          payload: { all: JSON.parse(JSON.stringify(response.data)) },
-        });
+        yield put({ type: 'updateState', payload: { all: response.data } });
       }
     },
     * list({ payload }, { call, put }) {
@@ -57,11 +45,6 @@ const modal = {
       if (success) {
         yield put({ type: 'list' });
       }
-    },
-  },
-  reducers: {
-    updateState(state, { payload }) {
-      return { ...state, ...payload };
     },
   },
 };

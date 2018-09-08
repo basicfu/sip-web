@@ -9,25 +9,25 @@ class MyDocument extends Document {
 
     return (
       <html lang="en" dir="ltr">
-        <Head>
-          <title>首页</title>
-          <meta charSet="utf-8" />
-          {/* Use minimum-scale=1 to enable GPU rasterization */}
-          <meta
-            name="viewport"
-            content={
-              'user-scalable=0, initial-scale=1, ' +
-              'minimum-scale=1, width=device-width, height=device-height'
-            }
-          />
-          {/* PWA primary color */}
-          <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
-          <style id="insertion-point-jss" />
-        </Head>
-        <body>
-          <Main />
-          <NextScript />
-        </body>
+      <Head>
+        <title>首页</title>
+        <meta charSet="utf-8" />
+        {/* Use minimum-scale=1 to enable GPU rasterization */}
+        <meta
+          name="viewport"
+          content={
+            'user-scalable=0, initial-scale=1, ' +
+            'minimum-scale=1, width=device-width, height=device-height'
+          }
+        />
+        {/* PWA primary color */}
+        <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
+        <style id="insertion-point-jss" />
+      </Head>
+      <body>
+      <Main />
+      <NextScript />
+      </body>
       </html>
     );
   }

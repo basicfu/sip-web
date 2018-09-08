@@ -1,7 +1,11 @@
 const config = {
-  google: {
-    id: 'UA-106598593-2',
+  app: 'sip',
+  router: {
+    '/': {},
+    '/login': { target: '/login', sidebar: false, navbar: false },
+    '/menu': {},
+    '/user': {},
+    '/user-template': {},
   },
 };
-
 export default config;

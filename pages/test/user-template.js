@@ -1,14 +1,20 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'dva';
-import styles from 'styles/user-template';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
+import {ArrowDropDown} from '@material-ui/icons';
+
 // import Tree, { TreeNode } from 'rc-tree';
 import Tree, { TreeNode } from '../../src/tree/index';
 import Button from "@material-ui/core/Button/Button";
 import {ListItem} from "@material-ui/core";
 
+const styles = {
+  button: {
+    width: '100%'
+  },
+};
 
 const treeData = [
   { key: '0-0',
@@ -67,28 +73,31 @@ class EntryManageCust extends React.Component {
 
   render() {
 
+    const { classes } = this.props;
     return (
       <div style={{ margin: '0 20px' }}>
         <h2>simple</h2>
-        <Tree
-          className="myCls"
-          showLine
-          checkable
-          defaultExpandAll
-          defaultExpandedKeys={this.state.defaultExpandedKeys}
-          onExpand={this.onExpand}
-          defaultSelectedKeys={this.state.defaultSelectedKeys}
-          defaultCheckedKeys={this.state.defaultCheckedKeys}
-          onSelect={this.onSelect}
-        onCheck={this.onCheck}
-        >
-          <TreeNode title="parent 1" key="0-0">
-            <TreeNode title="parent 1-2" key="0-0-2">
-              <TreeNode title="parent 1-2-0" key="0-0-2-0" />
-              <TreeNode title="parent 1-2-1" key="0-0-2-1" />
+        <div style={{width: '70%'}}>
+          <Tree
+            className="myCls"
+            showLine
+            checkable
+            defaultExpandAll
+            defaultExpandedKeys={this.state.defaultExpandedKeys}
+            onExpand={this.onExpand}
+            defaultSelectedKeys={this.state.defaultSelectedKeys}
+            defaultCheckedKeys={this.state.defaultCheckedKeys}
+            onSelect={this.onSelect}
+            onCheck={this.onCheck}
+          >
+            <TreeNode title="parent 1" key="0-0">
+              <TreeNode title="parent 1-2" key="0-0-2">
+                <TreeNode title="parent 1-2-0" key="0-0-2-0" />
+                <TreeNode title="parent 1-2-1" key="0-0-2-1" />
+              </TreeNode>
             </TreeNode>
-          </TreeNode>
-        </Tree>
+          </Tree>
+        </div>
 
         {/* <h2>Check on Click TreeNode</h2> */}
         {/*<Tree*/}

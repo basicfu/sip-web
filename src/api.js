@@ -2,16 +2,17 @@ import request from './utils/request';
 
 const prefix = '/api';
 const base = '/base';
+const dict = '/dict';
+const permission = '/permission';
 
-// export async function login(params) { return request(`${prefix}${system}/user/login`, { method: 'POST', body: params }); }
-// export async function register(params) { return request(`${prefix}${system}/user/register`, { method: 'POST', body: params }); }
-// export async function logout() { return request(`${prefix}${system}/user/logout`); }
-// export async function listUser(params) { return request(`${prefix}${system}/user/list?${stringify(params)}`); }
-// export async function insertUser(params) { return request(`${prefix}${system}/user/insert`, { method: 'POST', body: params }); }
-// export async function updateUser(params) { return request(`${prefix}${system}/user/update`, { method: 'POST', body: params }); }
+export async function allDict() { return request(`${prefix}${dict}/dict/all`, { method: 'GET' }); }
+
+export async function allMenu() { return request(`${prefix}${permission}/menu/all`, { method: 'GET' }); }
 
 export async function user() { return request(`${prefix}${base}/user`, { method: 'GET' }); }
 export async function login(params) { return request(`${prefix}${base}/user/login`, { method: 'POST', body: params }); }
+export async function logout() { return request(`${prefix}${base}/user/logout`, { method: 'GET' }); }
+export async function listUser(params) { return request(`${prefix}${base}/user/list`, { method: 'GET', body: params }); }
 
 // 用户模版
 export async function allUserTemplate(params) { return request(`${prefix}${base}/user-template/all`, { method: 'GET', body: params }); }

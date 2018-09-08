@@ -2,9 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Animate from 'rc-animate';
+import { withStyles } from '@material-ui/core/styles';
 import toArray from 'rc-util/lib/Children/toArray';
 import { polyfill } from 'react-lifecycles-compat';
 import { nodeContextTypes } from './contextTypes';
+import {ArrowDropDown ,ArrowRight} from '@material-ui/icons';
+import Button from "@material-ui/core/Button/Button";
+import IconButton from '@material-ui/core/IconButton';
 import {
   getNodeChildren, mapChildren,
   warnOnlyTreeNode,
@@ -15,7 +19,11 @@ const ICON_OPEN = 'open';
 const ICON_CLOSE = 'close';
 
 const defaultTitle = '---';
-
+const styles = {
+  button: {
+    width: '100%'
+  },
+};
 class TreeNode extends React.Component {
   static propTypes = {
     eventKey: PropTypes.string, // Pass by parent `cloneElement`
@@ -304,7 +312,14 @@ class TreeNode extends React.Component {
           `${prefixCls}-switcher_${expanded ? ICON_OPEN : ICON_CLOSE}`,
         )}
         onClick={this.onExpand}
-      />
+
+      >
+        {
+          expanded?
+            <ArrowDropDown/>:
+            <ArrowRight/>
+        }
+      </span>
     );
   };
 
@@ -339,6 +354,7 @@ class TreeNode extends React.Component {
     const { rcTree: { prefixCls } } = this.context;
 
     return (
+
       <span
         className={classNames(
           `${prefixCls}-iconEle`,
@@ -382,7 +398,7 @@ class TreeNode extends React.Component {
     }
 
     // Title
-    const $title = <span className={`${prefixCls}-title`}>{title}</span>;
+    const $title = <Button style={{width: '100%'}}><span className={`${prefixCls}-title`}>{title}</span></Button>;
 
     return (
       <span

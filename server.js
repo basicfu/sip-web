@@ -8,7 +8,7 @@ const handle = app.getRequestHandler();
 
 const devProxy = {
   '/api': {
-    target: 'http://wutong.sip-dev.dmka.cn/',
+    target: 'http://api-dev.dmka.cn/',
     pathRewrite: { '^/api': '/' },
     changeOrigin: true,
   },
@@ -19,7 +19,6 @@ app.prepare().then(() => {
 
   // Set up the proxy.
   if (dev && devProxy) {
-    console.log('1234');
     const proxyMiddleware = require('http-proxy-middleware');
     Object.keys(devProxy).forEach(context => {
       server.use(proxyMiddleware(context, devProxy[context]));

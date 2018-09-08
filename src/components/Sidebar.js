@@ -15,6 +15,10 @@ import { connect } from 'dva';
 
 const drawerWidth = 260;
 const styles = theme => ({
+    drawerDocked: {
+      width: drawerWidth,
+      height: '100%',
+    },
   drawerPaper: {
     top: 'auto',
     whiteSpace: 'nowrap',
@@ -112,7 +116,7 @@ class Sidebar extends React.Component {
     const { classes, activePage, data, router } = this.props;
     const menus = data.menus || [];
     return (
-      <Drawer variant="permanent" open classes={{ paper: classes.drawerPaper }}>
+      <Drawer variant="permanent" open classes={{ paper: classes.drawerPaper, docked: classes.drawerDocked }}>
         {renderNavItems({ props: this.props, pages: menus, activePage, depth: 0 })}
       </Drawer>
     );

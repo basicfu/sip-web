@@ -7,7 +7,7 @@ import styles from 'styles/user-template';
 import Input from '@material-ui/core/Input/Input';
 import Switch from '@material-ui/core/Switch/Switch';
 
-const namespace = 'userTemplate';
+const namespace = 'menu';
 
 class UserTemplate extends React.Component {
   componentDidMount() {
@@ -16,7 +16,7 @@ class UserTemplate extends React.Component {
 
   handleSearch = () => {
     const search = this.props.search;
-    this.props.dispatch({ type: `${namespace}/list`, payload: { data: search } });
+    this.props.dispatch({ type: `${namespace}/all`, payload: { data: search } });
   };
 
   renderColumns=(text, id, table, item, key, onChange) => {
@@ -49,27 +49,29 @@ style={{ width: '100%' }}
   }
 
   render() {
-    const { classes, data } = this.props;
+    const { data } = this.props;
     const tableProps = {
+      keyName: 'id',
       edit: 'false',
-      data,
+      actionName: 'all',
+      showFooter: false,
+      props: this.props,
       columns: [
-        { id: 'name', label: '字段名', render: this.renderColumns },
-        { id: 'enName', label: '字段英文名', render: this.renderColumns },
-        { id: 'type', label: '字段类型' },
-        { id: 'extra', label: '扩展信息', render: this.renderColumns },
-        { id: 'defaultValue', label: '默认值', render: this.renderColumns },
-        { id: 'required', label: '是否必填', render: this.renderColumns },
-        { id: 'sort', label: '顺序', render: this.renderColumns },
-        { id: 'cdate', label: '创建时间', render: formatDateTime },
-        { id: 'udate', label: '更新时间', render: formatDateTime },
+        { id: 'name', label: '菜单名', render: this.renderColumns },
+        { id: 'path', label: '路径', render: this.renderColumns },
+        { id: 'sort', label: '顺序' },
+        { id: 'icon', label: '图标', render: this.renderColumns },
+        { id: 'type', label: '类型', render: this.renderColumns },
+        { id: 'display', label: '是否显示', render: this.renderColumns },
       ],
     };
     return (
-      <CustomTable {...tableProps} />
+      <div>
+        <CustomTable {...tableProps} />
+      </div>
     );
   }
 }
 export default connect(state => ({
-  data: state.userTemplate,
+  data: state.menu,
 }))(withStyles(styles)(UserTemplate));

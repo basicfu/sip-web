@@ -6,49 +6,50 @@
   ],
   "plugins": [
     "@babel/plugin-transform-object-assign",
-    ["@babel/transform-runtime", { "polyfill": false, "useBuiltIns": true }]
+    ["@babel/transform-runtime", { "polyfill": false, "useBuiltIns": true }],
+    "babel-plugin-preval",
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "api":"./src/api.js",
+          "config":"./src/config.js",
+          "styles":"./src/styles",
+          "utils": "./src/utils",
+          "components":"./src/components",
+          "dva": "dva-no-router",
+          "notify": "./src/utils/notify"
+        }
+      }
+    ]
   ],
   "env": {
-    "development": {
-      "sourceMaps": "both",
-      "plugins": [
-        "babel-plugin-preval",
-        [
-          "module-resolver",
-          {
-            "alias": {
-              "api":"./src/api.js",
-              "styles":"./src/styles",
-              "utils": "./src/utils",
-              "components":"./src/components",
-              "dva": "dva-no-router",
-              "notify": "./src/utils/notify"
-            }
-          }
-        ]
-      ]
+    "local": {
+      "sourceMaps": "both"
     },
-    "production": {
+    "dev": {
       "plugins": [
-        "babel-plugin-preval",
-        [
-          "module-resolver",
-          {
-            "alias": {
-              "api":"./src/api.js",
-              "styles":"./src/styles",
-              "utils": "./src/utils",
-              "components":"./src/components",
-              "dva": "dva-no-router",
-              "notify": "./src/utils/notify"
-            }
-          }
-        ],
         "transform-react-constant-elements",
         "transform-dev-warning",
         ["react-remove-properties", { "properties": ["data-mui-test"] }],
         ["transform-react-remove-prop-types", { "mode": "remove" }]
       ]
     },
+    "test": {
+      "plugins": [
+        "transform-react-constant-elements",
+        "transform-dev-warning",
+        ["react-remove-properties", { "properties": ["data-mui-test"] }],
+        ["transform-react-remove-prop-types", { "mode": "remove" }]
+      ]
+    },
+    "prod": {
+      "plugins": [
+        "transform-react-constant-elements",
+        "transform-dev-warning",
+        ["react-remove-properties", { "properties": ["data-mui-test"] }],
+        ["transform-react-remove-prop-types", { "mode": "remove" }]
+      ]
+    }
   }
 }

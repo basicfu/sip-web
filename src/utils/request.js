@@ -1,5 +1,6 @@
 import fetch from 'dva/fetch';
 import notify from 'notify';
+import config from 'config';
 
 export default function request(url, options) {
   const defaultOptions = {
@@ -8,6 +9,9 @@ export default function request(url, options) {
   const newOptions = { ...defaultOptions, ...options };
   const auth = window.localStorage.getItem('auth');
   let headers = { Accept: 'application/json', ...newOptions.headers };
+  if (process.env.BABEL_ENV === 'local') {
+    headers.app = config.app;
+  }
   if (auth) {
     headers.Authorization = JSON.parse(auth).token;
   }
@@ -25,15 +29,13 @@ export default function request(url, options) {
       headers = { ...headers, 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' };
     }
   } else if (newOptions.body) {
-      for (const key of Object.keys(newOptions.body)) {
-        if (key) {
-          const value = newOptions.body[key];
-          const s = encodeURIComponent(value);
-          const inc = url.includes('?') ? '&' : '?';
-          url += `${inc}${key}=${s}`;
-        }
-      }
-    }
+    Object.keys(newOptions.body).forEach(key => {
+      const value = newOptions.body[key];
+      const s = encodeURIComponent(value);
+      const inc = url.includes('?') ? '&' : '?';
+      url += `${inc}${key}=${s}`;
+    });
+  }
   newOptions.headers = headers;
   newOptions.body = body;
   return fetch(url, newOptions)
@@ -42,22 +44,22 @@ export default function request(url, options) {
         notify.error('服务器开小差了，请稍候再来呦！');
         return { success: false };
       }
-        return response.json().then((result) => {
-          if (result.success === false) {
-            if (result.msg !== undefined && result.msg !== '') {
-              notify.error(result.msg);
-            }
-            if (result.code === 5) {
-              window.localStorage.removeItem('auth');
-              window.location.href = '/login';
-            }
-            return { success: false };
-          }
+      return response.json().then((result) => {
+        if (result.success === false) {
           if (result.msg !== undefined && result.msg !== '') {
-            notify.success(result.msg);
+            notify.error(result.msg);
           }
-          return result;
-        });
+          if (result.code === 5) {
+            window.localStorage.removeItem('auth');
+            window.location.href = '/login';
+          }
+          return { success: false };
+        }
+        if (result.msg !== undefined && result.msg !== '') {
+          notify.success(result.msg);
+        }
+        return result;
+      });
     })
     .catch((error) => {
       const { response } = error;
