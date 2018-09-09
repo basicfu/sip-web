@@ -5,7 +5,7 @@ const config = {
     '/login': { target: '/login', sidebar: false, navbar: false },
     '/menu': {},
     '/user': {},
-    '/user-template': {},
+    '/base/user-template': {},
   },
 };
 export default config;

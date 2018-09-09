@@ -68,7 +68,7 @@ function Link(props) {
     children = (
       <a
         className={classNames(className, {
-          [activeClassName]: activePage&&props.title+"-"+props.href === activePage.name+"-"+activePage.path && activeClassName,
+          [activeClassName]: activePage && props.href === activePage.path && activeClassName,
         })}
         onClick={onClick}
         {...other}

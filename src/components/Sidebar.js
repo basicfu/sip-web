@@ -1,24 +1,16 @@
 import React from 'react';
-import classNames from 'classnames';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Drawer from '@material-ui/core/Drawer';
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import Hidden from '@material-ui/core/Hidden';
 import AppDrawerNavItem from './AppDrawerNavItem';
-import Link from './Link';
-import { pageToTitle } from '../utils/helpers';
 import { connect } from 'dva';
 
-const drawerWidth = 260;
+const drawerWidth = 230;
 const styles = theme => ({
-    drawerDocked: {
-      width: drawerWidth,
-      height: '100%',
-    },
+  drawerDocked: {
+    width: drawerWidth,
+    height: '100%',
+  },
   drawerPaper: {
     top: 'auto',
     whiteSpace: 'nowrap',
@@ -27,9 +19,9 @@ const styles = theme => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    color: '#08a',
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#fff',
     // backgroundImage: 'url("https://demos.creative-tim.com/material-dashboard-pro-react/static/media/sidebar-2.d30c9e30.jpg")',
+    // backgroundSize: 'cover',
   },
   drawerPaperClose: {
     overflowX: 'hidden',
@@ -65,7 +57,7 @@ const styles = theme => ({
 // eslint-disable-next-line react/prop-types
 function renderNavItems({ pages, ...params }) {
   return (
-    <List>
+    <List style={{ padding: 0 }}>
       {pages.reduce(
         // eslint-disable-next-line no-use-before-define
         (items, page) => reduceChildRoutes({ items, page, ...params }),
@@ -75,45 +67,43 @@ function renderNavItems({ pages, ...params }) {
   );
 }
 
-function reduceChildRoutes({ props, activePage, items, page, depth, router }) {
+function reduceChildRoutes({ props, activePage, items, page, depth }) {
   if (page.displayNav === false) {
     return items;
   }
-  const title = page.name;
-  const key = page.name + page.path;
   if (page.children && page.children.length > 0) {
-    const openImmediately = activePage.pathname && activePage.pathname.indexOf(page.path) === 0;
-
+    const openImmediately = activePage.path && page.children.map(item => item.path).indexOf(activePage.path) !== -1;
     items.push(
-      <AppDrawerNavItem depth={depth} key={key} openImmediately={openImmediately} title={title} activePage={activePage}>
+      <AppDrawerNavItem
+        depth={depth}
+        key={page.path}
+        openImmediately={openImmediately}
+        title={page.name}
+        activePage={activePage}
+        icon={page.icon}>
         {renderNavItems({ props, pages: page.children, activePage, depth: depth + 1 })}
       </AppDrawerNavItem>,
     );
   } else {
     page = page.children && page.children.length === 1 ? page.children[0] : page;
-
     items.push(
       <AppDrawerNavItem
         depth={depth}
-        key={key}
-        title={title}
+        key={page.path}
+        title={page.name}
         href={page.path}
+        icon={page.icon}
         onClick={props.onClose}
         activePage={activePage}
       />,
     );
   }
-
   return items;
 }
 
 class Sidebar extends React.Component {
-  componentDidMount() {
-
-  }
-
   render() {
-    const { classes, activePage, data, router } = this.props;
+    const { classes, activePage, data } = this.props;
     const menus = data.menus || [];
     return (
       <Drawer variant="permanent" open classes={{ paper: classes.drawerPaper, docked: classes.drawerDocked }}>

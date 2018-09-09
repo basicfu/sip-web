@@ -1,25 +1,26 @@
 import App from 'next/app';
 import React from 'react';
-import {Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
-import {getOrCreateStore} from '../src/utils/store';
-import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
+import { getOrCreateStore } from '../src/utils/store';
+import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
 import compose from 'recompose/compose';
 import getPageContext from '../src/utils/getPageContext';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import JssProvider from 'react-jss/lib/JssProvider';
 import Notifications from '../src/components/Notifications';
-import {loadCSS} from 'fg-loadcss/src/loadCSS';
+import { loadCSS } from 'fg-loadcss/src/loadCSS';
 import NProgress from 'nprogress';
 import Navbar from 'components/Navbar';
 import Router from 'next/router';
 import Sidebar from 'components/Sidebar';
 import styles from 'styles/app';
 import config from 'config';
-import {getActivePage} from 'utils';
+import { getActivePage } from 'utils';
 
 // Inject the insertion-point-jss after docssearch
 if (process.browser) {
+  // 如果使用<Icon>name</Icon>需要引用
   // loadCSS(
   //   'https://fonts.googleapis.com/icon?family=Material+Icons',
   //   document.querySelector('#insertion-point-jss'),
@@ -107,7 +108,7 @@ class MyApp extends App {
 
   render() {
     const { Component, pageProps, store, router } = this.props;
-    const activePage = getActivePage(router.pathname, getOrCreateStore().getState().global.user.menus);
+    const activePage = {path: router.pathname};
     const pathRule = this.getPathRule();
     return (
         <Provider store={store}>
@@ -134,7 +135,7 @@ class MyApp extends App {
                   variant="permanent"
                   mobileOpen
                 />}
-                <div style={{ width: pathRule.sidebar !== false ? 'calc(100% - 260px)' : '100%', height: '100%' }}>
+                <div style={{ width: pathRule.sidebar !== false ? 'calc(100% - 230px)' : '100%', height: '100%' }}>
                   <Component pageContext={this.pageContext} {...pageProps} />
                 </div>
               </main>
