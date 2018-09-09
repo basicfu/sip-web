@@ -57,15 +57,14 @@ const styles = theme => ({
 
 class AppDrawerNavItem extends React.Component {
   state = {
-    open: this.props.openImmediately,
+    open: this.props.open,
   };
 
   componentDidMount() {
     // So we only run this logic once.
-    if (!this.props.openImmediately) {
+    if (!this.props.open) {
       return;
     }
-
     // Center the selected item in the list container.
     const activeElement = document.querySelector(`.${this.props.classes.active}`);
     if (activeElement && activeElement.scrollIntoView) {
@@ -140,12 +139,12 @@ AppDrawerNavItem.propTypes = {
   depth: PropTypes.number.isRequired,
   href: PropTypes.string,
   onClick: PropTypes.func,
-  openImmediately: PropTypes.bool,
+  open: PropTypes.bool,
   title: PropTypes.string.isRequired,
 };
 
 AppDrawerNavItem.defaultProps = {
-  openImmediately: false,
+  open: false,
 };
 
 export default withStyles(styles)(AppDrawerNavItem);

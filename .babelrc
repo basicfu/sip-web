@@ -24,24 +24,8 @@
     ]
   ],
   "env": {
-    "local": {
-      "sourceMaps": "both"
-    },
     "dev": {
-      "plugins": [
-        "transform-react-constant-elements",
-        "transform-dev-warning",
-        ["react-remove-properties", { "properties": ["data-mui-test"] }],
-        ["transform-react-remove-prop-types", { "mode": "remove" }]
-      ]
-    },
-    "test": {
-      "plugins": [
-        "transform-react-constant-elements",
-        "transform-dev-warning",
-        ["react-remove-properties", { "properties": ["data-mui-test"] }],
-        ["transform-react-remove-prop-types", { "mode": "remove" }]
-      ]
+      "sourceMaps": "both"
     },
     "prod": {
       "plugins": [

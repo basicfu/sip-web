@@ -1,22 +1,20 @@
 import App from 'next/app';
 import React from 'react';
-import { Provider } from 'react-redux';
+import {Provider} from 'react-redux';
 import withRedux from 'next-redux-wrapper';
-import { getOrCreateStore } from '../src/utils/store';
-import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
+import {getOrCreateStore} from '../src/utils/store';
+import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import compose from 'recompose/compose';
 import getPageContext from '../src/utils/getPageContext';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import JssProvider from 'react-jss/lib/JssProvider';
 import Notifications from '../src/components/Notifications';
-import { loadCSS } from 'fg-loadcss/src/loadCSS';
 import NProgress from 'nprogress';
 import Navbar from 'components/Navbar';
 import Router from 'next/router';
 import Sidebar from 'components/Sidebar';
 import styles from 'styles/app';
 import config from 'config';
-import { getActivePage } from 'utils';
 
 // Inject the insertion-point-jss after docssearch
 if (process.browser) {
@@ -25,14 +23,14 @@ if (process.browser) {
   //   'https://fonts.googleapis.com/icon?family=Material+Icons',
   //   document.querySelector('#insertion-point-jss'),
   // );
-  loadCSS(
-    'https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css',
-    document.querySelector('#insertion-point-jss'),
-  );
-  loadCSS(
-    '/static/assets/index.css',
-    document.querySelector('#insertion-point-jss'),
-  );
+  // loadCSS(
+  //   'https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css',
+  //   document.querySelector('#insertion-point-jss'),
+  // );
+  // loadCSS(
+  //   '/static/assets/index.css',
+  //   document.querySelector('#insertion-point-jss'),
+  // );
 }
 Router.onRouteChangeStart = () => {
   NProgress.start();
@@ -93,22 +91,15 @@ class MyApp extends App {
     if (jssStyles && jssStyles.parentNode) {
       jssStyles.parentNode.removeChild(jssStyles);
     }
-    if (
-      'serviceWorker' in navigator &&
-      process.env.NODE_ENV === 'production' &&
-      window.location.host === 'material-ui.com'
-    ) {
-      navigator.serviceWorker.register('/sw.js');
-    }
   }
 
   getPathRule=() => {
-    return config.router[this.props.router.pathname];
+    return config.router[this.props.router.pathname] || {};
   }
 
   render() {
     const { Component, pageProps, store, router } = this.props;
-    const activePage = {path: router.pathname};
+    const activePage = { path: router.pathname };
     const pathRule = this.getPathRule();
     return (
         <Provider store={store}>

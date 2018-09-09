@@ -72,12 +72,12 @@ function reduceChildRoutes({ props, activePage, items, page, depth }) {
     return items;
   }
   if (page.children && page.children.length > 0) {
-    const openImmediately = activePage.path && page.children.map(item => item.path).indexOf(activePage.path) !== -1;
+    const open = activePage.path && page.children.map(item => item.path).indexOf(activePage.path) !== -1;
     items.push(
       <AppDrawerNavItem
         depth={depth}
         key={page.path}
-        openImmediately={openImmediately}
+        open={open}
         title={page.name}
         activePage={activePage}
         icon={page.icon}>

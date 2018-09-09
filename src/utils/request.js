@@ -9,9 +9,9 @@ export default function request(url, options) {
   const newOptions = { ...defaultOptions, ...options };
   const auth = window.localStorage.getItem('auth');
   let headers = { Accept: 'application/json', ...newOptions.headers };
-  if (process.env.BABEL_ENV === 'local') {
+  // if (process.env.BABEL_ENV === 'dev') {
     headers.app = config.app;
-  }
+  // }
   if (auth) {
     headers.Authorization = JSON.parse(auth).token;
   }
