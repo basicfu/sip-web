@@ -53,6 +53,10 @@ const styles = theme => ({
     color: '#1890ff',
     backgroundColor: '#e6f7ff',
   },
+  menuLabel:{
+    marginLeft: 6,
+    cursor: 'pointer',
+  }
 });
 
 class AppDrawerNavItem extends React.Component {
@@ -99,7 +103,7 @@ class AppDrawerNavItem extends React.Component {
             component={props => (
                 <Link variant="button" title={title} activeClassName={classes.active} href={href} {...props} activePage={activePage}>
                    <span style={{ width: 24, height: 24 }} dangerouslySetInnerHTML={{ __html: icon }} />
-                  <label style={{ marginLeft: 6 }}>{title}</label>
+                  <label className={classes.menuLabel}>{title}</label>
                 </Link>
             )}
             className={classNames(classes.buttonLeaf, `depth-${depth}`)}
@@ -122,7 +126,7 @@ class AppDrawerNavItem extends React.Component {
           style={style}
         >
           <span style={{ width: 24, height: 24 }} dangerouslySetInnerHTML={{ __html: icon }} />
-          <label style={{ marginLeft: 6 }}>{title}</label>
+          <label className={classes.menuLabel}>{title}</label>
           <span style={{ width: 24, height: 24, position: 'absolute', right: 16 }}>{this.state.open ? <ExpandLess /> : <ExpandMore />}</span>
         </Button>
         <Collapse in={this.state.open} timeout="auto" unmountOnExit>
