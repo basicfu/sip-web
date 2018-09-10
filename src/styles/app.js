@@ -1,7 +1,7 @@
 const drawerWidth = 230;
 export default theme => ({
   '@global': {
-    'html,body,#__next': {
+    'html,body': {
       height: '100%',
     },
   },

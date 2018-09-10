@@ -1,38 +1,23 @@
 /* eslint-disable react/no-array-index-key */
-import React, { Fragment } from 'react';
-import classNames from 'classnames';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
-import ClearIcon from '@material-ui/icons/Clear';
-import AccountCircle from '@material-ui/icons/Search';
-import DoneIcon from '@material-ui/icons/Done';
-import { lighten } from '@material-ui/core/styles/colorManipulator';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import dialog from 'utils/dialog';
-import { getOrCreateStore } from 'utils/store';
-import Input from '../../node_modules/@material-ui/core/Input/Input';
-import InputAdornment from '../../node_modules/@material-ui/core/InputAdornment/InputAdornment';
-import TextField from '../../node_modules/@material-ui/core/TextField/TextField';
-
+import {getOrCreateStore} from 'utils/store';
+import TableHeader from "components/TableHeader";
 
 const CustomTableCell = withStyles(theme => ({
   head: {
@@ -42,105 +27,6 @@ const CustomTableCell = withStyles(theme => ({
     padding: 4,
   },
 }))(TableCell);
-
-const toolbarStyles = theme => ({
-  root: {
-    paddingRight: theme.spacing.unit,
-  },
-  highlight:
-    theme.palette.type === 'light'
-      ? {
-        color: theme.palette.secondary.main,
-        backgroundColor: lighten(theme.palette.secondary.light, 0.90),
-      }
-      : {
-        color: theme.palette.text.primary,
-        backgroundColor: theme.palette.secondary.dark,
-      },
-  spacer: {
-    flex: '1 1 100%',
-  },
-  actions: {
-    color: theme.palette.text.secondary,
-  },
-  title: {
-    flex: '0 0 auto',
-  },
-  iconGroup: {
-    display: 'flex',
-  },
-  rowDoneIcon: {
-    color: '#4caf50',
-  },
-  rowClearIcon: {
-    color: '#ba68c8',
-  },
-});
-
-let EnhancedTableToolbar = props => {
-  const { numSelected, classes, addOrEdit, onAdd, onEdit, onDelete, onDone, onClear, headerChild } = props;
-  return (
-    <Toolbar
-      className={classNames(classes.root, {
-        [classes.highlight]: numSelected > 0,
-      })}
-    >
-      <div className={classes.title}>
-        {numSelected > 0 ? (
-          <Typography color="inherit" variant="subheading">
-            {numSelected} selected
-          </Typography>
-        ) : (
-          headerChild
-        )}
-      </div>
-      <div className={classes.spacer} />
-      <div className={classes.actions}>
-        {numSelected > 0 ? (
-          <div className={classes.iconGroup}>
-            {addOrEdit &&
-            <Fragment>
-              <Tooltip title="确定">
-                <IconButton color={'primary'} className={classes.rowDoneIcon} onClick={() => onDone()}>
-                  <DoneIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="取消">
-                <IconButton color={'secondary'} className={classes.rowClearIcon} onClick={() => onClear()}>
-                  <ClearIcon />
-                </IconButton>
-              </Tooltip>
-            </Fragment>
-            }
-            <Tooltip title="修改">
-              <IconButton color={'primary'} onClick={() => onEdit()}>
-                <EditOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="删除">
-              <IconButton color={'secondary'} onClick={() => onDelete()}>
-                <DeleteOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          </div>
-        ) : (
-          <Tooltip title="添加">
-            <Button mini variant="fab" color="secondary" onClick={() => onAdd()}>
-              <AddOutlinedIcon />
-            </Button>
-          </Tooltip>
-        )}
-      </div>
-    </Toolbar>
-  );
-};
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-};
-
-EnhancedTableToolbar = withStyles(toolbarStyles)(EnhancedTableToolbar);
-
 const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
@@ -449,7 +335,7 @@ class CustomTable extends React.Component {
     return (
       <Paper className={classes.root}>
         {showHeader &&
-        <EnhancedTableToolbar
+        <TableHeader
           numSelected={selected.length}
           onAdd={this.handleAdd}
           onEdit={this.handleEdit}

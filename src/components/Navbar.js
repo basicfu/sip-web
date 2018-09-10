@@ -31,6 +31,10 @@ const styles = theme => ({
       position: 'absolute',
     },
   },
+  rightButton:{
+    position: 'absolute',
+    right: 10,
+  }
 });
 
 class Navbar extends React.Component {
@@ -79,11 +83,11 @@ class Navbar extends React.Component {
               onMouseOver={this.handleOpen}
               onMouseOut={this.handleClose}
               aria-labelledby="appbar-github"
+              className={classes.rightButton}
             >
               <GithubIcon />
             </IconButton>
              }
-
               <Popper
                 open={open}
                 anchorEl={this.anchorEl}
