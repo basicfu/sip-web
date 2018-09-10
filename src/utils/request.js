@@ -1,6 +1,7 @@
 import fetch from 'dva/fetch';
 import notify from 'notify';
 import config from 'config';
+import { dealObjectValue } from 'utils';
 
 export default function request(url, options) {
   const defaultOptions = {
@@ -17,6 +18,7 @@ export default function request(url, options) {
   }
   let body;
   if (newOptions.method !== 'GET') {
+    newOptions.body = dealObjectValue(newOptions.body);
     if (!newOptions.type) {
       body = JSON.stringify(newOptions.body);
       headers = { ...headers, 'Content-Type': 'application/json; charset=utf-8' };
@@ -33,7 +35,10 @@ export default function request(url, options) {
       const value = newOptions.body[key];
       const s = encodeURIComponent(value);
       const inc = url.includes('?') ? '&' : '?';
-      url += `${inc}${key}=${s}`;
+      // 排除undefined、null、''
+      if (s !== 'undefined' && s !== null && s !== '') {
+        url += `${inc}${key}=${s}`;
+      }
     });
   }
   newOptions.headers = headers;

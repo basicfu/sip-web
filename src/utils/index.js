@@ -15,7 +15,31 @@ export function getParentName(all, id, p) {
   }
   return text;
 }
-
+/**
+ *  判断传入参数的类型，以字符串的形式返回
+ *  @obj：数据
+ * */
+function dataType(obj) {
+  if (obj === null) return 'Null';
+  if (obj === undefined) return 'Undefined';
+  return Object.prototype.toString.call(obj).slice(8, -1);
+}
+/**
+ * 处理对象参数值，排除对象参数值为”“、null、undefined，并返回一个新对象
+ * @param obj
+ */
+export function dealObjectValue(obj) {
+  const param = {};
+  if (obj === null || obj === undefined || obj === '') return param;
+  for (const key in obj) {
+    if (dataType(obj[key]) === 'Object') {
+      param[key] = dealObjectValue(obj[key]);
+    } else if (obj[key] !== null && obj[key] !== undefined && obj[key] !== '') {
+      param[key] = obj[key];
+    }
+  }
+  return param;
+}
 export function formatFlag(data) {
   if (data === undefined || data === null) {
     return '';

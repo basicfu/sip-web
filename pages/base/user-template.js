@@ -6,6 +6,7 @@ import { formatDateTime, formatFlag } from 'utils';
 import styles from 'styles/user-template';
 import Input from '@material-ui/core/Input/Input';
 import Switch from '@material-ui/core/Switch/Switch';
+import CustomSearch from 'components/CustomSearch';
 
 const namespace = 'userTemplate';
 
@@ -14,9 +15,8 @@ class UserTemplate extends React.Component {
     this.handleSearch();
   }
 
-  handleSearch = () => {
-    const search = this.props.search;
-    this.props.dispatch({ type: `${namespace}/list`, payload: { data: search } });
+  handleSearch = (value) => {
+    this.props.dispatch({ type: `${namespace}/list`, payload: { name: value } });
   };
 
   renderColumns=(text, id, table, item, key, onChange) => {
@@ -53,6 +53,7 @@ style={{ width: '100%' }}
     const tableProps = {
       edit: 'false',
       data,
+      headerChild: <CustomSearch onSearch={(value) => this.handleSearch(value)} />,
       columns: [
         { id: 'name', label: '字段名', render: this.renderColumns },
         { id: 'enName', label: '字段英文名', render: this.renderColumns },

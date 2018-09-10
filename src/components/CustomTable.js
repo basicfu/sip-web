@@ -20,6 +20,7 @@ import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import ClearIcon from '@material-ui/icons/Clear';
+import AccountCircle from '@material-ui/icons/Search';
 import DoneIcon from '@material-ui/icons/Done';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
@@ -28,6 +29,9 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import dialog from 'utils/dialog';
 import { getOrCreateStore } from 'utils/store';
+import Input from '../../node_modules/@material-ui/core/Input/Input';
+import InputAdornment from '../../node_modules/@material-ui/core/InputAdornment/InputAdornment';
+import TextField from '../../node_modules/@material-ui/core/TextField/TextField';
 
 
 const CustomTableCell = withStyles(theme => ({
@@ -74,8 +78,7 @@ const toolbarStyles = theme => ({
 });
 
 let EnhancedTableToolbar = props => {
-  const { numSelected, classes, addOrEdit, onAdd, onEdit, onDelete, onDone, onClear } = props;
-
+  const { numSelected, classes, addOrEdit, onAdd, onEdit, onDelete, onDone, onClear, headerChild } = props;
   return (
     <Toolbar
       className={classNames(classes.root, {
@@ -88,9 +91,7 @@ let EnhancedTableToolbar = props => {
             {numSelected} selected
           </Typography>
         ) : (
-          <Typography variant="title" id="tableTitle">
-            Nutrition
-          </Typography>
+          headerChild
         )}
       </div>
       <div className={classes.spacer} />
@@ -307,7 +308,7 @@ class CustomTable extends React.Component {
     window.addEventListener('keyup', (e) => {
       // esc 暂只重置第一个table
       if (e.keyCode === 27) {
-        const { namespace, keyName, tableName,page, list, dispatch } = this.data();
+        const { namespace, keyName, tableName, page, list, dispatch } = this.data();
         if (list.length > 0 && list[0][keyName] === -1) {
           list.shift();
           dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {}, data: { page, list } } });
@@ -428,17 +429,17 @@ class CustomTable extends React.Component {
 
   data=() => {
     const dispatch = getOrCreateStore().dispatch;
-    const { classes, columns, data, keyName, tableName, edit, actionName, showCheck, showHeader, showFooter } = this.props;
+    const { classes, columns, data, keyName, tableName, edit, actionName, showCheck, showHeader, headerChild, showFooter } = this.props;
     const { namespace, data: { list, page }, all } = data;
     const table = data[tableName];
     const selected = table.selected || [];
     const item = table.item || {};
     const addOrEdit = table.status === 'add' || table.status === 'edit';
-    return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, addOrEdit, edit, actionName, showCheck, showHeader, showFooter };
+    return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, addOrEdit, edit, actionName, showCheck, showHeader, headerChild, showFooter };
   }
 
   render() {
-    const { classes, dispatch, columns, keyName, tableName, namespace, list, page, table, selected, addOrEdit, showCheck, showHeader, showFooter } = this.data();
+    const { classes, dispatch, columns, keyName, tableName, namespace, list, page, table, selected, addOrEdit, showCheck, showHeader, headerChild, showFooter } = this.data();
     const { rowsPerPageOptions, rowsPerPage } = this.state;
     const handleItemChange = (itemKey, itemValue) => {
       // TODO 保存会闪原数据
@@ -455,6 +456,7 @@ class CustomTable extends React.Component {
           onDelete={this.handleDelete}
           onDone={this.handleDone}
           onClear={this.handleClear}
+          headerChild={headerChild}
           addOrEdit={addOrEdit}
         />}
         <div className={classes.tableWrapper}>
@@ -462,10 +464,10 @@ class CustomTable extends React.Component {
             <TableHead>
               <TableRow>
                 {showCheck &&
-                <CustomTableCell style={{ textAlign: 'center' }}>
+                <CustomTableCell style={{ textAlign: 'left',width: 56 }}>
                   <Checkbox
                     indeterminate={selected.length > 0 && selected.length < list.length}
-                    checked={selected.length === list.length}
+                    checked={selected.length === list.length && list.length !== 0}
                     onChange={this.handleSelectAllClick}
                   />
                 </CustomTableCell>}
