@@ -5,6 +5,7 @@ import {
   updateUserTemplate,
   deleteUserTemplate,
 } from 'api';
+import dialog from 'utils/dialog';
 
 const modal = {
   effects: {
@@ -16,12 +17,9 @@ const modal = {
     },
     * list({ payload }, { call, put }) {
       const data = payload;
-      // delete data.total;
       // 暂时写死清空默认table
-      yield put({
-        type: 'updateState',
-        payload: { loading: true, modalVisible: false, table: {} },
-      });
+      dialog.close();
+      yield put({ type: 'updateState', payload: { table: {} } });
       const response = yield call(listUserTemplate, data);
       yield put({ type: 'updateState', payload: { loading: false } });
       if (response.success) {

@@ -13,6 +13,7 @@
       {
         "alias": {
           "api":"./src/api.js",
+          "enum":"./src/utils/enum.js",
           "config":"./src/config.js",
           "styles":"./src/styles",
           "utils": "./src/utils",

@@ -8,7 +8,7 @@ const handle = app.getRequestHandler();
 
 const devProxy = {
   '/api': {
-    target: 'http://api-dev.dmka.cn/',
+    target: 'http://localhost:7100/',
     pathRewrite: { '^/api': '/' },
     changeOrigin: true,
   },

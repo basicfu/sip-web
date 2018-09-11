@@ -7,5 +7,6 @@ const config = {
     '/user': {},
     '/base/user-template': {},
   },
+
 };
 export default config;

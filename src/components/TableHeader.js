@@ -73,6 +73,11 @@ class TableHeader extends React.Component {
     open: false,
   };
 
+  handleAdd=(edit) => {
+    this.handleClose();
+    this.props.onAdd(edit);
+  }
+
   handleOpen = () => {
     if (!this.state.hidden) {
       this.setState({
@@ -88,10 +93,7 @@ class TableHeader extends React.Component {
   };
 
   render() {
-    const { numSelected, classes, addOrEdit, onAdd, onEdit, onDelete, onDone, onClear, headerChild } = this.props;
-    const actions = [
-      { icon: <Assignment />, name: '弹窗添加' },
-    ];
+    const { numSelected, classes, tableStatus, onEdit, onDelete, onDone, onClear, headerChild } = this.props;
     const { open } = this.state;
     return (
       <Toolbar
@@ -112,7 +114,7 @@ class TableHeader extends React.Component {
         <div className={classes.actions}>
           {numSelected > 0 ? (
             <div className={classes.iconGroup}>
-              {addOrEdit &&
+              {(tableStatus === 'add' || tableStatus === 'edit') &&
               <Fragment>
                 <Tooltip title="确定">
                   <IconButton color={'primary'} className={classes.rowDoneIcon} onClick={() => onDone()}>
@@ -126,16 +128,20 @@ class TableHeader extends React.Component {
                 </Tooltip>
               </Fragment>
               }
-              <Tooltip title="修改">
-                <IconButton color={'primary'} onClick={() => onEdit()}>
-                  <EditOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="删除">
-                <IconButton color={'secondary'} onClick={() => onDelete()}>
-                  <DeleteOutlinedIcon />
-                </IconButton>
-              </Tooltip>
+              {tableStatus !== 'add' &&
+                <Fragment>
+                  <Tooltip title="修改">
+                    <IconButton color={'primary'} onClick={() => onEdit()}>
+                      <EditOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="删除">
+                    <IconButton color={'secondary'} onClick={() => onDelete()}>
+                      <DeleteOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Fragment>
+              }
             </div>
           ) : (
             <SpeedDial
@@ -146,20 +152,19 @@ class TableHeader extends React.Component {
               hidden={false}
               icon={<SpeedDialIcon openIcon={<EditOutlinedIcon />} />}
               onBlur={this.handleClose}
-              onClick={() => onAdd()}
+              onClick={() => this.handleAdd('row')}
               onClose={this.handleClose}
               onFocus={this.handleOpen}
               onMouseEnter={this.handleOpen}
               onMouseLeave={this.handleClose}
               open={open}
             >
-              {actions.map(action => (
-                <SpeedDialAction
-                  key={action.name}
-                  icon={action.icon}
-                  tooltipTitle={action.name}
+              <SpeedDialAction
+                  key="1"
+                  icon={<Assignment />}
+                  tooltipTitle="弹窗添加"
+                  onClick={() => this.handleAdd('modal')}
                 />
-              ))}
             </SpeedDial>
           )}
         </div>
