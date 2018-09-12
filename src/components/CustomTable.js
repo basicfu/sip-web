@@ -19,6 +19,7 @@ import dialog from 'utils/dialog';
 import { getOrCreateStore } from 'utils/store';
 import TableHeader from 'components/TableHeader';
 import notify from 'utils/notify';
+import Divider from "../../node_modules/@material-ui/core/Divider/Divider";
 
 const CustomTableCell = withStyles(theme => ({
   head: {
@@ -130,17 +131,22 @@ function getDomWidth(text) {
 }
 // 计算自适应宽度
 function calcTableAuto(props) {
-  const { list, columns, key, addOrEdit, table } = props;
+  const { list, columns, keyName, addOrEdit, table } = props;
+  const renderField=(column,item)=>{
+    const add = table.status === 'add' && item[keyName] === -1;
+    const edit = table.status === 'edit' && item[keyName] === table.selected[0];
+    return column.render ? column.render(item[column.id], {id:column.id,label:column.label,required:column.required},add,edit) : item[column.id]
+  };
   const selected = table.selected || [];
   const headerMinWidths = [];
   const contentWidths = [];
   let calcList = [...list];
   if (addOrEdit) {
-    calcList = calcList.filter(it => it[key] !== selected[0]);
+    calcList = calcList.filter(it => it[keyName] !== selected[0]);
   }
   let totalPart = 0;
   columns.forEach(column => {
-    const widths = calcList.map(it => getDomWidth(column.render ? column.render(it[column.id], column.id, table, it, key) : it[column.id]));
+    const widths = calcList.map(it => getDomWidth(renderField(column,it)));
     if (widths && widths.length > 0) {
       totalPart += widths.reduce((a, b) => a + b) / calcList.length;
     }
@@ -158,7 +164,7 @@ function calcTableAuto(props) {
     if (totalHeader !== 0) {
       headerRate = (column.label.length * 12) * (100 / totalHeader);
     }
-    const widths = calcList.map(it => getDomWidth(column.render ? column.render(it[column.id], column.id, table, it, key) : it[column.id]));
+    const widths = calcList.map(it => getDomWidth(renderField(column,it)));
     if (widths && widths.length > 0) {
       const total = widths.reduce((a, b) => a + b);
       contentRate = total / calcList.length * totalPerRate;
@@ -227,30 +233,6 @@ class CustomTable extends React.Component {
     dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: [] } } });
   };
 
-  // 处理单击/双击冲突事件
-  handleClick = (event, id) => {
-    clearTimeout(timerId);
-    timerId = setTimeout(() => {
-      const { namespace, keyName, tableName, list, dispatch, selected, addOrEdit } = this.data();
-      const item = list.filter(it => it[keyName] === id)[0];
-      if (selected.indexOf(id) === -1) {
-        dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: [id], item } } });
-      } else if (!addOrEdit) {
-        dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: [], item: {} } } });
-      }
-    }, 200);
-  };
-
-  handleCheckbox = (event, id) => {
-    clearTimeout(timerId);
-    const { namespace, selected, tableName, dispatch } = this.data();
-    if (event.target.checked) {
-      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: [...selected, id] } } });
-    } else {
-      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: selected.filter(it => it !== id) } } });
-    }
-  }
-
   handleChangePage = (event, page) => {
     const { namespace, page: { pageSize }, dispatch } = this.data();
     dispatch({ type: `${namespace}/list`, payload: { pageNum: page + 1, pageSize } });
@@ -271,18 +253,23 @@ class CustomTable extends React.Component {
       columns.forEach(it=>{
         defaultItem[it.id]=it.addDefaultValue;
       });
-      let newTable={ ...table, selected: [defaultItem[keyName]], item: defaultItem, status: 'add' }
       if(edit==='row'){
         list.unshift(defaultItem);
+        let newTable={ ...table, selected: [defaultItem[keyName]], item: defaultItem, status: 'add' };
         dispatch({ type: `${namespace}/updateState`, payload: { data: { page, list },[tableName]: newTable } });
       }else if(edit==='modal'){
-        let ele=[];
-        columns.forEach(column=>{
-          let element=column.render ? column.render(defaultItem[column.id], column.id, newTable, defaultItem, keyName, this.handleItemChange) : defaultItem[column.id]
-          ele.push(element)
+        //弹窗添加时不应该selected
+        let newTable={ ...table, selected: [], item: defaultItem, status: 'add' };
+        let elements=[];
+        columns.forEach((column,index)=>{
+          let ele=this.renderField(column,defaultItem,newTable,edit);
+          if(index!==0&&ele!==''){
+            elements.push(<Divider key={index} style={{height:0,margin:'5px 0'}}/>)
+          }
+          elements.push(ele)
         });
         dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: newTable } });
-        dialog.content({title:'添加',children:ele,onOk:this.handleDone})
+        dialog.content({title:'添加',children:elements,onOk:this.handleDone})
       }
     }
   };
@@ -293,11 +280,71 @@ class CustomTable extends React.Component {
     dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, status: 'edit' } } });
   };
 
+  // 单击事件，处理单击/双击冲突事件
+  handleClick = (event, id) => {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      const { namespace, keyName, tableName,page, list, dispatch, selected, addOrEdit } = this.data();
+      //单击当前编辑行无操作
+      if (id !== -1) {
+        let newSelected=[...selected];
+        let newItem = list.filter(it => it[keyName] === id)[0];
+        if(list[0].id===-1){
+          //如果有新建行不进入编辑状态
+          list.shift();
+          newItem={};
+          newSelected=[];
+        }else{
+          newSelected=[id]
+        }
+        if (selected.indexOf(id) === -1) {
+          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: newSelected, item:newItem,status:'' },data:{page,list} } });
+        } else if (!addOrEdit) {
+          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: [], item: {},status:'' },data:{page,list}  } });
+        }
+      }
+    }, 200);
+  };
+
   // 双击事件
   handleDoubleClick = (event, id) => {
     clearTimeout(timerId);
-    const { namespace, keyName, tableName, list, dispatch, table } = this.data();
-    dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, selected: [id], item: list.filter(it => it[keyName] === id)[0], status: 'edit' } } });
+    const { namespace, keyName, tableName, page, list, dispatch, table,item } = this.data();
+    //双击当前编辑行无操作
+    if (id !== -1) {
+      let newItem=list.filter(it => it[keyName] === id)[0];
+      let selected=[id];
+      let status='edit';
+      if(list[0].id===-1){
+        //如果有新建行不进入编辑状态
+        list.shift();
+        newItem={};
+        selected=[];
+        status='';
+      }
+      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, selected, item:newItem, status }, data: { page, list } } });
+    }
+  };
+
+  //行checkbox事件
+  handleCheckbox = (event, id) => {
+    clearTimeout(timerId);
+    const { namespace, selected, tableName, dispatch,page,list } = this.data();
+    if (id !== -1) {
+      let newSelected=selected.filter(it => it !== id);
+      let isNull=false;
+      if(list[0].id===-1){
+        //如果有新建行删除
+        list.shift();
+        newSelected=[]
+        isNull=true
+      }
+      if (event.target.checked&&!isNull) {
+        dispatch({ type: `${namespace}/updateState`, payload: {  data: { page, list },[tableName]: { selected: [...selected, id] } } });
+      } else {
+        dispatch({ type: `${namespace}/updateState`, payload: {  data: { page, list },[tableName]: { selected: newSelected } } });
+      }
+    }
   };
 
   handleDelete = () => {
@@ -353,6 +400,16 @@ class CustomTable extends React.Component {
     // TODO 保存会闪原数据
     dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, item: { ...table.item, [itemKey]: itemValue } } } });
   };
+  renderField(column,item,table,edit){
+    const { keyName } = this.data();
+    const rowAdd = table.status === 'add' && item[keyName] === -1;
+    const rowEdit = table.status === 'edit' && item[keyName] === table.selected[0];
+    let label='';
+    if(edit&&edit==='modal'){
+      label=column.label
+    }
+    return column.render ? column.render(item[column.id], {id:column.id,label,required:column.required} ,rowAdd,rowEdit, this.handleItemChange) : item[column.id]
+  }
   render() {
     const { classes, dispatch, columns, keyName, tableName, namespace, list, page, table, selected, addOrEdit, tableStatus, showCheck, showHeader, headerChild, showFooter } = this.data();
     const { rowsPerPageOptions, rowsPerPage } = this.state;
@@ -411,7 +468,7 @@ class CustomTable extends React.Component {
                     {columns.map((column, columnIndex) => {
                       return (
                         <CustomTableCell key={columnIndex} style={{ textAlign: column.align || undefined }}>
-                          {column.render ? column.render(item[column.id], column.id, table, item, keyName, this.handleItemChange) : item[column.id]}
+                          {this.renderField(column,item,table)}
                         </CustomTableCell>);
                     })}
                   </TableRow>

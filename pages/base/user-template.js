@@ -1,14 +1,14 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import { connect } from 'dva';
+import {withStyles} from '@material-ui/core/styles';
+import {connect} from 'dva';
 import CustomTable from 'components/CustomTable';
-import { formatDateTime, formatDict, formatFlag } from 'utils';
+import {formatDateTime, formatDict, formatFlag} from 'utils';
 import styles from 'styles/user-template';
-import Input from '@material-ui/core/Input/Input';
 import CustomSearch from 'components/CustomSearch';
 import Select from 'components/Select';
-import { Dict, SelectDefault } from 'enum';
+import {Dict, SelectDefault} from 'enum';
 import Switch from 'components/Switch';
+import Input from "components/Input";
 
 const namespace = 'userTemplate';
 
@@ -21,10 +21,8 @@ class UserTemplate extends React.Component {
     this.props.dispatch({ type: `${namespace}/list`, payload: { q: value } });
   };
 
-  renderColumns=(text, id, table, item, key, onChange) => {
-    const { classes } = this.props;
-    const add = table.status === 'add' && item[key] === -1;
-    const edit = table.status === 'edit' && item[key] === table.selected[0];
+  renderColumns=(text, column, add, edit, onChange) => {
+    const { id } = column;
     switch (id) {
       case 'name':
       case 'enName':
@@ -32,17 +30,17 @@ class UserTemplate extends React.Component {
       case 'defaultValue':
       case 'sort':
         if (add || edit) {
-          return <Input key={id} defaultValue={text} className={classes.input} onChange={e => onChange(id, e.target.value)} error={false} label="Required" />;
+          return <Input key={id} defaultValue={text} onChange={e => onChange(id, e.target.value)} column={column} />;
         }
         return text;
       case 'type':
         if (add || edit) {
-          return <Select key={id} dict={Dict.USER_TEMPLATE_FIELD_TYPE} default={SelectDefault.CHOOSE} defaultValue={text} onChange={value => onChange(id, value)} />;
+          return <Select key={id} dict={Dict.USER_TEMPLATE_FIELD_TYPE} default={SelectDefault.CHOOSE} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
         }
         return formatDict(text, Dict.USER_TEMPLATE_FIELD_TYPE);
       case 'required':
         if (add || edit) {
-          return <Switch key={id} checked={text} onChange={checked => onChange(id, checked)} />;
+          return <Switch key={id} checked={text} onChange={checked => onChange(id, checked)} column={column} />;
         }
         return formatFlag(text);
       default:

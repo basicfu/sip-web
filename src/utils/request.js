@@ -12,6 +12,8 @@ export default function request(url, options) {
   let headers = { Accept: 'application/json', ...newOptions.headers };
   // if (process.env.BABEL_ENV === 'dev') {
     headers.app = config.app;
+    // dev ignore permission
+    headers.secret = config.app;
   // }
   if (auth) {
     headers.Authorization = JSON.parse(auth).token;

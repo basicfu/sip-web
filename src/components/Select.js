@@ -1,8 +1,12 @@
 import React from 'react';
-import {withStyles} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import MuiSelect from '../../node_modules/@material-ui/core/Select';
 import MenuItem from '../../node_modules/@material-ui/core/MenuItem/MenuItem';
-import {getOrCreateStore} from 'utils/store';
+import { getOrCreateStore } from 'utils/store';
+import MuiSwitch from '../../node_modules/@material-ui/core/Switch/Switch';
+import FormControlLabel from '../../node_modules/@material-ui/core/FormControlLabel/FormControlLabel';
+import FormControl from '../../node_modules/@material-ui/core/FormControl/FormControl';
+import InputLabel from '../../node_modules/@material-ui/core/InputLabel/InputLabel';
 
 const styles = {
   root: {
@@ -44,19 +48,35 @@ class Select extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, column: { label, required } } = this.props;
     const { option, value } = this.state;
     return (
-      <MuiSelect
-        className={classes.root}
-        displayEmpty
-        value={value}
-        onChange={this.handleChange}
-      >
-        {option.map(it =>
-          <MenuItem key={it.value} value={it.value}>{it.name}</MenuItem>,
-        )}
-      </MuiSelect>
+      label === undefined || label === '' ? (
+        <MuiSelect
+          className={classes.root}
+          displayEmpty
+          value={value}
+          onChange={this.handleChange}
+        >
+          {option.map(it =>
+            <MenuItem key={it.value} value={it.value}>{it.name}</MenuItem>,
+          )}
+        </MuiSelect>
+      ) : (
+        <FormControl>
+          <InputLabel>{`${label}${required ? '*' : ''}`}</InputLabel>
+          <MuiSelect
+            className={classes.root}
+            displayEmpty
+            value={value}
+            onChange={this.handleChange}
+          >
+            {option.map(it =>
+              <MenuItem key={it.value} value={it.value}>{it.name}</MenuItem>,
+            )}
+          </MuiSelect>
+        </FormControl>
+        )
     );
   }
 }

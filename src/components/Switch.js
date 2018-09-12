@@ -1,6 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import MuiSwitch from '../../node_modules/@material-ui/core/Switch/Switch';
+import FormControlLabel from '../../node_modules/@material-ui/core/FormControlLabel/FormControlLabel';
 
 const styles = {
   paper: {
@@ -33,12 +34,24 @@ class Switch extends React.Component {
 
   render() {
     const { checked } = this.state;
-
+    const { column: { label, required } } = this.props;
     return (
-      <MuiSwitch
-        checked={checked}
-        onChange={this.handleChange}
-      />
+      label === undefined || label === '' ? (
+        <MuiSwitch
+          checked={checked}
+          onChange={this.handleChange}
+        />
+      ) : (
+        <FormControlLabel
+          control={
+            <MuiSwitch
+              checked={checked}
+              onChange={this.handleChange}
+            />
+          }
+          label={`${label}${required ? '*' : ''}`}
+        />
+      )
     );
   }
 }

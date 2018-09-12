@@ -6,7 +6,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import ReactDOM from 'react-dom';
 import Warning from '@material-ui/icons/Warning';
 import { withStyles } from '@material-ui/core/styles';
-import dialog from "utils/dialog";
+import dialog from 'utils/dialog';
 
 const styles = {
   paper: {
@@ -18,6 +18,10 @@ const styles = {
     verticalAlign: 'bottom',
     marginRight: '10px',
     color: '#faad14',
+  },
+  content: {
+    margin: '0 20px',
+    display: 'grid',
   },
 };
 
@@ -43,7 +47,7 @@ class CustomDialog extends React.Component {
         <DialogTitle>
           {title || '提示'}
         </DialogTitle>
-        {children}
+        <div className={classes.content}>{children}</div>
               </Fragment>);
     }
     return '';
