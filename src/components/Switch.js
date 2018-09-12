@@ -24,6 +24,8 @@ class Switch extends React.Component {
   componentDidMount() {
     const { checked } = this.props;
     this.setState({ checked: checked === true });
+    // 更新原有值,避免发生bool存在null的情况
+    this.props.onChange(checked);
   }
 
   handleChange=(e) => {

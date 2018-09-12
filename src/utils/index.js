@@ -64,7 +64,7 @@ export function formatDict(value, dict) {
     return '';
   }
   const data = getOrCreateStore().getState().global.dict;
-  const option = [...(data && data[dict] && data[dict].children)] || [];
+  const option = [...(data && data[dict] && data[dict].children) || []];
   const values = option.filter(it => it.value === value);
   if (values.length !== 0) {
     return values[0].name;
