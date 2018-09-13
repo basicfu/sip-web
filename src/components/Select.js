@@ -24,7 +24,7 @@ class Select extends React.Component {
     const { dict, defaultValue } = this.props;
     const data = getOrCreateStore().getState().global.dict;
     const defaultOption = this.props.default;
-    const option = [...(data && data[dict] && data[dict].children)] || [];
+    const option = [...(data && data[dict] && data[dict].children) || []];
     let value = '';
     if (defaultOption) {
       option.unshift(defaultOption);

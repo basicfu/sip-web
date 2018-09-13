@@ -3,7 +3,6 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import ReactDOM from 'react-dom';
 import Warning from '@material-ui/icons/Warning';
 import { withStyles } from '@material-ui/core/styles';
 import dialog from 'utils/dialog';
@@ -11,8 +10,7 @@ import dialog from 'utils/dialog';
 const styles = {
   paper: {
     width: 400,
-    top: 150,
-    position: 'absolute',
+    top: -80,
   },
   warning: {
     verticalAlign: 'bottom',
@@ -27,6 +25,10 @@ const styles = {
 
 class CustomDialog extends React.Component {
   handleClose = () => {
+    const { onClose } = this.props.data;
+    if (onClose) {
+      onClose();
+    }
     dialog.close();
   };
 

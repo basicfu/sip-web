@@ -202,18 +202,13 @@ class CustomTable extends React.Component {
 
   componentDidMount() {
     window.addEventListener('keyup', (e) => {
-      // esc 暂只重置第一个table
       if (e.keyCode === 27) {
-        const { namespace, keyName, tableName, page, list, dispatch } = this.data();
-        if (list.length > 0 && list[0][keyName] === -1) {
-          list.shift();
-          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {}, data: { page, list } } });
-        } else {
-          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {} } });
-        }
+        //取消
+        this.handleClear()
       } else if (e.keyCode === 13) {
+        //回车
         const { addOrEdit } = this.data();
-        if (addOrEdit) {
+        if (addOrEdit===true) {
           this.handleDone();
         }
       }
@@ -269,7 +264,7 @@ class CustomTable extends React.Component {
           elements.push(ele)
         });
         dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: newTable } });
-        dialog.content({title:'添加',children:elements,onOk:this.handleDone})
+        dialog.content({title:'添加',children:elements,onOk:this.handleDone,onClose:this.handleClear})
       }
     }
   };
@@ -375,12 +370,12 @@ class CustomTable extends React.Component {
 
   // cancel
   handleClear=() => {
-    const { namespace, keyName, tableName, dispatch, list, page, table, item } = this.data();
-    if (item[keyName] === -1) {
+    const { namespace, keyName, tableName, dispatch, list, page, item } = this.data();
+    if (list.length>1&&list[0][keyName]===-1) {
       list.shift();
-      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, selected: [], item: {}, status: '' }, data: { page, list } } });
-    } else {
-      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, selected: [], item: {}, status: '' }, data: { page, list } } });
+      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {}, data: { page, list } } });
+    }else {
+      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {}, data: { page, list } } });
     }
   }
 
