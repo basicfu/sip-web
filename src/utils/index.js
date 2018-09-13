@@ -38,11 +38,11 @@ export function dealObjectValue(obj) {
     return obj;
   }
   const param = {};
-  if (obj === null || obj === undefined || obj === '') return param;
+  if (obj === null || obj === undefined) return param;
   for (const key in obj) {
     if (dataType(obj[key]) === 'Object') {
       param[key] = dealObjectValue(obj[key]);
-    } else if (obj[key] !== null && obj[key] !== undefined && obj[key] !== '') {
+    } else if (obj[key] !== null && obj[key] !== undefined) {
       param[key] = obj[key];
     }
   }

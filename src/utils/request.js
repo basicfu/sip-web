@@ -38,7 +38,7 @@ export default function request(url, options) {
       const s = encodeURIComponent(value);
       const inc = url.includes('?') ? '&' : '?';
       // 排除undefined、null、''
-      if (s !== 'undefined' && s !== null && s !== '') {
+      if (s !== 'undefined' && s !== null) {
         url += `${inc}${key}=${s}`;
       }
     });
