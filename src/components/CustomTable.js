@@ -371,7 +371,7 @@ class CustomTable extends React.Component {
   // cancel
   handleClear=() => {
     const { namespace, keyName, tableName, dispatch, list, page, item } = this.data();
-    if (list.length>1&&list[0][keyName]===-1) {
+    if (list.length>0&&list[0][keyName]===-1) {
       list.shift();
       dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {}, data: { page, list } } });
     }else {
