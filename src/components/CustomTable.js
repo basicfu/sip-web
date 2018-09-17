@@ -257,11 +257,13 @@ class CustomTable extends React.Component {
         let newTable={ ...table, selected: [], item: defaultItem, status: 'add' };
         let elements=[];
         columns.forEach((column,index)=>{
-          let ele=this.renderField(column,defaultItem,newTable,edit);
-          if(index!==0&&ele!==''){
-            elements.push(<Divider key={index} style={{height:0,margin:'5px 0'}}/>)
+          if(column.dialogVisible!==false){
+            let ele=this.renderField(column,defaultItem,newTable,edit);
+            if(index!==0){
+              elements.push(<Divider key={index} style={{height:0,margin:'5px 0'}}/>)
+            }
+            elements.push(ele)
           }
-          elements.push(ele)
         });
         dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: newTable } });
         dialog.content({title:'添加',children:elements,onOk:this.handleDone,onClose:this.handleClear})
@@ -270,9 +272,26 @@ class CustomTable extends React.Component {
   };
 
   // 赋值当前选中项
-  handleEdit =() => {
-    const { namespace, tableName, dispatch, table } = this.data();
-    dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, status: 'edit' } } });
+  handleEdit =(edit) => {
+    const { namespace, tableName, dispatch,columns, table,item } = this.data();
+    if(edit==='row'){
+      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, status: 'edit' } } });
+    }else if(edit==='modal'){
+      //弹窗添加时不应该selected
+      let newTable={ ...table, status: 'edit' };
+      let elements=[];
+      columns.forEach((column,index)=>{
+        if(column.dialogVisible!==false){
+          let ele=this.renderField(column,item,newTable,edit);
+          if(index!==0){
+            elements.push(<Divider key={index} style={{height:0,margin:'5px 0'}}/>)
+          }
+          elements.push(ele)
+        }
+      });
+      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: newTable } });
+      dialog.content({title:'修改',children:elements,onOk:this.handleDone,onClose:this.handleClear})
+    }
   };
 
   // 单击事件，处理单击/双击冲突事件

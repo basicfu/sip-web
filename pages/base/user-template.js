@@ -1,14 +1,14 @@
 import React from 'react';
-import {withStyles} from '@material-ui/core/styles';
-import {connect} from 'dva';
+import { withStyles } from '@material-ui/core/styles';
+import { connect } from 'dva';
 import CustomTable from 'components/CustomTable';
-import {formatDateTime, formatDict, formatFlag} from 'utils';
+import { formatDateTime, formatDict, formatFlag } from 'utils';
 import styles from 'styles/user-template';
 import CustomSearch from 'components/CustomSearch';
 import Select from 'components/Select';
-import {Dict, SelectDefault} from 'enum';
+import { Dict, SelectDefault } from 'enum';
 import Switch from 'components/Switch';
-import Input from "components/Input";
+import Input from 'components/Input';
 
 const namespace = 'userTemplate';
 
@@ -62,8 +62,8 @@ class UserTemplate extends React.Component {
         { id: 'defaultValue', label: '默认值', required: false, render: this.renderColumns },
         { id: 'required', label: '是否必填', required: true, addDefaultValue: false, render: this.renderColumns },
         { id: 'sort', label: '顺序', required: false, addDefaultValue: 0, render: this.renderColumns },
-        { id: 'cdate', label: '创建时间', required: false, render: formatDateTime },
-        { id: 'udate', label: '更新时间', required: false, render: formatDateTime },
+        { id: 'cdate', label: '创建时间', required: false, dialogVisible: false, render: formatDateTime },
+        { id: 'udate', label: '更新时间', required: false, dialogVisible: false, render: formatDateTime },
       ],
     };
     return (

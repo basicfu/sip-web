@@ -49,6 +49,9 @@ const toolbarStyles = theme => ({
   rowClearIcon: {
     color: '#ba68c8',
   },
+  modalIcon: {
+    color: '#ba8448',
+  },
   speedDial: {
     position: 'absolute',
     top: 10,
@@ -130,8 +133,13 @@ class TableHeader extends React.Component {
               }
               {tableStatus !== 'add' &&
                 <Fragment>
+                  <Tooltip title="弹窗修改">
+                    <IconButton color={'primary'} className={classes.modalIcon} onClick={() => onEdit('modal')}>
+                      <Assignment />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="修改">
-                    <IconButton color={'primary'} onClick={() => onEdit()}>
+                    <IconButton color={'primary'} onClick={() => onEdit('row')}>
                       <EditOutlinedIcon />
                     </IconButton>
                   </Tooltip>
