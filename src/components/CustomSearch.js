@@ -27,7 +27,7 @@ class CustomSearch extends React.Component {
   };
 
   render() {
-    const { classes, onSearch } = this.props;
+    const { classes,placeholder, onSearch } = this.props;
     const { value } = this.state;
     return (
       <TextField
@@ -37,7 +37,7 @@ class CustomSearch extends React.Component {
         id="search"
         type="search"
         margin="normal"
-        placeholder="字段名或英文名"
+        placeholder={placeholder}
         InputProps={{
           startAdornment: (
             <InputAdornment className={classes.icon} position="start">

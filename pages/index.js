@@ -14,5 +14,5 @@ class EntryManageCust extends React.Component {
 }
 
 export default connect(state => ({
-  data: state.userTemplate,
+  data: state.baseUserTemplate,
 }))(withStyles(styles)(EntryManageCust));

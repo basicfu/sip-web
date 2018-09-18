@@ -17,11 +17,9 @@ const modal = {
     },
     * list({ payload }, { call, put }) {
       const data = payload;
-      // 暂时写死清空默认table
       dialog.close();
       yield put({ type: 'updateState', payload: { table: {} } });
       const response = yield call(listUserTemplate, data);
-      yield put({ type: 'updateState', payload: { loading: false } });
       if (response.success) {
         yield put({ type: 'updateState', payload: { ...response } });
       }

@@ -10,7 +10,7 @@ import { Dict, SelectDefault } from 'enum';
 import Switch from 'components/Switch';
 import Input from 'components/Input';
 
-const namespace = 'userTemplate';
+const namespace = 'baseUserTemplate';
 
 class UserTemplate extends React.Component {
   componentDidMount() {
@@ -53,7 +53,7 @@ class UserTemplate extends React.Component {
     const tableProps = {
       // edit: 'false',
       data,
-      headerChild: <CustomSearch onSearch={(value) => this.handleSearch(value)} />,
+      headerChild: <CustomSearch placeholder="字段名或英文名" onSearch={(value) => this.handleSearch(value)} />,
       columns: [
         { id: 'name', label: '字段名', required: true, render: this.renderColumns },
         { id: 'enName', label: '字段英文名', required: true, render: this.renderColumns },
@@ -72,5 +72,5 @@ class UserTemplate extends React.Component {
   }
 }
 export default connect(state => ({
-  data: state.userTemplate,
+  data: state[namespace],
 }))(withStyles(styles)(UserTemplate));
