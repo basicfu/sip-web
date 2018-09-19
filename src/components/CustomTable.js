@@ -266,7 +266,7 @@ class CustomTable extends React.Component {
           }
         });
         dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: newTable } });
-        dialog.content({title:'添加',children:elements,onOk:this.handleDone,onClose:this.handleClear})
+        dialog.confirm({title:'添加',content:elements,onOk:this.handleDone,onClose:this.handleClear})
       }
     }
   };
@@ -290,7 +290,7 @@ class CustomTable extends React.Component {
         }
       });
       dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: newTable } });
-      dialog.content({title:'修改',children:elements,onOk:this.handleDone,onClose:this.handleClear})
+      dialog.confirm({title:'修改',content:elements,onOk:this.handleDone,onClose:this.handleClear})
     }
   };
 
@@ -362,13 +362,14 @@ class CustomTable extends React.Component {
   };
 
   handleDelete = () => {
-    const { namespace, dispatch, selected } = this.data();
-    dialog.warning({ onOk() { dispatch({ type: `${namespace}/delete`, payload: selected }); } });
+    const { namespace, dispatch, selected,deleteTitle,deleteContent } = this.data();
+    dialog.confirm({ title:deleteTitle||"确定要删除吗？",content:deleteContent,onOk() { dispatch({ type: `${namespace}/delete`, payload: selected }); } });
   };
 
   // insert
   handleDone=() => {
-    const { namespace, keyName, dispatch, table, item, columns } = this.data();
+    const { namespace, keyName, dispatch, table, item,list, columns } = this.data();
+    console.log(list);
     const add = table.status === 'add';
     const edit = table.status === 'edit';
     // check field
@@ -376,7 +377,6 @@ class CustomTable extends React.Component {
     // 非必填  过滤null/underfind
     for (const it of columns) {
       let v=item[it.id];
-      console.log(item);
       if (it.required===true) {
         if(v===undefined||v===null||v===''){
           notify.warning(`[${it.label}]必填`);
@@ -410,14 +410,14 @@ class CustomTable extends React.Component {
 
   data=() => {
     const dispatch = getOrCreateStore().dispatch;
-    const { classes, columns, data, keyName, tableName, edit, actionName, showCheck, showHeader, headerChild, showFooter } = this.props;
+    const { classes, columns, data, keyName, tableName, edit, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent } = this.props;
     const { namespace, data: { list, page }, all } = data;
     const table = data[tableName];
     const selected = table.selected || [];
-    const item = table.item || {};
+    const item = {...table.item} || {};
     const addOrEdit = table.status === 'add' || table.status === 'edit';
     const tableStatus = table.status;
-    return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, addOrEdit, tableStatus, edit, actionName, showCheck, showHeader, headerChild, showFooter };
+    return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, addOrEdit, tableStatus, edit, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent };
   }
   handleItemChange = (itemKey, itemValue) => {
     const { dispatch, tableName, namespace, table } = this.data();
