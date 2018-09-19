@@ -372,14 +372,24 @@ class CustomTable extends React.Component {
     const add = table.status === 'add';
     const edit = table.status === 'edit';
     // check field
+    // 必填   过滤null/underfind/""
+    // 非必填  过滤null/underfind
     for (const it of columns) {
       let v=item[it.id];
-      if (it.required && (v===undefined||v===null||v==='')) {
-        notify.warning(`[${it.label}]必填`);
-        return;
+      console.log(item);
+      if (it.required===true) {
+        if(v===undefined||v===null||v===''){
+          notify.warning(`[${it.label}]必填`);
+          return;
+        }
+      }else{
+        if(v===undefined||v===null){
+          delete item[it.id]
+        }
       }
     }
     if (add) {
+      //添加过滤主键
       delete item[keyName];
       dispatch({ type: `${namespace}/insert`, payload: { ...item } });
     } else if (edit) {

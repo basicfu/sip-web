@@ -3,6 +3,16 @@ import notify from 'notify';
 import config from 'config';
 import { dealObjectValue } from 'utils';
 
+/**
+ * 通用HTTP请求
+ * URL参数过滤null/undefined/""
+ * 非URL参数两种情况(在通用请求处判断，这里不考虑参数是否必填)：
+ * 必填   过滤null/underfind/""
+ * 非必填  过滤null/underfind
+ * @param url
+ * @param options
+ * @returns {*}
+ */
 export default function request(url, options) {
   const defaultOptions = {
     credentials: 'include',
@@ -37,8 +47,8 @@ export default function request(url, options) {
       const value = newOptions.body[key];
       const s = encodeURIComponent(value);
       const inc = url.includes('?') ? '&' : '?';
-      // 排除undefined、null、''
-      if (s !== 'undefined' && s !== null) {
+      // GET请求过滤undefined、null、''
+      if (s !== 'undefined' && s !== null && s !== '') {
         url += `${inc}${key}=${s}`;
       }
     });
