@@ -3,9 +3,9 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Warning from '@material-ui/icons/Warning';
 import { withStyles } from '@material-ui/core/styles';
 import dialog from 'utils/dialog';
+import DialogContentText from '../../node_modules/@material-ui/core/DialogContentText/DialogContentText';
 
 const styles = {
   paper: {
@@ -23,6 +23,10 @@ const styles = {
   },
 };
 
+/**
+ * 如果需要动态控制width
+ * 预先提供N种width的宽度，然后选择一种
+ */
 class CustomDialog extends React.Component {
   handleClose = () => {
     const { onClose } = this.props.data;
@@ -37,26 +41,27 @@ class CustomDialog extends React.Component {
   };
 
   renderChildren() {
-    const { classes, type, data: { title, children } } = this.props;
-    if (type === 'warning') {
-      return (<DialogTitle>
-        <Warning className={classes.warning} />
-        {title || '确定要删除吗?'}
-              </DialogTitle>);
-    }
-    if (type === 'content') {
-      return (<Fragment>
-        <DialogTitle>
-          {title || '提示'}
-        </DialogTitle>
-        <div className={classes.content}>{children}</div>
-              </Fragment>);
-    }
-    return '';
+    const { classes, data: { title, content } } = this.props;
+    const isString = typeof content === 'string' || typeof content === 'undefined';
+    return (
+      <Fragment>
+      <DialogTitle>
+        {title || '提示'}
+      </DialogTitle>
+      <div className={classes.content}>
+        {isString ?
+          <DialogContentText id="alert-dialog-description">
+            {content}
+          </DialogContentText>
+          :
+          content
+        }
+      </div>
+      </Fragment>);
   }
 
   render() {
-    const { classes, type, data: { title } } = this.props;
+    const { classes } = this.props;
     return (
       <Dialog
         classes={{ paper: classes.paper }}

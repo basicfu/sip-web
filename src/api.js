@@ -27,6 +27,13 @@ export async function insertAppService(params) { return request(`${prefix}${base
 export async function updateAppService(params) { return request(`${prefix}${base}/app-service/update`, { method: 'POST', body: params }); }
 export async function deleteAppService(params) { return request(`${prefix}${base}/app-service/delete`, { method: 'DELETE', body: params }); }
 
+// 应用Secret
+export async function listAppSecret(params) { return request(`${prefix}${base}/app-secret/list`, { method: 'GET', body: params }); }
+export async function allAppSecret(params) { return request(`${prefix}${base}/app-secret/all`, { method: 'GET', body: params }); }
+export async function insertAppSecret(params) { return request(`${prefix}${base}/app-secret/insert`, { method: 'POST', body: params }); }
+export async function updateAppSecret(params) { return request(`${prefix}${base}/app-secret/update`, { method: 'POST', body: params }); }
+export async function deleteAppSecret(params) { return request(`${prefix}${base}/app-secret/delete`, { method: 'DELETE', body: params }); }
+
 // 用户模版
 export async function allUserTemplate(params) { return request(`${prefix}${base}/user-template/all`, { method: 'GET', body: params }); }
 export async function listUserTemplate(params) { return request(`${prefix}${base}/user-template/list`, { method: 'GET', body: params }); }
