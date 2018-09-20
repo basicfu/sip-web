@@ -32,7 +32,7 @@ class Login extends React.Component {
 
   handleLogin = () => {
     const { username, password } = this.state;
-    this.props.dispatch({ type: 'user/login', payload: { username, password } });
+    this.props.dispatch({ type: 'baseUser/login', payload: { username, password } });
   };
 
   handleMouseDownPassword = event => {

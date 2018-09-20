@@ -8,3 +8,12 @@ export const SelectDefault = {
   CHOOSE: { name: '请选择', value: 'SelectDefault' },
 };
 Object.freeze(SelectDefault);
+export const FieldType = {
+  TEXT: 'TEXT',
+  NUMBER: 'NUMBER',
+  CHECK: 'CHECK',
+  RADIO: 'RADIO',
+  SELECT: 'SELECT',
+  DATE: 'DATE',
+};
+Object.freeze(FieldType);

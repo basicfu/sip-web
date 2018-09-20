@@ -135,7 +135,7 @@ function calcTableAuto(props) {
   const renderField=(column,item)=>{
     const add = table.status === 'add' && item[keyName] === -1;
     const edit = table.status === 'edit' && item[keyName] === table.selected[0];
-    return column.render ? column.render(item[column.id], {id:column.id,label:column.label,required:column.required},add,edit) : item[column.id]
+    return column.render ? column.render(item[column.id], {id:column.id,label:column.label,required:column.required,type:column.type},add,edit) : item[column.id]
   };
   const selected = table.selected || [];
   const headerMinWidths = [];
@@ -369,7 +369,6 @@ class CustomTable extends React.Component {
   // insert
   handleDone=() => {
     const { namespace, keyName, dispatch, table, item,list, columns } = this.data();
-    console.log(list);
     const add = table.status === 'add';
     const edit = table.status === 'edit';
     // check field
@@ -424,15 +423,15 @@ class CustomTable extends React.Component {
     // TODO 保存会闪原数据
     dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, item: { ...table.item, [itemKey]: itemValue } } } });
   };
-  renderField(column,item,table,edit){
-    const { keyName } = this.data();
-    const rowAdd = table.status === 'add' && item[keyName] === -1;
-    const rowEdit = table.status === 'edit' && item[keyName] === table.selected[0];
+  renderField(column,listItem,table,edit){
+    const { keyName,item } = this.data();
+    const rowAdd = table.status === 'add' && listItem[keyName] === -1;
+    const rowEdit = table.status === 'edit' && listItem[keyName] === table.selected[0];
     let label='';
     if(edit&&edit==='modal'){
       label=column.label
     }
-    return column.render ? column.render(item[column.id], {id:column.id,label,required:column.required} ,rowAdd,rowEdit, this.handleItemChange) : item[column.id]
+    return column.render ? column.render(listItem[column.id], {id:column.id,label,required:column.required,type:column.type} ,rowAdd,rowEdit, this.handleItemChange,item) : listItem[column.id]
   }
   render() {
     const { classes, dispatch, columns, keyName, tableName, namespace, list, page, table, selected, addOrEdit, tableStatus, showCheck, showHeader, headerChild, showFooter } = this.data();

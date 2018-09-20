@@ -52,7 +52,7 @@ class Navbar extends React.Component {
   };
 
   handleLogout = () => {
-    this.props.dispatch({ type: 'user/logout' });
+    this.props.dispatch({ type: 'baseUser/logout' });
   };
 
   render() {
