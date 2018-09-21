@@ -135,7 +135,7 @@ function calcTableAuto(props) {
   const renderField=(column,item)=>{
     // const add = table.status === 'add' && item[keyName] === -1;
     // const edit = table.status === 'edit' && item[keyName] === table.selected[0];
-    return column.render ? column.render(item[column.id], {id:column.id,label:column.label,required:column.required,type:column.type},'','') : item[column.id]
+    return column.render ? column.render(item[column.id], column,'','') : item[column.id]
   };
   const selected = table.selected || [];
   const headerMinWidths = [];
@@ -238,7 +238,7 @@ class CustomTable extends React.Component {
     dispatch({ type: `${namespace}/list`, payload: { pageNum, pageSize: event.target.value } });
   };
 
-  // 添加默认值
+  // 预添加模式
   handleAdd =(edit) => {
     const { namespace, tableName, page, list, dispatch, table, addOrEdit,keyName,columns,item } = this.data();
     if (!addOrEdit) {
@@ -250,11 +250,11 @@ class CustomTable extends React.Component {
       });
       if(edit==='row'){
         list.unshift(defaultItem);
-        let newTable={ ...table, selected: [defaultItem[keyName]], item: defaultItem, status: 'add' };
+        let newTable={ ...table, selected: [defaultItem[keyName]], item: defaultItem, status: 'add',editStatus:'row' };
         dispatch({ type: `${namespace}/updateState`, payload: { data: { page, list },[tableName]: newTable } });
       }else if(edit==='modal'){
         //弹窗添加时不应该selected
-        let newTable={ ...table, selected: [], item: defaultItem, status: 'add' };
+        let newTable={ ...table, selected: [], item: defaultItem, status: 'add',editStatus:'modal' };
         let elements=[];
         columns.forEach((column,index)=>{
           if(column.dialogVisible!==false){
@@ -271,14 +271,28 @@ class CustomTable extends React.Component {
     }
   };
 
-  // 赋值当前选中项
-  handleEdit =(edit) => {
-    const { namespace, tableName, dispatch,columns, table,item } = this.data();
+  // 预编辑模式,行双击事件需要指定行id
+  handleEdit =(edit,id) => {
+    const { namespace, tableName, dispatch,columns, table,item,keyName,page,list } = this.data();
     if(edit==='row'){
-      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, status: 'edit' } } });
+      clearTimeout(timerId);
+      //双击当前编辑行无操作
+      if (id !== -1) {
+        let newItem=list.filter(it => it[keyName] === id)[0];
+        let selected=[id];
+        let status='edit';
+        if(list[0].id===-1){
+          //如果有新建行不进入编辑状态
+          list.shift();
+          newItem={};
+          selected=[];
+          status='';
+        }
+        dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, selected, item:newItem, status,editStatus:'row' }, data: { page, list } } });
+      }
     }else if(edit==='modal'){
       //弹窗添加时不应该selected
-      let newTable={ ...table, status: 'edit' };
+      let newTable={ ...table, status: 'edit',editStatus:'modal' };
       let elements=[];
       columns.forEach((column,index)=>{
         if(column.dialogVisible!==false){
@@ -320,26 +334,6 @@ class CustomTable extends React.Component {
     }, 200);
   };
 
-  // 双击事件
-  handleDoubleClick = (event, id) => {
-    clearTimeout(timerId);
-    const { namespace, keyName, tableName, page, list, dispatch, table,item } = this.data();
-    //双击当前编辑行无操作
-    if (id !== -1) {
-      let newItem=list.filter(it => it[keyName] === id)[0];
-      let selected=[id];
-      let status='edit';
-      if(list[0].id===-1){
-        //如果有新建行不进入编辑状态
-        list.shift();
-        newItem={};
-        selected=[];
-        status='';
-      }
-      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, selected, item:newItem, status }, data: { page, list } } });
-    }
-  };
-
   //行checkbox事件
   handleCheckbox = (event, id) => {
     clearTimeout(timerId);
@@ -366,7 +360,7 @@ class CustomTable extends React.Component {
     dialog.confirm({ title:deleteTitle||"确定要删除吗？",content:deleteContent,onOk() { dispatch({ type: `${namespace}/delete`, payload: selected }); } });
   };
 
-  // insert
+  // insert/update
   handleDone=() => {
     const { namespace, keyName, dispatch, table, item,list, columns } = this.data();
     const add = table.status === 'add';
@@ -376,14 +370,25 @@ class CustomTable extends React.Component {
     // 非必填  过滤null/underfind
     for (const it of columns) {
       let v=item[it.id];
+      //check required
       if (it.required===true) {
-        if(v===undefined||v===null||v===''){
-          notify.warning(`[${it.label}]必填`);
-          return;
+        if((it.addRequired!==true&&it.editRequired!==true)||(add===true&&it.addRequired===true)||(edit===true&&it.editRequired===true)){
+          if(v===undefined||v===null||v===''){
+            notify.warning(`[${it.label}]必填`);
+            return;
+          }
         }
       }else{
         if(v===undefined||v===null){
           delete item[it.id]
+        }
+      }
+      //check validator
+      if(it.validator){
+        let msg=it.validator(v,item)
+        if(msg){
+          notify.warning(msg);
+          return
         }
       }
     }
@@ -416,7 +421,9 @@ class CustomTable extends React.Component {
     const item = {...table.item} || {};
     const addOrEdit = table.status === 'add' || table.status === 'edit';
     const tableStatus = table.status;
-    return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, addOrEdit, tableStatus, edit, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent };
+    const editStatus = table.editStatus;
+    return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, addOrEdit, tableStatus, edit, actionName,
+      showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent,editStatus };
   }
   handleItemChange = (itemKey, itemValue) => {
     const { dispatch, tableName, namespace, table } = this.data();
@@ -427,16 +434,17 @@ class CustomTable extends React.Component {
     const { keyName,item } = this.data();
     const rowAdd = table.status === 'add' && listItem[keyName] === -1;
     const rowEdit = table.status === 'edit' && listItem[keyName] === table.selected[0];
-    let label='';
-    if(edit&&edit==='modal'){
-      label=column.label
+    let newColumn={...column};
+    if(!(edit&&edit==='modal')){
+      newColumn.label=''
     }
-    return column.render ? column.render(listItem[column.id], {id:column.id,label,required:column.required,type:column.type} ,rowAdd,rowEdit, this.handleItemChange,item) : listItem[column.id]
+    return column.render ? column.render(listItem[column.id], newColumn ,rowAdd,rowEdit, this.handleItemChange,item) : listItem[column.id]
   }
   render() {
-    const { classes, dispatch, columns, keyName, tableName, namespace, list, page, table, selected, addOrEdit, tableStatus, showCheck, showHeader, headerChild, showFooter } = this.data();
+    const { classes, editStatus, columns, keyName, tableName, namespace, list, page, table, selected, addOrEdit, tableStatus, showCheck, showHeader, headerChild, showFooter } = this.data();
     const { rowsPerPageOptions, rowsPerPage } = this.state;
     const { headerMinWidths, contentWidths } = calcTableAuto({ list, columns, keyName, table, addOrEdit });
+    console.log(editStatus);
     return (
       <Paper className={classes.root}>
         {showHeader &&
@@ -463,11 +471,13 @@ class CustomTable extends React.Component {
                   />
                 </CustomTableCell>}
                 {columns.map((column, columnIndex) => {
-                  return (
-                    <CustomTableCell key={columnIndex} style={{ minWidth: `${headerMinWidths[columnIndex]}px`, width: `${contentWidths[columnIndex]}%` }}>
-                      {column.label}
-                    </CustomTableCell>
-                  );
+                  if(column.visible!==false||(column.visible===false&&editStatus==='row')){
+                    return (
+                      <CustomTableCell key={columnIndex} style={{ minWidth: `${headerMinWidths[columnIndex]}px`, width: `${contentWidths[columnIndex]}%` }}>
+                        {column.label}
+                      </CustomTableCell>
+                    );
+                  }
                 }, this)}
               </TableRow>
             </TableHead>
@@ -478,21 +488,23 @@ class CustomTable extends React.Component {
                   <TableRow
                     hover
                     onClick={event => this.handleClick(event, item[keyName])}
-                    onDoubleClick={event => this.handleDoubleClick(event, item[keyName])}
+                    onDoubleClick={event => this.handleEdit('row', item[keyName])}
                     aria-checked={isSelected}
                     tabIndex={-1}
                     key={item[keyName]}
                     selected={isSelected}
                   >
                     {showCheck &&
-                    <CustomTableCell style={{ textAlign: 'center' }}>
+                    <CustomTableCell style={{ textAlign: 'left' }}>
                       <Checkbox checked={isSelected} onChange={e => this.handleCheckbox(e, item[keyName])} />
                     </CustomTableCell>}
                     {columns.map((column, columnIndex) => {
-                      return (
-                        <CustomTableCell key={columnIndex} style={{ textAlign: column.align || undefined }}>
-                          {this.renderField(column,item,table)}
-                        </CustomTableCell>);
+                      if(column.visible!==false||(column.visible===false&&editStatus==='row')){
+                        return (
+                          <CustomTableCell key={columnIndex} style={{textAlign: column.align || undefined}}>
+                            {this.renderField(column, item, table)}
+                          </CustomTableCell>);
+                        }
                     })}
                   </TableRow>
                 );

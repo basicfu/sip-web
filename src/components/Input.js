@@ -14,13 +14,14 @@ const styles = {
 
 class Input extends React.Component {
   render() {
-    const { classes, defaultValue, onChange, column: { label, required } } = this.props;
+    const { classes, defaultValue, onChange,type, column: { label, required } } = this.props;
     return (
       label === undefined || label === '' ? (
         <MuiInput
           className={classes.input}
           onChange={onChange}
           defaultValue={defaultValue}
+          type={type}
         />
       ) : (
         <FormControl
@@ -30,6 +31,7 @@ class Input extends React.Component {
             className={classes.input}
             onChange={onChange}
             defaultValue={defaultValue}
+            type={type}
           />
         </FormControl>
       )

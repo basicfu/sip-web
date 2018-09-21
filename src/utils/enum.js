@@ -15,5 +15,6 @@ export const FieldType = {
   RADIO: 'RADIO',
   SELECT: 'SELECT',
   DATE: 'DATE',
+  PASSWORD: 'PASSWORD',
 };
 Object.freeze(FieldType);

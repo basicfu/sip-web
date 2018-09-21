@@ -5,10 +5,11 @@ import CustomTable from 'components/CustomTable';
 import styles from 'styles/user-template';
 import CustomSearch from 'components/CustomSearch';
 import Input from 'components/Input';
-import { formatDateTime, formatFlag } from 'utils';
+import {formatDateTime, formatDict, formatFlag} from 'utils';
 import Switch from 'components/Switch';
-import { FieldType } from 'enum';
+import { Dict, FieldType, SelectDefault } from 'enum';
 import InputNumber from 'components/InputNumber';
+import Select from 'components/Select';
 
 const namespace = 'baseUser';
 
@@ -23,7 +24,7 @@ class User extends React.Component {
   };
 
   renderColumns=(text, column, add, edit, onChange) => {
-    const { id, type } = column;
+    const { id, type, extra } = column;
     switch (type) {
       case FieldType.TEXT:
         if (add || edit) {
@@ -35,15 +36,20 @@ class User extends React.Component {
           return <InputNumber key={id} defaultValue={text} onChange={e => onChange(id, e.target.value)} column={column} />;
         }
         return text;
-      // case 'CHECK':
-      //   columns.push({ id, label, required, render: this.renderColumns });
-      //   break;
-      // case 'RADIO':
-      //   columns.push({ id, label, required, render: this.renderColumns });
-      //   break;
-      // case 'SELECT':
-      //   columns.push({ id, label, required, render: this.renderColumns });
-      //   break;
+      case FieldType.PASSWORD:
+        if (add || edit) {
+          return <Input key={id} type="password" defaultValue={text} onChange={e => onChange(id, e.target.value)} column={column} />;
+        }
+        return text;
+      case 'CHECK':
+        break;
+      case 'RADIO':
+        break;
+      case FieldType.SELECT:
+        if (add || edit) {
+          return <Select key={id} dict={extra} default={SelectDefault.CHOOSE} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
+        }
+        return formatDict(text, extra);
       // case 'DATE':
       //   columns.push({ id, label, required, render: this.renderColumns });
       //   break;
@@ -54,12 +60,19 @@ class User extends React.Component {
 
   render() {
     const { data, userTemplate } = this.props;
+    const validator = (value, item) => {
+      if (value !== item.password) {
+        return '两次密码不一致';
+      }
+    };
     const columns = [];
     columns.push({ id: 'username', label: '用户名', type: FieldType.TEXT, required: true, render: this.renderColumns });
     columns.push({ id: 'mobile', label: '手机号', type: FieldType.TEXT, required: false, render: this.renderColumns });
     columns.push({ id: 'email', label: '邮箱', type: FieldType.TEXT, required: false, render: this.renderColumns });
+    columns.push({ id: 'password', label: '密码', type: FieldType.PASSWORD, required: true, addRequired: true, editRequired: false, visible: false, render: this.renderColumns });
+    columns.push({ id: 'repassword', label: '确认密码', type: FieldType.PASSWORD, required: true, addRequired: true, editRequired: false, visible: false, validator, render: this.renderColumns });
     userTemplate.forEach(it => {
-      columns.push({ id: it.enName, label: it.name, type: it.type, required: it.required, addDefaultValue: it.defaultValue, render: this.renderColumns });
+      columns.push({ id: it.enName, label: it.name, type: it.type, required: it.required, addDefaultValue: it.defaultValue, extra: it.extra, render: this.renderColumns });
     });
     columns.push({ id: 'cdate', label: '创建时间', required: false, dialogVisible: false, render: formatDateTime });
     columns.push({ id: 'udate', label: '更新时间', required: false, dialogVisible: false, render: formatDateTime });
