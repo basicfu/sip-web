@@ -133,17 +133,17 @@ function getDomWidth(text) {
 function calcTableAuto(props) {
   const { list, columns, keyName, addOrEdit, table } = props;
   const renderField=(column,item)=>{
-    const add = table.status === 'add' && item[keyName] === -1;
-    const edit = table.status === 'edit' && item[keyName] === table.selected[0];
-    return column.render ? column.render(item[column.id], {id:column.id,label:column.label,required:column.required,type:column.type},add,edit) : item[column.id]
+    // const add = table.status === 'add' && item[keyName] === -1;
+    // const edit = table.status === 'edit' && item[keyName] === table.selected[0];
+    return column.render ? column.render(item[column.id], {id:column.id,label:column.label,required:column.required,type:column.type},'','') : item[column.id]
   };
   const selected = table.selected || [];
   const headerMinWidths = [];
   const contentWidths = [];
   let calcList = [...list];
-  if (addOrEdit) {
-    calcList = calcList.filter(it => it[keyName] !== selected[0]);
-  }
+  // if (addOrEdit) {
+  //   calcList = calcList.filter(it => it[keyName] !== selected[0]);
+  // }
   let totalPart = 0;
   columns.forEach(column => {
     const widths = calcList.map(it => getDomWidth(renderField(column,it)));
