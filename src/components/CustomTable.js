@@ -240,7 +240,7 @@ class CustomTable extends React.Component {
 
   // 预添加模式
   handleAdd =(edit) => {
-    const { namespace, tableName, page, list, dispatch, table, addOrEdit,keyName,columns,item } = this.data();
+    const { namespace, tableName, page, list, dispatch, table, addOrEdit,keyName,columns,editMode } = this.data();
     if (!addOrEdit) {
       const defaultItem = {
         [keyName]: -1,
@@ -248,17 +248,25 @@ class CustomTable extends React.Component {
       columns.forEach(it=>{
         defaultItem[it.id]=it.addDefaultValue;
       });
-      if(edit==='row'){
+      let editStatus=edit;
+      //行添加模式
+      if((editMode==='all'||editMode==='row')&&editStatus==='row'){
         list.unshift(defaultItem);
         let newTable={ ...table, selected: [defaultItem[keyName]], item: defaultItem, status: 'add',editStatus:'row' };
         dispatch({ type: `${namespace}/updateState`, payload: { data: { page, list },[tableName]: newTable } });
-      }else if(edit==='modal'){
-        //弹窗添加时不应该selected
+      }else if(editMode==='all'||editMode==='modal'){
         let newTable={ ...table, selected: [], item: defaultItem, status: 'add',editStatus:'modal' };
+        //行弹窗添加
+        if(editStatus==="row"){
+          //添加状态由行更改为弹窗
+          editStatus='modal';
+          newTable={ ...newTable,editStatus:editStatus};
+        }
+        //标准弹窗添加
         let elements=[];
         columns.forEach((column,index)=>{
           if(column.dialogVisible!==false){
-            let ele=this.renderField(column,defaultItem,newTable,edit);
+            let ele=this.renderField(column,defaultItem,newTable,editStatus);
             if(index!==0){
               elements.push(<Divider key={index} style={{height:0,margin:'5px 0'}}/>)
             }
@@ -287,7 +295,7 @@ class CustomTable extends React.Component {
     let editStatus=edit;
     let elements=[];
     let selected=[...table.selected||[]];
-    if(edit==='row'){
+    if(editStatus==='row'){
       clearTimeout(timerId);
       if(id!==undefined){
         if (id === -1) {
@@ -309,11 +317,11 @@ class CustomTable extends React.Component {
     }
     //行编辑模式
     newTable={ ...newTable, selected, item:newItem,status:tableStatus,editStatus:editStatus };
-    if((editMode==='all'||editMode==='row')&&edit==='row'){
+    if((editMode==='all'||editMode==='row')&&editStatus==='row'){
       dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: newTable, data: { page, list } } });
     }else if(editMode==='all'||editMode==='modal'){
       //行弹窗编辑
-      if(edit==="row"){
+      if(editStatus==="row"){
         //编辑状态由行更改为弹窗
         editStatus='modal';
         newTable={ ...newTable,editStatus:editStatus};

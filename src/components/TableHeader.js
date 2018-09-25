@@ -182,12 +182,16 @@ class TableHeader extends React.Component {
               onMouseLeave={this.handleClose}
               open={open}
             >
-              <SpeedDialAction
+              {editMode === 'all' ?
+                <SpeedDialAction
                   key="1"
                   icon={<Assignment />}
                   tooltipTitle="弹窗添加"
                   onClick={() => this.handleAdd('modal')}
                 />
+                :
+                'tip'
+              }
             </SpeedDial>
           )}
         </div>
