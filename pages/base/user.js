@@ -5,17 +5,19 @@ import CustomTable from 'components/CustomTable';
 import styles from 'styles/user-template';
 import CustomSearch from 'components/CustomSearch';
 import Input from 'components/Input';
-import {formatDateTime, formatDict, formatFlag} from 'utils';
+import { formatDateTime, formatDict, formatFlag } from 'utils';
 import Switch from 'components/Switch';
 import { Dict, FieldType, SelectDefault } from 'enum';
 import InputNumber from 'components/InputNumber';
 import Select from 'components/Select';
+import ReactSelect from 'components/ReactSelect';
 
 const namespace = 'baseUser';
 
 class User extends React.Component {
   componentDidMount() {
     this.props.dispatch({ type: 'baseUserTemplate/all' });
+    this.props.dispatch({ type: 'permissionRole/all' });
     this.handleSearch();
   }
 
@@ -41,13 +43,14 @@ class User extends React.Component {
           return <Input key={id} type="password" defaultValue={text} onChange={e => onChange(id, e.target.value)} column={column} />;
         }
         return text;
-      case 'CHECK':
-        break;
-      case 'RADIO':
-        break;
       case FieldType.SELECT:
         if (add || edit) {
           return <Select key={id} dict={extra} default={SelectDefault.CHOOSE} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
+        }
+        return formatDict(text, extra);
+      case FieldType.MULTI_SELECT:
+        if (add || edit) {
+          return <ReactSelect key={id} options={extra} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
         }
         return formatDict(text, extra);
       // case 'DATE':
@@ -59,14 +62,16 @@ class User extends React.Component {
   }
 
   render() {
-    const { data, userTemplate } = this.props;
+    const { data, userTemplate, role } = this.props;
     const validator = (value, item) => {
       if (value !== item.password) {
         return '两次密码不一致';
       }
     };
+    const roleData = role.map(it => ({ label: it.name, value: it.id }));
     const columns = [];
     columns.push({ id: 'username', label: '用户名', type: FieldType.TEXT, required: true, render: this.renderColumns });
+    columns.push({ id: 'roleIds', label: '用户角色', type: FieldType.MULTI_SELECT, required: false, extra: roleData, render: this.renderColumns });
     columns.push({ id: 'mobile', label: '手机号', type: FieldType.TEXT, required: false, render: this.renderColumns });
     columns.push({ id: 'email', label: '邮箱', type: FieldType.TEXT, required: false, render: this.renderColumns });
     columns.push({ id: 'password', label: '密码', type: FieldType.PASSWORD, required: true, addRequired: true, editRequired: false, visible: false, render: this.renderColumns });
@@ -80,6 +85,7 @@ class User extends React.Component {
 
     const tableProps = {
       data,
+      editMode: 'modal',
       headerChild: <CustomSearch placeholder="用户名" onSearch={(value) => this.handleSearch(value)} />,
       columns,
     };
@@ -91,4 +97,5 @@ class User extends React.Component {
 export default connect(state => ({
   data: state[namespace],
   userTemplate: state.baseUserTemplate.all,
+  role: state.permissionRole.all,
 }))(withStyles(styles)(User));

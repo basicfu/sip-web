@@ -42,3 +42,42 @@ export async function listUserTemplate(params) { return request(`${prefix}${base
 export async function insertUserTemplate(params) { return request(`${prefix}${base}/user-template/insert`, { method: 'POST', body: params }); }
 export async function updateUserTemplate(params) { return request(`${prefix}${base}/user-template/update`, { method: 'POST', body: params }); }
 export async function deleteUserTemplate(params) { return request(`${prefix}${base}/user-template/delete`, { method: 'DELETE', body: params }); }
+
+
+// 角色
+export async function allRole(params) { return request(`${prefix}${permission}/role/all`, { method: 'GET', body: params }); }
+export async function listRole(params) { return request(`${prefix}${permission}/role/list`, { method: 'GET', body: params }); }
+export async function insertRole(params) { return request(`${prefix}${permission}/role/insert`, { method: 'POST', body: params }); }
+export async function insertRoleUser(params) { return request(`${prefix}${permission}/role/insert/user`, { method: 'POST', body: params }); }
+export async function insertRoleMenu(params) { return request(`${prefix}${permission}/role/insert/menu`, { method: 'POST', body: params }); }
+export async function insertRolePermission(params) { return request(`${prefix}${permission}/role/insert/permission`, { method: 'POST', body: params }); }
+export async function updateRole(params) { return request(`${prefix}${permission}/role/update`, { method: 'POST', body: params }); }
+export async function deleteRole(params) { return request(`${prefix}${permission}/role/delete`, { method: 'DELETE', body: params }); }
+export async function deleteRoleUser(params) { return request(`${prefix}${permission}/role/delete/user`, { method: 'DELETE', body: params }); }
+export async function deleteRoleMenu(params) { return request(`${prefix}${permission}/role/delete/menu`, { method: 'DELETE', body: params }); }
+export async function deleteRolePermission(params) { return request(`${prefix}${permission}/role/delete/permission`, { method: 'DELETE', body: params }); }
+
+// 菜单
+export async function allMenu(params) { return request(`${prefix}${permission}/menu/all`, { method: 'GET', body: params }); }
+export async function listMenu(params) { return request(`${prefix}${permission}/menu/list`, { method: 'GET', body: params }); }
+export async function insertMenu(params) { return request(`${prefix}${permission}/menu/insert`, { method: 'POST', body: params }); }
+export async function insertMenuResource(params) { return request(`${prefix}${permission}/menu/insert/resource`, { method: 'POST', body: params }); }
+export async function updateMenu(params) { return request(`${prefix}${permission}/menu/update`, { method: 'POST', body: params }); }
+export async function deleteMenu(params) { return request(`${prefix}${permission}/menu/delete`, { method: 'DELETE', body: params }); }
+export async function deleteMenuResource(params) { return request(`${prefix}${permission}/menu/delete/resource`, { method: 'DELETE', body: params }); }
+
+// 权限
+export async function allPermission(params) { return request(`${prefix}${permission}/permission/all`, { method: 'GET', body: params }); }
+export async function listPermission(params) { return request(`${prefix}${permission}/permission/list`, { method: 'GET', body: params }); }
+export async function insertPermission(params) { return request(`${prefix}${permission}/permission/insert`, { method: 'POST', body: params }); }
+export async function insertPermissionResource(params) { return request(`${prefix}${permission}/permission/insert/resource`, { method: 'POST', body: params }); }
+export async function updatePermission(params) { return request(`${prefix}${permission}/permission/update`, { method: 'POST', body: params }); }
+export async function deletePermission(params) { return request(`${prefix}${permission}/permission/delete`, { method: 'DELETE', body: params }); }
+export async function deletePermissionResource(params) { return request(`${prefix}${permission}/permission/delete/resource`, { method: 'DELETE', body: params }); }
+
+// 资源
+export async function allResource(params) { return request(`${prefix}${permission}/resource/all`, { method: 'GET', body: params }); }
+export async function listResource(params) { return request(`${prefix}${permission}/resource/list`, { method: 'GET', body: params }); }
+export async function insertResource(params) { return request(`${prefix}${permission}/resource/insert`, { method: 'POST', body: params }); }
+export async function updateResource(params) { return request(`${prefix}${permission}/resource/update`, { method: 'POST', body: params }); }
+export async function deleteResource(params) { return request(`${prefix}${permission}/resource/delete`, { method: 'DELETE', body: params }); }

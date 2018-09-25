@@ -16,5 +16,6 @@ export const FieldType = {
   SELECT: 'SELECT',
   DATE: 'DATE',
   PASSWORD: 'PASSWORD',
+  MULTI_SELECT: 'MULTI_SELECT',
 };
 Object.freeze(FieldType);

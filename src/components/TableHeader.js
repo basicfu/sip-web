@@ -95,8 +95,32 @@ class TableHeader extends React.Component {
     });
   };
 
+  renderEdit=() => {
+    const { classes, editMode, onEdit } = this.props;
+    if (editMode === 'all') {
+      return (<Fragment>
+        <Tooltip title="弹窗修改">
+          <IconButton color={'primary'} className={classes.modalIcon} onClick={() => onEdit('modal')}>
+            <Assignment />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="修改">
+          <IconButton color={'primary'} onClick={() => onEdit('row')}>
+            <EditOutlinedIcon />
+          </IconButton>
+        </Tooltip>
+              </Fragment>);
+    } if (editMode === 'row' || editMode === 'modal') {
+      return (<Tooltip title="修改">
+        <IconButton color={'primary'} onClick={() => onEdit('row')}>
+          <EditOutlinedIcon />
+        </IconButton>
+              </Tooltip>);
+    }
+  }
+
   render() {
-    const { numSelected, classes, tableStatus, onEdit, onDelete, onDone, onClear, headerChild } = this.props;
+    const { numSelected, classes, tableStatus, onEdit, onDelete, onDone, onClear, headerChild, editMode } = this.props;
     const { open } = this.state;
     return (
       <Toolbar
@@ -133,16 +157,7 @@ class TableHeader extends React.Component {
               }
               {tableStatus !== 'add' &&
                 <Fragment>
-                  <Tooltip title="弹窗修改">
-                    <IconButton color={'primary'} className={classes.modalIcon} onClick={() => onEdit('modal')}>
-                      <Assignment />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="修改">
-                    <IconButton color={'primary'} onClick={() => onEdit('row')}>
-                      <EditOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
+                  {this.renderEdit()}
                   <Tooltip title="删除">
                     <IconButton color={'secondary'} onClick={() => onDelete()}>
                       <DeleteOutlinedIcon />
