@@ -157,7 +157,7 @@ class TableHeader extends React.Component {
               }
               {tableStatus !== 'add' &&
                 <Fragment>
-                  {this.renderEdit()}
+                  {numSelected === 1 && this.renderEdit()}
                   <Tooltip title="删除">
                     <IconButton color={'secondary'} onClick={() => onDelete()}>
                       <DeleteOutlinedIcon />
