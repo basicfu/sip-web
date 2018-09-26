@@ -52,10 +52,7 @@ class User extends React.Component {
         if (add || edit) {
           return <ReactSelect key={id} options={extra} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
         }
-        return formatDict(text, extra);
-      // case 'DATE':
-      //   columns.push({ id, label, required, render: this.renderColumns });
-      //   break;
+        return text && text.map(it => it.name).join(',');
       default:
         break;
     }
@@ -71,21 +68,22 @@ class User extends React.Component {
     const roleData = role.map(it => ({ label: it.name, value: it.id }));
     const columns = [];
     columns.push({ id: 'username', label: '用户名', type: FieldType.TEXT, required: true, render: this.renderColumns });
-    columns.push({ id: 'roleIds', label: '用户角色', type: FieldType.MULTI_SELECT, required: false, extra: roleData, render: this.renderColumns });
+    columns.push({ id: 'roleIds', label: '用户角色', type: FieldType.MULTI_SELECT, required: false, extra: roleData, visible: ['dialogAdd', 'dialogEdit'], render: this.renderColumns });
+    columns.push({ id: 'roles', label: '用户角色', type: FieldType.MULTI_SELECT, required: false, extra: roleData, visible: ['row'], render: this.renderColumns });
     columns.push({ id: 'mobile', label: '手机号', type: FieldType.TEXT, required: false, render: this.renderColumns });
     columns.push({ id: 'email', label: '邮箱', type: FieldType.TEXT, required: false, render: this.renderColumns });
-    columns.push({ id: 'password', label: '密码', type: FieldType.PASSWORD, required: true, addRequired: true, editRequired: false, visible: false, render: this.renderColumns });
-    columns.push({ id: 'repassword', label: '确认密码', type: FieldType.PASSWORD, required: true, addRequired: true, editRequired: false, visible: false, validator, render: this.renderColumns });
+    columns.push({ id: 'password', label: '密码', type: FieldType.PASSWORD, required: true, addRequired: true, editRequired: false, visible: ['dialogAdd', 'dialogEdit'], render: this.renderColumns });
+    columns.push({ id: 'repassword', label: '确认密码', type: FieldType.PASSWORD, required: true, addRequired: true, editRequired: false, visible: ['dialogAdd', 'dialogEdit'], validator, render: this.renderColumns });
     userTemplate.forEach(it => {
       columns.push({ id: it.enName, label: it.name, type: it.type, required: it.required, addDefaultValue: it.defaultValue, extra: it.extra, render: this.renderColumns });
     });
-    columns.push({ id: 'cdate', label: '创建时间', required: false, dialogVisible: false, render: formatDateTime });
-    columns.push({ id: 'udate', label: '更新时间', required: false, dialogVisible: false, render: formatDateTime });
-    columns.push({ id: 'ldate', label: '最后登录时间', required: false, dialogVisible: false, render: formatDateTime });
+    columns.push({ id: 'cdate', label: '创建时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime });
+    columns.push({ id: 'udate', label: '更新时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime });
+    columns.push({ id: 'ldate', label: '最后登录时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime });
 
     const tableProps = {
       data,
-      editMode: 'modal',
+      mode: 'all',
       headerChild: <CustomSearch placeholder="用户名" onSearch={(value) => this.handleSearch(value)} />,
       columns,
     };

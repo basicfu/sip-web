@@ -131,19 +131,26 @@ function getDomWidth(text) {
 }
 // 计算自适应宽度
 function calcTableAuto(props) {
-  const { list, columns, keyName, addOrEdit, table } = props;
+  const { list, columns,tableStatus,currentMode } = props;
   const renderField=(column,item)=>{
     // const add = table.status === 'add' && item[keyName] === -1;
     // const edit = table.status === 'edit' && item[keyName] === table.selected[0];
-    return column.render ? column.render(item[column.id], column,'','') : item[column.id]
+    const visible=column.visible||['all'];
+    const flag=visible.includes('all')
+      ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
+      ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
+      ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
+      ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
+      ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
+    if(flag){
+      return column.render ? column.render(item[column.id], column,'','') : item[column.id]
+    }else{
+      return ""
+    }
   };
-  const selected = table.selected || [];
   const headerMinWidths = [];
   const contentWidths = [];
   let calcList = [...list];
-  // if (addOrEdit) {
-  //   calcList = calcList.filter(it => it[keyName] !== selected[0]);
-  // }
   let totalPart = 0;
   columns.forEach(column => {
     const widths = calcList.map(it => getDomWidth(renderField(column,it)));
@@ -153,28 +160,37 @@ function calcTableAuto(props) {
   });
   const totalPerRate = 100 / totalPart;
   columns.forEach((column, index) => {
-    let contentRate = 0;
-    if (index === columns.length - 1) {
-      headerMinWidths.push((column.label.length * 12) + 10 + 28);
-    } else {
-      headerMinWidths.push((column.label.length * 12) + 10);
+    const visible=column.visible||['all'];
+    const flag=visible.includes('all')
+      ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
+      ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
+      ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
+      ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
+      ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
+    if(flag){
+      let contentRate = 0;
+      if (index === columns.length - 1) {
+        headerMinWidths.push((column.label.length * 12) + 10 + 28);
+      } else {
+        headerMinWidths.push((column.label.length * 12) + 10);
+      }
+      const totalHeader = (columns.map(it => it.label).join('').length * 12);
+      let headerRate = 0;
+      if (totalHeader !== 0) {
+        headerRate = (column.label.length * 12) * (100 / totalHeader);
+      }
+      const widths = calcList.map(it => getDomWidth(renderField(column,it)));
+      if (widths && widths.length > 0) {
+        const total = widths.reduce((a, b) => a + b);
+        contentRate = total / calcList.length * totalPerRate;
+      }
+      if (contentRate !== 0) {
+        contentRate = (headerRate + contentRate) / 2;
+      } else {
+        // 需要重新计算contentRate=headerRate
+      }
+      contentWidths.push(contentRate.toFixed(2));
     }
-    const totalHeader = (columns.map(it => it.label).join('').length * 12);
-    let headerRate = 0;
-    if (totalHeader !== 0) {
-      headerRate = (column.label.length * 12) * (100 / totalHeader);
-    }
-    const widths = calcList.map(it => getDomWidth(renderField(column,it)));
-    if (widths && widths.length > 0) {
-      const total = widths.reduce((a, b) => a + b);
-      contentRate = total / calcList.length * totalPerRate;
-    }
-    if (contentRate !== 0) {
-      contentRate = (headerRate + contentRate) / 2;
-    } else {
-      // 需要重新计算contentRate=headerRate
-    }
-    contentWidths.push(contentRate.toFixed(2));
   });
   return { headerMinWidths, contentWidths };
 }
@@ -207,8 +223,8 @@ class CustomTable extends React.Component {
         this.handleClear()
       } else if (e.keyCode === 13) {
         //回车
-        const { addOrEdit } = this.data();
-        if (addOrEdit===true) {
+        const { tableStatus } = this.data();
+        if (tableStatus==='add'||tableStatus==='edit') {
           this.handleDone();
         }
       }
@@ -240,33 +256,37 @@ class CustomTable extends React.Component {
 
   // 预添加模式
   handleAdd =(edit) => {
-    const { namespace, tableName, page, list, dispatch, table, addOrEdit,keyName,columns,editMode } = this.data();
-    if (!addOrEdit) {
+    const { namespace, tableName, page, list, dispatch, table, tableStatus,keyName,columns,mode } = this.data();
+    if (!(tableStatus==='add'||tableStatus==='edit')) {
+      let newTableStatus='add';
       const defaultItem = {
         [keyName]: -1,
       };
       columns.forEach(it=>{
         defaultItem[it.id]=it.addDefaultValue;
       });
-      let editStatus=edit;
+      let currentMode=edit;
       //行添加模式
-      if((editMode==='all'||editMode==='row')&&editStatus==='row'){
+      if((mode==='all'||mode==='row')&&currentMode==='row'){
         list.unshift(defaultItem);
-        let newTable={ ...table, selected: [defaultItem[keyName]], item: defaultItem, status: 'add',editStatus:'row' };
+        let newTable={ ...table, selected: [defaultItem[keyName]], item: defaultItem, status: newTableStatus,currentMode };
         dispatch({ type: `${namespace}/updateState`, payload: { data: { page, list },[tableName]: newTable } });
-      }else if(editMode==='all'||editMode==='modal'){
+      }else if(mode==='all'||mode==='modal'){
         let newTable={ ...table, selected: [], item: defaultItem, status: 'add',editStatus:'modal' };
         //行弹窗添加
-        if(editStatus==="row"){
+        if(currentMode==="row"){
           //添加状态由行更改为弹窗
-          editStatus='modal';
-          newTable={ ...newTable,editStatus:editStatus};
+          currentMode='modal';
+          newTable={ ...newTable,currentMode};
         }
         //标准弹窗添加
         let elements=[];
         columns.forEach((column,index)=>{
-          if(column.dialogVisible!==false){
-            let ele=this.renderField(column,defaultItem,newTable,editStatus);
+          const visible=column.visible||['all'];
+          const flag=visible.includes('all')
+            ||(visible.includes('dialogAdd'));
+          if(flag){
+            let ele=this.renderField(column,defaultItem,newTable,currentMode);
             if(index!==0){
               elements.push(<Divider key={index} style={{height:0,margin:'5px 0'}}/>)
             }
@@ -284,18 +304,18 @@ class CustomTable extends React.Component {
   // row 双击行编辑,修改行编辑，隐藏弹窗添加/编辑按钮
   // modal 双击弹窗编辑，隐藏正常添加、编辑按钮
   handleEdit =(edit,id) => {
-    const { namespace, tableName, dispatch,columns, table,item,keyName,page,list,editMode } = this.data();
-    if(editMode==='false'){
+    let tableStatus='edit';
+    const { namespace, tableName, dispatch,columns, table,item,keyName,page,list,mode } = this.data();
+    if(mode==='false'){
       return;
     }
     //准备数据
     let newItem={...item};
     let newTable={...table};
-    let tableStatus='edit';
-    let editStatus=edit;
+    let currentMode=edit;
     let elements=[];
     let selected=[...table.selected||[]];
-    if(editStatus==='row'){
+    if(currentMode==='row'){
       clearTimeout(timerId);
       if(id!==undefined){
         if (id === -1) {
@@ -309,27 +329,30 @@ class CustomTable extends React.Component {
           newItem={};
           selected=[];
           tableStatus='';
-          newTable={ ...newTable, selected, item:newItem, status:tableStatus,editStatus:editStatus };
+          newTable={ ...newTable, selected, item:newItem, status:tableStatus,currentMode };
           dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: newTable, data: { page, list } } });
           return;
         }
       }
     }
     //行编辑模式
-    newTable={ ...newTable, selected, item:newItem,status:tableStatus,editStatus:editStatus };
-    if((editMode==='all'||editMode==='row')&&editStatus==='row'){
+    newTable={ ...newTable, selected, item:newItem,status:tableStatus,currentMode };
+    if((mode==='all'||mode==='row')&&currentMode==='row'){
       dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: newTable, data: { page, list } } });
-    }else if(editMode==='all'||editMode==='modal'){
+    }else if(mode==='all'||mode==='modal'){
       //行弹窗编辑
-      if(editStatus==="row"){
+      if(currentMode==="row"){
         //编辑状态由行更改为弹窗
-        editStatus='modal';
-        newTable={ ...newTable,editStatus:editStatus};
+        currentMode='modal';
+        newTable={ ...newTable,currentMode};
       }
       //标准弹窗编辑
       columns.forEach((column,index)=>{
-        if(column.dialogVisible!==false){
-          let ele=this.renderField(column,newItem,newTable,editStatus);
+        const visible=column.visible||['all'];
+        const flag=visible.includes('all')
+          ||(visible.includes('dialogEdit'));
+        if(flag){
+          let ele=this.renderField(column,newItem,newTable,currentMode);
           if(index!==0){
             elements.push(<Divider key={index} style={{height:0,margin:'5px 0'}}/>)
           }
@@ -345,7 +368,7 @@ class CustomTable extends React.Component {
   handleClick = (event, id) => {
     clearTimeout(timerId);
     timerId = setTimeout(() => {
-      const { namespace, keyName, tableName,page, list, dispatch, selected, addOrEdit } = this.data();
+      const { namespace, keyName, tableName,page, list, dispatch, selected, tableStatus } = this.data();
       //单击当前编辑行无操作
       if (id !== -1) {
         let newSelected=[...selected];
@@ -359,9 +382,9 @@ class CustomTable extends React.Component {
           newSelected=[id]
         }
         if (selected.indexOf(id) === -1) {
-          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: newSelected, item:newItem,status:'' },data:{page,list} } });
-        } else if (!addOrEdit) {
-          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: [], item: {},status:'' },data:{page,list}  } });
+          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: newSelected, item:newItem },data:{page,list} } });
+          } else if (!(tableStatus==='add'||tableStatus==='edit')) {
+          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: [] },data:{page,list}  } });
         }
       }
     }, 200);
@@ -447,16 +470,17 @@ class CustomTable extends React.Component {
 
   data=() => {
     const dispatch = getOrCreateStore().dispatch;
-    const { classes, columns, data, keyName, tableName, editMode, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent } = this.props;
+    const { classes, columns, data, keyName, tableName, mode, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent } = this.props;
     const { namespace, data: { list, page }, all } = data;
     const table = data[tableName];
     const selected = table.selected || [];
     const item = {...table.item} || {};
-    const addOrEdit = table.status === 'add' || table.status === 'edit';
+    //表格当前状态add/edit
     const tableStatus = table.status;
-    const editStatus = table.editStatus;
-    return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, addOrEdit, tableStatus, editMode, actionName,
-      showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent,editStatus };
+    //表格当前操作模式row/modal
+    const currentMode = table.currentMode;
+    return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, currentMode, mode, actionName,
+      showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent,tableStatus };
   }
   handleItemChange = (itemKey, itemValue) => {
     const { dispatch, tableName, namespace, table } = this.data();
@@ -471,13 +495,12 @@ class CustomTable extends React.Component {
     if(!(edit&&edit==='modal')){
       newColumn.label=''
     }
-    console.log('renderField...');
     return column.render ? column.render(listItem[column.id], newColumn ,rowAdd,rowEdit, this.handleItemChange,item) : listItem[column.id]
   }
   render() {
-    const { classes, editStatus, columns, keyName, editMode, namespace, list, page, table, selected, addOrEdit, tableStatus, showCheck, showHeader, headerChild, showFooter } = this.data();
+    const { classes, tableStatus, columns, keyName, mode, list, page, table, selected, currentMode, showCheck, showHeader, headerChild, showFooter } = this.data();
     const { rowsPerPageOptions, rowsPerPage } = this.state;
-    const { headerMinWidths, contentWidths } = calcTableAuto({ list, columns, keyName, table, addOrEdit });
+    const { headerMinWidths, contentWidths } = calcTableAuto({ list, columns, keyName, table,tableStatus,currentMode });
     return (
       <Paper className={classes.root}>
         {showHeader &&
@@ -490,7 +513,7 @@ class CustomTable extends React.Component {
           onClear={this.handleClear}
           headerChild={headerChild}
           tableStatus={tableStatus}
-          editMode={editMode}
+          mode={mode}
         />}
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -505,7 +528,14 @@ class CustomTable extends React.Component {
                   />
                 </CustomTableCell>}
                 {columns.map((column, columnIndex) => {
-                  if(column.visible!==false||(column.visible===false&&editStatus==='row')){
+                  const visible=column.visible||['all'];
+                  const flag=visible.includes('all')
+                    ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
+                    ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
+                    ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
+                    ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
+                    ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
+                  if(flag){
                     return (
                       <CustomTableCell key={columnIndex} style={{ minWidth: `${headerMinWidths[columnIndex]}px`, width: `${contentWidths[columnIndex]}%` }}>
                         {column.label}
@@ -533,7 +563,14 @@ class CustomTable extends React.Component {
                       <Checkbox checked={isSelected} onChange={e => this.handleCheckbox(e, item[keyName])} />
                     </CustomTableCell>}
                     {columns.map((column, columnIndex) => {
-                      if(column.visible!==false||(column.visible===false&&editStatus==='row')){
+                      const visible=column.visible||['all'];
+                      const flag=visible.includes('all')
+                        ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
+                        ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
+                        ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
+                        ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
+                        ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
+                      if(flag){
                         return (
                           <CustomTableCell key={columnIndex} style={{textAlign: column.align || undefined}}>
                             {this.renderField(column, item, table)}
@@ -567,13 +604,13 @@ class CustomTable extends React.Component {
 CustomTable.propTypes = {
   actionName: PropTypes.string.isRequired,
   columns: PropTypes.array.isRequired,
-  editMode: PropTypes.oneOf(['all', 'row', 'modal', 'false']),
+  mode: PropTypes.oneOf(['all', 'row', 'modal', 'false']),
   keyName: PropTypes.string.isRequired,
   tableName: PropTypes.string.isRequired,
 };
 CustomTable.defaultProps = {
   actionName: 'list',
-  editMode: 'all',
+  mode: 'all',
   keyName: 'id',
   tableName: 'table',
   showCheck: true,

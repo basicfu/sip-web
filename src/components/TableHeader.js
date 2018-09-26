@@ -96,8 +96,8 @@ class TableHeader extends React.Component {
   };
 
   renderEdit=() => {
-    const { classes, editMode, onEdit } = this.props;
-    if (editMode === 'all') {
+    const { classes, mode, onEdit } = this.props;
+    if (mode === 'all') {
       return (<Fragment>
         <Tooltip title="弹窗修改">
           <IconButton color={'primary'} className={classes.modalIcon} onClick={() => onEdit('modal')}>
@@ -110,7 +110,7 @@ class TableHeader extends React.Component {
           </IconButton>
         </Tooltip>
               </Fragment>);
-    } if (editMode === 'row' || editMode === 'modal') {
+    } if (mode === 'row' || mode === 'modal') {
       return (<Tooltip title="修改">
         <IconButton color={'primary'} onClick={() => onEdit('row')}>
           <EditOutlinedIcon />
@@ -120,7 +120,7 @@ class TableHeader extends React.Component {
   }
 
   render() {
-    const { numSelected, classes, tableStatus, onEdit, onDelete, onDone, onClear, headerChild, editMode } = this.props;
+    const { numSelected, classes, tableStatus, onEdit, onDelete, onDone, onClear, headerChild, mode } = this.props;
     const { open } = this.state;
     return (
       <Toolbar
@@ -182,7 +182,7 @@ class TableHeader extends React.Component {
               onMouseLeave={this.handleClose}
               open={open}
             >
-              {editMode === 'all' ?
+              {mode === 'all' ?
                 <SpeedDialAction
                   key="1"
                   icon={<Assignment />}
