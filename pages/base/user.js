@@ -25,34 +25,34 @@ class User extends React.Component {
     this.props.dispatch({ type: `${namespace}/list`, payload: { q: value } });
   };
 
-  renderColumns=(text, column, add, edit, onChange) => {
+  renderColumns=(text, column, addOrEdit, item, onChange) => {
     const { id, type, extra } = column;
     switch (type) {
       case FieldType.TEXT:
-        if (add || edit) {
+        if (addOrEdit) {
           return <Input key={id} defaultValue={text} onChange={e => onChange(id, e.target.value)} column={column} />;
         }
         return text;
       case FieldType.NUMBER:
-        if (add || edit) {
+        if (addOrEdit) {
           return <InputNumber key={id} defaultValue={text} onChange={e => onChange(id, e.target.value)} column={column} />;
         }
         return text;
       case FieldType.PASSWORD:
-        if (add || edit) {
+        if (addOrEdit) {
           return <Input key={id} type="password" defaultValue={text} onChange={e => onChange(id, e.target.value)} column={column} />;
         }
         return text;
       case FieldType.SELECT:
-        if (add || edit) {
+        if (addOrEdit) {
           return <Select key={id} dict={extra} default={SelectDefault.CHOOSE} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
         }
         return formatDict(text, extra);
       case FieldType.MULTI_SELECT:
-        if (add || edit) {
+        if (addOrEdit) {
           return <ReactSelect key={id} options={extra} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
         }
-        return text && text.map(it => it.name).join(',');
+        return item.roles && item.roles.map(it => it.name).join(',');
       default:
         break;
     }
@@ -68,8 +68,7 @@ class User extends React.Component {
     const roleData = role.map(it => ({ label: it.name, value: it.id }));
     const columns = [];
     columns.push({ id: 'username', label: '用户名', type: FieldType.TEXT, required: true, render: this.renderColumns });
-    columns.push({ id: 'roleIds', label: '用户角色', type: FieldType.MULTI_SELECT, required: false, extra: roleData, visible: ['dialogAdd', 'dialogEdit'], render: this.renderColumns });
-    columns.push({ id: 'roles', label: '用户角色', type: FieldType.MULTI_SELECT, required: false, extra: roleData, visible: ['row'], render: this.renderColumns });
+    columns.push({ id: 'roleIds', label: '用户角色', type: FieldType.MULTI_SELECT, required: false, extra: roleData, visible: ['row', 'dialogAdd', 'dialogEdit'], render: this.renderColumns });
     columns.push({ id: 'mobile', label: '手机号', type: FieldType.TEXT, required: false, render: this.renderColumns });
     columns.push({ id: 'email', label: '邮箱', type: FieldType.TEXT, required: false, render: this.renderColumns });
     columns.push({ id: 'password', label: '密码', type: FieldType.PASSWORD, required: true, addRequired: true, editRequired: false, visible: ['dialogAdd', 'dialogEdit'], render: this.renderColumns });

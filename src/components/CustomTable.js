@@ -143,7 +143,8 @@ function calcTableAuto(props) {
       ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
       ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
     if(flag){
-      return column.render ? column.render(item[column.id], column,'','') : item[column.id]
+      //不处理是否添加编辑模式
+      return column.render ? column.render(item[column.id], column,'',item) : item[column.id]
     }else{
       return ""
     }
@@ -488,14 +489,13 @@ class CustomTable extends React.Component {
     dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, item: { ...table.item, [itemKey]: itemValue } } } });
   };
   renderField(column,listItem,table,edit){
-    const { keyName,item } = this.data();
-    const rowAdd = table.status === 'add' && listItem[keyName] === -1;
-    const rowEdit = table.status === 'edit' && listItem[keyName] === table.selected[0];
+    const { keyName } = this.data();
+    const addOrEdit = (table.status === 'add' && listItem[keyName] === -1)||(table.status === 'edit' && listItem[keyName] === table.selected[0]);
     let newColumn={...column};
     if(!(edit&&edit==='modal')){
       newColumn.label=''
     }
-    return column.render ? column.render(listItem[column.id], newColumn ,rowAdd,rowEdit, this.handleItemChange,item) : listItem[column.id]
+    return column.render ? column.render(listItem[column.id], newColumn ,addOrEdit,listItem,this.handleItemChange) : listItem[column.id]
   }
   render() {
     const { classes, tableStatus, columns, keyName, mode, list, page, table, selected, currentMode, showCheck, showHeader, headerChild, showFooter } = this.data();
