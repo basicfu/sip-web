@@ -58,6 +58,8 @@ const toolbarStyles = theme => ({
     right: 10,
   },
   speedActions: {
+    margin: '0!important',
+    padding: '0!important',
     width: 46,
     '& button': {
       margin: '10px auto',
@@ -130,7 +132,7 @@ class TableHeader extends React.Component {
       >
         <div className={classes.title}>
           {numSelected > 0 ? (
-            <Typography color="inherit" variant="subheading">
+            <Typography color="inherit">
               {numSelected} selected
             </Typography>
           ) : (
