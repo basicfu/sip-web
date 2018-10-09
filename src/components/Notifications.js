@@ -18,6 +18,7 @@ const styles = theme => ({
   close: {
     width: theme.spacing.unit * 4,
     height: theme.spacing.unit * 4,
+    padding: 0,
   },
   success: {
     backgroundColor: green[600],

@@ -510,7 +510,25 @@ class CustomTable extends React.Component {
     });
     this.headerMinWidths=headerMinWidths;
     this.contentWidths=contentWidths;
+    // console.log(headerMinWidths)
+    // console.log(contentWidths)
   }
+  renderCell=(columns,tableStatus,currentMode,renderElement)=>{
+    let index=-1;
+    return columns.map((column, columnIndex) => {
+      const visible=column.visible||['all'];
+      const flag=visible.includes('all')
+        ||(visible.includes('row'))
+        ||(visible.includes('rowAdd')&&tableStatus==='add'&&(currentMode==='row'||currentMode==='modal'))
+        ||(visible.includes('rowEdit')&&tableStatus==='edit'&&(currentMode==='row'||currentMode==='modal'))
+        ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='row')
+        ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='row');
+      if(flag){
+        index++;
+        return renderElement(column,index);
+      }
+    })
+  };
   render() {
     const { classes, tableStatus, columns, keyName, mode, list, page, table, selected, currentMode, showCheck, showHeader, headerChild, showFooter } = this.data();
     const { rowsPerPageOptions, rowsPerPage } = this.state;
@@ -518,8 +536,6 @@ class CustomTable extends React.Component {
     if((currentMode===undefined||currentMode==='')&&(tableStatus===undefined||tableStatus==='')){
       this.calcTableAuto({ list, columns, keyName, table,tableStatus,currentMode });
     }
-    const headerMinWidths=this.headerMinWidths;
-    const contentWidths=this.contentWidths;
     return (
       <MuiThemeProvider theme={theme}>
         <Paper className={classes.root}>
@@ -547,22 +563,11 @@ class CustomTable extends React.Component {
                       onChange={this.handleSelectAllClick}
                     />
                   </CustomTableCell>}
-                  {columns.map((column, columnIndex) => {
-                    const visible=column.visible||['all'];
-                    const flag=visible.includes('all')
-                      ||(visible.includes('row'))
-                      ||(visible.includes('rowAdd')&&tableStatus==='add'&&(currentMode==='row'||currentMode==='modal'))
-                      ||(visible.includes('rowEdit')&&tableStatus==='edit'&&(currentMode==='row'||currentMode==='modal'))
-                      ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='row')
-                      ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='row');
-                    if(flag){
-                      return (
-                        <CustomTableCell key={columnIndex} style={{ minWidth: `${headerMinWidths[columnIndex]}px`, width: `${contentWidths[columnIndex]}%` }}>
-                          {column.label}
-                        </CustomTableCell>
-                      );
-                    }
-                  }, this)}
+                  {this.renderCell(columns,tableStatus,currentMode,(column,index)=>(
+                    <CustomTableCell key={index} style={{ minWidth: `${this.headerMinWidths[index]}px`, width: `${this.contentWidths[index]}%` }}>
+                      {column.label}
+                    </CustomTableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -582,22 +587,11 @@ class CustomTable extends React.Component {
                       <CustomTableCell style={{ textAlign: 'left' }}>
                         <Checkbox checked={isSelected} onChange={e => this.handleCheckbox(e, item[keyName])} />
                       </CustomTableCell>}
-                      {columns.map((column, columnIndex) => {
-                        const visible=column.visible||['all'];
-                        //这里一定都是行渲染，弹窗渲染的元素不走此处
-                        const flag=visible.includes('all')
-                          ||(visible.includes('row'))
-                          ||(visible.includes('rowAdd')&&tableStatus==='add'&&(currentMode==='row'||currentMode==='modal'))
-                          ||(visible.includes('rowEdit')&&tableStatus==='edit'&&(currentMode==='row'||currentMode==='modal'))
-                          ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='row')
-                          ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='row');
-                        if(flag){
-                          return (
-                            <CustomTableCell key={columnIndex} style={{textAlign: column.align || undefined}}>
-                              {this.renderField(column, item, table)}
-                            </CustomTableCell>);
-                          }
-                      })}
+                      {this.renderCell(columns,tableStatus,currentMode,(column,index)=>(
+                        <CustomTableCell key={index} style={{textAlign: column.align || undefined}}>
+                          {this.renderField(column, item, table)}
+                        </CustomTableCell>
+                      ))}
                     </TableRow>
                   );
                 })}
