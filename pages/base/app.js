@@ -5,6 +5,9 @@ import CustomTable from 'components/CustomTable';
 import styles from 'styles/user-template';
 import CustomSearch from 'components/CustomSearch';
 import Input from 'components/Input';
+import { FieldType } from 'enum';
+import Switch from 'components/Switch';
+import { formatFlag } from 'utils';
 
 const namespace = 'baseApp';
 
@@ -17,19 +20,18 @@ class App extends React.Component {
     this.props.dispatch({ type: `${namespace}/list`, payload: { q: value } });
   };
 
-  renderColumns=(text, column, add, edit, onChange) => {
-    const { id } = column;
-    switch (id) {
-      case 'name':
-      case 'code':
-        if (add || edit) {
+  renderColumns = (text, column, addOrEdit, item, onChange) => {
+    const { id, type } = column;
+    switch (type) {
+      case FieldType.TEXT:
+        if (addOrEdit) {
           return <Input key={id} defaultValue={text} onChange={e => onChange(id, e.target.value)} column={column} />;
         }
         return text;
       default:
         break;
     }
-  }
+  };
 
   render() {
     const { data } = this.props;
@@ -37,8 +39,8 @@ class App extends React.Component {
       data,
       headerChild: <CustomSearch placeholder="应用名或code" onSearch={(value) => this.handleSearch(value)} />,
       columns: [
-        { id: 'name', label: '应用名', required: true, render: this.renderColumns },
-        { id: 'code', label: '应用code', required: true, render: this.renderColumns },
+        { id: 'name', label: '应用名', type: FieldType.TEXT, required: true, render: this.renderColumns },
+        { id: 'code', label: '应用code', type: FieldType.TEXT, required: true, render: this.renderColumns },
       ],
     };
     return (

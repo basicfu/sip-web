@@ -169,7 +169,7 @@ class TableHeader extends React.Component {
               }
             </div>
           ) : (
-            <SpeedDial
+            mode !== 'false' && <SpeedDial
               direction="down"
               ariaLabel="SpeedDial"
               className={classes.speedDial}
@@ -194,7 +194,7 @@ class TableHeader extends React.Component {
                 :
                 'tip'
               }
-            </SpeedDial>
+                                </SpeedDial>
           )}
         </div>
       </Toolbar>

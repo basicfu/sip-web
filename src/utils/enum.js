@@ -14,6 +14,7 @@ export const FieldType = {
   CHECK: 'CHECK',
   RADIO: 'RADIO',
   SELECT: 'SELECT',
+  SWITCH: 'SWITCH',
   DATE: 'DATE',
   PASSWORD: 'PASSWORD',
   MULTI_SELECT: 'MULTI_SELECT',
