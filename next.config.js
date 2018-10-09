@@ -9,6 +9,8 @@ module.exports = {
     Object.keys(process.env).forEach(key => {
       env[key] = JSON.stringify(process.env[key]);
     });
+    // 禁用弃用typography警告 https://material-ui.com/style/typography/#migration-to-typography-v2
+    env.MUI_SUPPRESS_DEPRECATION_WARNINGS = true;
     // noinspection JSUnresolvedFunction
     const plugins = config.plugins.concat([
       new webpack.DefinePlugin({

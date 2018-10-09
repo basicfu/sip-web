@@ -6,9 +6,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import MenuIcon from '@material-ui/icons/Menu';
-import GithubIcon from '@material-ui/docs/svgIcons/GitHub';
+import GithubIcon from '@material-ui/icons/Grade';
 import Notifications from './Notifications';
-import { Typography } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 import Menu from '@material-ui/core/Menu/Menu';
 import MenuItem from '@material-ui/core/MenuItem/MenuItem';
 import Popper from '@material-ui/core/Popper/Popper';
@@ -16,6 +16,8 @@ import Grow from '@material-ui/core/Grow/Grow';
 import Paper from '@material-ui/core/Paper/Paper';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener/ClickAwayListener';
 import MenuList from '@material-ui/core/MenuList/MenuList';
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 
 const styles = theme => ({
   root: {
@@ -31,12 +33,18 @@ const styles = theme => ({
       position: 'absolute',
     },
   },
-  rightButton:{
+  rightButton: {
     position: 'absolute',
     right: 10,
-  }
+  },
 });
-
+const theme = createMuiTheme({
+  typography: {
+    // Tell Material-UI what the font-size on the html element is.
+    htmlFontSize: 10,
+    useNextVariants: true,
+  },
+});
 class Navbar extends React.Component {
   state = {
     open: false,
@@ -69,11 +77,13 @@ class Navbar extends React.Component {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="title" color="inherit" noWrap>
-              Service Integration Platform
-            </Typography>
+            <MuiThemeProvider theme={theme}>
+              <Typography color="inherit">
+                Service Integration Platform
+              </Typography>
+            </MuiThemeProvider>
             <div className={classes.grow} />
-             {data.auth.username&&
+            {data.auth.username &&
             <IconButton
               aria-owns={open ? 'menu-appbar' : null}
               color="inherit"
@@ -87,36 +97,36 @@ class Navbar extends React.Component {
             >
               <GithubIcon />
             </IconButton>
-             }
-              <Popper
-                open={open}
-                anchorEl={this.anchorEl}
-                transition
-                disablePortal
-                onMouseOver={this.handleOpen}
-                onMouseOut={this.handleClose}>
-                {({ TransitionProps, placement }) => (
-                  <Grow
-                    {...TransitionProps}
-                    id="menu-list-grow"
-                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                  >
-                    <Paper>
-                      <ClickAwayListener onClickAway={this.handleClose}>
-                        <MenuList>
-                          {data.auth.username && <MenuItem disabled>basicfu</MenuItem>}
-                          <MenuItem onClick={this.handleClose}>修改密码</MenuItem>
-                          <MenuItem onClick={this.handleLogout}>退出</MenuItem>
-                        </MenuList>
-                      </ClickAwayListener>
-                    </Paper>
-                  </Grow>
-                )}
-              </Popper>
+            }
+            <Popper
+              open={open}
+              anchorEl={this.anchorEl}
+              transition
+              disablePortal
+              onMouseOver={this.handleOpen}
+              onMouseOut={this.handleClose}>
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  id="menu-list-grow"
+                  style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                >
+                  <Paper>
+                    <ClickAwayListener onClickAway={this.handleClose}>
+                      <MenuList>
+                        {data.auth.username && <MenuItem disabled>basicfu</MenuItem>}
+                        <MenuItem onClick={this.handleClose}>修改密码</MenuItem>
+                        <MenuItem onClick={this.handleLogout}>退出</MenuItem>
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
             {/* //写div有警告 */}
             {/* {data.auth.username && <div className={classes.grow}> */}
 
-                                   {/* </div>} */}
+            {/* </div>} */}
           </Toolbar>
         </AppBar>
         <Notifications />

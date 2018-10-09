@@ -20,7 +20,14 @@ import { getOrCreateStore } from 'utils/store';
 import TableHeader from 'components/TableHeader';
 import notify from 'utils/notify';
 import Divider from "../../node_modules/@material-ui/core/Divider/Divider";
+import MuiThemeProvider from "../../node_modules/@material-ui/core/es/styles/MuiThemeProvider";
+import createMuiTheme from "../../node_modules/@material-ui/core/styles/createMuiTheme";
 
+const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+  },
+});
 const CustomTableCell = withStyles(theme => ({
   head: {
     padding: 4,
@@ -129,72 +136,6 @@ function getDomWidth(text) {
   }
   return 0;
 }
-// 计算自适应宽度
-function calcTableAuto(props) {
-  const { list, columns,tableStatus,currentMode } = props;
-  const renderField=(column,item)=>{
-    // const add = table.status === 'add' && item[keyName] === -1;
-    // const edit = table.status === 'edit' && item[keyName] === table.selected[0];
-    const visible=column.visible||['all'];
-    const flag=visible.includes('all')
-      ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
-      ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
-      ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
-      ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
-      ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
-    if(flag){
-      //不处理是否添加编辑模式
-      return column.render ? column.render(item[column.id], column,'',item) : item[column.id]
-    }else{
-      return ""
-    }
-  };
-  const headerMinWidths = [];
-  const contentWidths = [];
-  let calcList = [...list];
-  let totalPart = 0;
-  columns.forEach(column => {
-    const widths = calcList.map(it => getDomWidth(renderField(column,it)));
-    if (widths && widths.length > 0) {
-      totalPart += widths.reduce((a, b) => a + b) / calcList.length;
-    }
-  });
-  const totalPerRate = 100 / totalPart;
-  columns.forEach((column, index) => {
-    const visible=column.visible||['all'];
-    const flag=visible.includes('all')
-      ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
-      ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
-      ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
-      ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
-      ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
-    if(flag){
-      let contentRate = 0;
-      if (index === columns.length - 1) {
-        headerMinWidths.push((column.label.length * 12) + 10 + 28);
-      } else {
-        headerMinWidths.push((column.label.length * 12) + 10);
-      }
-      const totalHeader = (columns.map(it => it.label).join('').length * 12);
-      let headerRate = 0;
-      if (totalHeader !== 0) {
-        headerRate = (column.label.length * 12) * (100 / totalHeader);
-      }
-      const widths = calcList.map(it => getDomWidth(renderField(column,it)));
-      if (widths && widths.length > 0) {
-        const total = widths.reduce((a, b) => a + b);
-        contentRate = total / calcList.length * totalPerRate;
-      }
-      if (contentRate !== 0) {
-        contentRate = (headerRate + contentRate) / 2;
-      } else {
-        // 需要重新计算contentRate=headerRate
-      }
-      contentWidths.push(contentRate.toFixed(2));
-    }
-  });
-  return { headerMinWidths, contentWidths };
-}
 const styles = {
   root: {
     width: '100%',
@@ -211,6 +152,8 @@ const styles = {
 };
 // TODO 性能待优化
 let timerId;
+let headerMinWidths=[];
+let contentWidths=[];
 class CustomTable extends React.Component {
   state = {
     rowsPerPage: 20,
@@ -489,115 +432,194 @@ class CustomTable extends React.Component {
     dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table, item: { ...table.item, [itemKey]: itemValue } } } });
   };
   renderField(column,listItem,table,edit){
-    const { keyName } = this.data();
-    const addOrEdit = (table.status === 'add' && listItem[keyName] === -1)||(table.status === 'edit' && listItem[keyName] === table.selected[0]);
+    const { keyName,currentMode } = this.data();
+    let addOrEdit = (table.status === 'add' && listItem[keyName] === -1)||(table.status === 'edit' && listItem[keyName] === table.selected[0]);
     let newColumn={...column};
-    if(!(edit&&edit==='modal')){
+    //不是弹窗模式时置空label字段，不渲染tip,如果edit没值则是行渲染，且currentMode是modal时将addOrEdit置为false，在弹窗时不渲染行编辑
+    if(!edit&&currentMode==='modal'){
+      console.log(currentMode)
+      addOrEdit=false;
+    }else if(!(edit&&edit==='modal')){
       newColumn.label=''
     }
     return column.render ? column.render(listItem[column.id], newColumn ,addOrEdit,listItem,this.handleItemChange) : listItem[column.id]
   }
+  // 计算自适应宽度
+  calcTableAuto(props) {
+    const { list, columns,tableStatus,currentMode } = props;
+    const renderField=(column,item)=>{
+      // const add = table.status === 'add' && item[keyName] === -1;
+      // const edit = table.status === 'edit' && item[keyName] === table.selected[0];
+      const visible=column.visible||['all'];
+      const flag=visible.includes('all')
+        ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
+        ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
+        ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
+        ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
+        ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
+      if(flag){
+        //不处理是否添加编辑模式
+        return column.render ? column.render(item[column.id], column,'',item) : item[column.id]
+      }else{
+        return ""
+      }
+    };
+    const headerMinWidths = [];
+    const contentWidths = [];
+    let calcList = [...list];
+    let totalPart = 0;
+    columns.forEach(column => {
+      const widths = calcList.map(it => getDomWidth(renderField(column,it)));
+      if (widths && widths.length > 0) {
+        totalPart += widths.reduce((a, b) => a + b) / calcList.length;
+      }
+    });
+    const totalPerRate = 100 / totalPart;
+    columns.forEach((column, index) => {
+      const visible=column.visible||['all'];
+      const flag=visible.includes('all')
+        ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
+        ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
+        ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
+        ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
+        ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
+      if(flag){
+        let contentRate = 0;
+        if (index === columns.length - 1) {
+          headerMinWidths.push((column.label.length * 12) + 10 + 28);
+        } else {
+          headerMinWidths.push((column.label.length * 12) + 10);
+        }
+        const totalHeader = (columns.map(it => it.label).join('').length * 12);
+        let headerRate = 0;
+        if (totalHeader !== 0) {
+          headerRate = (column.label.length * 12) * (100 / totalHeader);
+        }
+        const widths = calcList.map(it => getDomWidth(renderField(column,it)));
+        if (widths && widths.length > 0) {
+          const total = widths.reduce((a, b) => a + b);
+          contentRate = total / calcList.length * totalPerRate;
+        }
+        if (contentRate !== 0) {
+          contentRate = (headerRate + contentRate) / 2;
+        } else {
+          // 需要重新计算contentRate=headerRate
+        }
+        contentWidths.push(contentRate.toFixed(2));
+      }
+    });
+    this.headerMinWidths=headerMinWidths;
+    this.contentWidths=contentWidths;
+  }
   render() {
     const { classes, tableStatus, columns, keyName, mode, list, page, table, selected, currentMode, showCheck, showHeader, headerChild, showFooter } = this.data();
     const { rowsPerPageOptions, rowsPerPage } = this.state;
-    const { headerMinWidths, contentWidths } = calcTableAuto({ list, columns, keyName, table,tableStatus,currentMode });
+    //非添加编辑、弹窗模式进行计算
+    if((currentMode===undefined||currentMode==='')&&(tableStatus===undefined||tableStatus==='')){
+      this.calcTableAuto({ list, columns, keyName, table,tableStatus,currentMode });
+    }
+    const headerMinWidths=this.headerMinWidths;
+    const contentWidths=this.contentWidths;
     return (
-      <Paper className={classes.root}>
-        {showHeader &&
-        <TableHeader
-          numSelected={selected.length}
-          onAdd={this.handleAdd}
-          onEdit={this.handleEdit}
-          onDelete={this.handleDelete}
-          onDone={this.handleDone}
-          onClear={this.handleClear}
-          headerChild={headerChild}
-          tableStatus={tableStatus}
-          mode={mode}
-        />}
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
-            <TableHead>
-              <TableRow>
-                {showCheck &&
-                <CustomTableCell style={{ textAlign: 'left', width: 56 }}>
-                  <Checkbox
-                    indeterminate={selected.length > 0 && selected.length < list.length}
-                    checked={selected.length === list.length && list.length !== 0}
-                    onChange={this.handleSelectAllClick}
-                  />
-                </CustomTableCell>}
-                {columns.map((column, columnIndex) => {
-                  const visible=column.visible||['all'];
-                  const flag=visible.includes('all')
-                    ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
-                    ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
-                    ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
-                    ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
-                    ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
-                  if(flag){
-                    return (
-                      <CustomTableCell key={columnIndex} style={{ minWidth: `${headerMinWidths[columnIndex]}px`, width: `${contentWidths[columnIndex]}%` }}>
-                        {column.label}
-                      </CustomTableCell>
-                    );
-                  }
-                }, this)}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {list.map((item, itemIndex) => {
-                const isSelected = selected.indexOf(item[keyName]) !== -1;
-                return (
-                  <TableRow
-                    hover
-                    onClick={event => this.handleClick(event, item[keyName])}
-                    onDoubleClick={event => this.handleEdit('row', item[keyName])}
-                    aria-checked={isSelected}
-                    tabIndex={-1}
-                    key={item[keyName]}
-                    selected={isSelected}
-                  >
-                    {showCheck &&
-                    <CustomTableCell style={{ textAlign: 'left' }}>
-                      <Checkbox checked={isSelected} onChange={e => this.handleCheckbox(e, item[keyName])} />
-                    </CustomTableCell>}
-                    {columns.map((column, columnIndex) => {
-                      const visible=column.visible||['all'];
-                      const flag=visible.includes('all')
-                        ||(visible.includes('row')&&tableStatus===undefined||tableStatus==='')
-                        ||(visible.includes('rowAdd')&&tableStatus==='add'&&currentMode==='row')
-                        ||(visible.includes('rowEdit')&&tableStatus==='edit'&&currentMode==='row')
-                        ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='modal')
-                        ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='modal');
-                      if(flag){
-                        return (
-                          <CustomTableCell key={columnIndex} style={{textAlign: column.align || undefined}}>
-                            {this.renderField(column, item, table)}
-                          </CustomTableCell>);
-                        }
-                    })}
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-        {showFooter &&
-        <TablePagination
-          classes={{ select: classes.pagination }}
-          colSpan={3}
-          component="div"
-          count={page.total || 0}
-          rowsPerPage={page.pageSize && rowsPerPageOptions.indexOf(page.pageSize) !== -1 ? page.pageSize : rowsPerPage}
-          rowsPerPageOptions={rowsPerPageOptions}
-          labelRowsPerPage={'Rows per page'}
-          page={page.pageNum ? page.pageNum - 1 : 0}
-          onChangePage={this.handleChangePage}
-          onChangeRowsPerPage={this.handleChangeRowsPerPage}
-          ActionsComponent={TablePaginationActionsWrapped}
-        />}
-      </Paper>
+      <MuiThemeProvider theme={theme}>
+        <Paper className={classes.root}>
+          {showHeader &&
+          <TableHeader
+            numSelected={selected.length}
+            onAdd={this.handleAdd}
+            onEdit={this.handleEdit}
+            onDelete={this.handleDelete}
+            onDone={this.handleDone}
+            onClear={this.handleClear}
+            headerChild={headerChild}
+            tableStatus={tableStatus}
+            mode={mode}
+          />}
+          <div className={classes.tableWrapper}>
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  {showCheck &&
+                  <CustomTableCell style={{ textAlign: 'left', width: 56 }}>
+                    <Checkbox
+                      indeterminate={selected.length > 0 && selected.length < list.length}
+                      checked={selected.length === list.length && list.length !== 0}
+                      onChange={this.handleSelectAllClick}
+                    />
+                  </CustomTableCell>}
+                  {columns.map((column, columnIndex) => {
+                    const visible=column.visible||['all'];
+                    const flag=visible.includes('all')
+                      ||(visible.includes('row'))
+                      ||(visible.includes('rowAdd')&&tableStatus==='add'&&(currentMode==='row'||currentMode==='modal'))
+                      ||(visible.includes('rowEdit')&&tableStatus==='edit'&&(currentMode==='row'||currentMode==='modal'))
+                      ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='row')
+                      ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='row');
+                    if(flag){
+                      return (
+                        <CustomTableCell key={columnIndex} style={{ minWidth: `${headerMinWidths[columnIndex]}px`, width: `${contentWidths[columnIndex]}%` }}>
+                          {column.label}
+                        </CustomTableCell>
+                      );
+                    }
+                  }, this)}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {list.map((item, itemIndex) => {
+                  const isSelected = selected.indexOf(item[keyName]) !== -1;
+                  return (
+                    <TableRow
+                      hover
+                      onClick={event => this.handleClick(event, item[keyName])}
+                      onDoubleClick={event => this.handleEdit('row', item[keyName])}
+                      aria-checked={isSelected}
+                      tabIndex={-1}
+                      key={item[keyName]}
+                      selected={isSelected}
+                    >
+                      {showCheck &&
+                      <CustomTableCell style={{ textAlign: 'left' }}>
+                        <Checkbox checked={isSelected} onChange={e => this.handleCheckbox(e, item[keyName])} />
+                      </CustomTableCell>}
+                      {columns.map((column, columnIndex) => {
+                        const visible=column.visible||['all'];
+                        //这里一定都是行渲染，弹窗渲染的元素不走此处
+                        const flag=visible.includes('all')
+                          ||(visible.includes('row'))
+                          ||(visible.includes('rowAdd')&&tableStatus==='add'&&(currentMode==='row'||currentMode==='modal'))
+                          ||(visible.includes('rowEdit')&&tableStatus==='edit'&&(currentMode==='row'||currentMode==='modal'))
+                          ||(visible.includes('dialogAdd')&&tableStatus==='add'&&currentMode==='row')
+                          ||(visible.includes('dialogEdit')&&tableStatus==='edit'&&currentMode==='row');
+                        if(flag){
+                          return (
+                            <CustomTableCell key={columnIndex} style={{textAlign: column.align || undefined}}>
+                              {this.renderField(column, item, table)}
+                            </CustomTableCell>);
+                          }
+                      })}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          {showFooter &&
+          <TablePagination
+            classes={{ select: classes.pagination }}
+            colSpan={3}
+            component="div"
+            count={page.total || 0}
+            rowsPerPage={page.pageSize && rowsPerPageOptions.indexOf(page.pageSize) !== -1 ? page.pageSize : rowsPerPage}
+            rowsPerPageOptions={rowsPerPageOptions}
+            labelRowsPerPage={'Rows per page'}
+            page={page.pageNum ? page.pageNum - 1 : 0}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+            ActionsComponent={TablePaginationActionsWrapped}
+          />}
+        </Paper>
+      </MuiThemeProvider>
     );
   }
 }

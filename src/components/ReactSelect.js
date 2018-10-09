@@ -177,7 +177,7 @@ class ReactSelect extends React.Component {
     if (options && defaultValue) {
       const value = options.filter(it => defaultValue.indexOf(it.value) !== -1);
       this.setState({ value });
-      this.props.onChange(value);
+      this.props.onChange(defaultValue);
     } else {
       this.props.onChange([]);
     }
