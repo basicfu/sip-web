@@ -39,7 +39,15 @@ const model = {
     * user({ _ }, { call, put }) {
       const response = yield call(user);
       if (response.success) {
-        yield put({ type: 'updateState', payload: { user: { ...response.data } } });
+        // 此应用没有访客页面，未登录跳转条件
+        // 1.如果/user接口中roles为空或者roles中只包含guest则为未登录用户
+        // 2.如果任意api接口中响应code=1表示未登录
+        const roles = response.data.roles;
+        if (roles === undefined || (roles.indexOf('GUEST') && roles.length === 1)) {
+          Router.push('/login');
+        } else {
+          yield put({ type: 'updateState', payload: { user: { ...response.data } } });
+        }
       }
     },
     * dict(_, { call, put }) {

@@ -20,11 +20,9 @@ export default function request(url, options) {
   const newOptions = { ...defaultOptions, ...options };
   const auth = window.localStorage.getItem('auth');
   let headers = { Accept: 'application/json', ...newOptions.headers };
-  // if (process.env.BABEL_ENV === 'dev') {
     headers.app = config.app;
     // dev ignore permission
     headers.secret = config.app;
-  // }
   if (auth) {
     headers.Authorization = JSON.parse(auth).token;
   }
@@ -66,7 +64,8 @@ export default function request(url, options) {
           if (result.msg !== undefined && result.msg !== '') {
             notify.error(result.msg);
           }
-          if (result.code === 5) {
+          // code=1表示未登录
+          if (result.code === 1) {
             window.localStorage.removeItem('auth');
             window.location.href = '/login';
           }
