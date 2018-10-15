@@ -37,13 +37,18 @@ const model = {
   },
   effects: {
     * user({ _ }, { call, put }) {
+      // 登录成功和第一次进入页面必走
       const response = yield call(user);
       if (response.success) {
         // 此应用没有访客页面，未登录跳转条件
         // 1.如果/user接口中roles为空或者roles中只包含guest则为未登录用户
         // 2.如果任意api接口中响应code=1表示未登录
         const roles = response.data.roles;
-        if (roles === undefined || (roles.indexOf('GUEST') && roles.length === 1)) {
+        // 如果是超管获取所有应用以便切换
+        if (response.data.type === 'SYSTEM_SUPER_ADMIN' || response.data.user === 'SYSTEM_ADMIN') {
+          yield put({ type: 'baseApp/all' });
+        }
+        if (roles === undefined || (roles.indexOf('GUEST') !== -1 && roles.length === 1)) {
           Router.push('/login');
         } else {
           yield put({ type: 'updateState', payload: { user: { ...response.data } } });

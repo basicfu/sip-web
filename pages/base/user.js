@@ -67,7 +67,8 @@ class User extends React.Component {
     };
     const roleData = role.map(it => ({ label: it.name, value: it.id }));
     const columns = [];
-    columns.push({ id: 'username', label: '用户名', type: FieldType.TEXT, required: true,visible: ['row', 'rowAdd', 'rowEdit','dialogAdd'], render: this.renderColumns });
+    columns.push({ id: 'username', label: '用户名', type: FieldType.TEXT, required: true, visible: ['row', 'rowAdd', 'rowEdit', 'dialogAdd'], render: this.renderColumns });
+    columns.push({ id: 'type', label: '用户类型', type: FieldType.SELECT, required: true, extra: Dict.USER_TYPE, visible: ['row', 'dialogAdd', 'dialogEdit'], render: this.renderColumns });
     columns.push({ id: 'roleIds', label: '用户角色', type: FieldType.MULTI_SELECT, required: false, extra: roleData, visible: ['row', 'dialogAdd', 'dialogEdit'], render: this.renderColumns });
     columns.push({ id: 'mobile', label: '手机号', type: FieldType.TEXT, required: false, render: this.renderColumns });
     columns.push({ id: 'email', label: '邮箱', type: FieldType.TEXT, required: false, render: this.renderColumns });

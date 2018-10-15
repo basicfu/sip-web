@@ -18,6 +18,7 @@ export async function deleteUser(params) { return request(`${prefix}${base}/user
 
 // 应用管理
 export async function listApp(params) { return request(`${prefix}${base}/app/list`, { method: 'GET', body: params }); }
+export async function allApp() { return request(`${prefix}${base}/app/all`, { method: 'GET' }); }
 export async function insertApp(params) { return request(`${prefix}${base}/app/insert`, { method: 'POST', body: params }); }
 export async function updateApp(params) { return request(`${prefix}${base}/app/update`, { method: 'POST', body: params }); }
 export async function deleteApp(params) { return request(`${prefix}${base}/app/delete`, { method: 'DELETE', body: params }); }

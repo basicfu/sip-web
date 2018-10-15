@@ -126,9 +126,14 @@ class MyApp extends App {
                   variant="permanent"
                   mobileOpen
                 />}
+                <MuiThemeProvider
+                  theme={this.pageContext.theme}
+                  sheetsManager={this.pageContext.sheetsManager}
+                >
                 <div style={{ width: pathRule.sidebar !== false ? 'calc(100% - 230px)' : '100%', height: '100%' }}>
                   <Component pageContext={this.pageContext} {...pageProps} />
                 </div>
+                </MuiThemeProvider>
               </main>
             </MuiThemeProvider>
           </JssProvider>

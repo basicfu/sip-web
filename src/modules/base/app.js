@@ -1,5 +1,6 @@
 import {
   listApp,
+  allApp,
   insertApp,
   updateApp,
   deleteApp,
@@ -15,6 +16,12 @@ const modal = {
       const response = yield call(listApp, data);
       if (response.success) {
         yield put({ type: 'updateState', payload: { ...response } });
+      }
+    },
+    * all(_, { call, put }) {
+      const response = yield call(allApp);
+      if (response.success) {
+        yield put({ type: 'updateState', payload: { all: response.data } });
       }
     },
     * insert({ payload }, { call, put }) {

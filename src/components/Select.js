@@ -5,6 +5,7 @@ import MenuItem from '../../node_modules/@material-ui/core/MenuItem/MenuItem';
 import { getOrCreateStore } from 'utils/store';
 import MuiSwitch from '../../node_modules/@material-ui/core/Switch/Switch';
 import FormControlLabel from '../../node_modules/@material-ui/core/FormControlLabel/FormControlLabel';
+import classNames from 'classnames';
 import FormControl from '../../node_modules/@material-ui/core/FormControl/FormControl';
 import InputLabel from '../../node_modules/@material-ui/core/InputLabel/InputLabel';
 
@@ -17,23 +18,28 @@ const styles = {
 class Select extends React.Component {
   state={
     value: '',
-    option: [],
+    options: [],
   };
 
   componentDidMount() {
-    const { dict, defaultValue } = this.props;
+    const { dict, options, defaultValue } = this.props;
     const data = getOrCreateStore().getState().global.dict;
     const defaultOption = this.props.default;
-    const option = [...(data && data[dict] && data[dict].children) || []];
+    let newOptions = [];
+    if (dict) {
+      newOptions = [...(data && data[dict] && data[dict].children) || []];
+    } else {
+      newOptions = options;
+    }
     let value = '';
     if (defaultOption) {
-      option.unshift(defaultOption);
+      newOptions.unshift(defaultOption);
       value = defaultOption.value;
     }
     if (defaultValue) {
       value = defaultValue;
     }
-    this.setState({ option, value });
+    this.setState({ options: newOptions, value });
   }
 
   handleChange=(e) => {
@@ -48,17 +54,18 @@ class Select extends React.Component {
   }
 
   render() {
-    const { classes, column: { label, required } } = this.props;
-    const { option, value } = this.state;
+    const { classes, className, column } = this.props;
+    const { label, required } = column || {};
+    const { options, value } = this.state;
     return (
       label === undefined || label === '' ? (
         <MuiSelect
-          className={classes.root}
+          className={classNames(classes.root, className)}
           displayEmpty
           value={value}
           onChange={this.handleChange}
         >
-          {option.map(it =>
+          {options.map(it =>
             <MenuItem key={it.value} value={it.value}>{it.name}</MenuItem>,
           )}
         </MuiSelect>
@@ -66,12 +73,12 @@ class Select extends React.Component {
         <FormControl>
           <InputLabel>{`${label}${required ? '*' : ''}`}</InputLabel>
           <MuiSelect
-            className={classes.root}
+            className={classNames(classes.root, className)}
             displayEmpty
             value={value}
             onChange={this.handleChange}
           >
-            {option.map(it =>
+            {options.map(it =>
               <MenuItem key={it.value} value={it.value}>{it.name}</MenuItem>,
             )}
           </MuiSelect>

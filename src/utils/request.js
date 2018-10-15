@@ -19,10 +19,18 @@ export default function request(url, options) {
   };
   const newOptions = { ...defaultOptions, ...options };
   const auth = window.localStorage.getItem('auth');
+  const appCode = window.localStorage.getItem('appCode') || 'sip';
   let headers = { Accept: 'application/json', ...newOptions.headers };
+  headers.app = appCode;
+  // dev ignore permission
+  headers.secret = appCode;
+  if (appCode !== config.app) {
+    headers.call = config.app;
+  }
+  // 此接口特殊处理依旧调用sip
+  if (url === '/api/dict/dict/all') {
     headers.app = config.app;
-    // dev ignore permission
-    headers.secret = config.app;
+  }
   if (auth) {
     headers.Authorization = JSON.parse(auth).token;
   }

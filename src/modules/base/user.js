@@ -26,6 +26,7 @@ const modal = {
       const { success } = yield call(logout);
       if (success) {
         window.localStorage.removeItem('auth');
+        window.localStorage.removeItem('appCode');
         // noinspection JSUnresolvedFunction
         Router.push('/login');
       }

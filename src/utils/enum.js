@@ -1,6 +1,6 @@
 export const Dict = {
   USER_TEMPLATE_FIELD_TYPE: 'USER_TEMPLATE_FIELD_TYPE',
-  HELLO: 'HELLO',
+  USER_TYPE: 'USER_TYPE',
 };
 Object.freeze(Dict);
 export const SelectDefault = {

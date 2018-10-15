@@ -18,6 +18,8 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener/ClickAwayList
 import MenuList from '@material-ui/core/MenuList/MenuList';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+import Select from 'components/Select';
+import config from 'config';
 
 const styles = theme => ({
   root: {
@@ -37,6 +39,10 @@ const styles = theme => ({
     position: 'absolute',
     right: 10,
   },
+  appSelect: {
+    marginRight: 60,
+    width: 100,
+  },
 });
 const theme = createMuiTheme({
   typography: {
@@ -50,7 +56,6 @@ class Navbar extends React.Component {
     open: false,
   };
 
-
   handleOpen = () => {
     this.setState({ open: true });
   }
@@ -63,9 +68,21 @@ class Navbar extends React.Component {
     this.props.dispatch({ type: 'baseUser/logout' });
   };
 
+  handleAppChange=(appCode) => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('appCode', appCode);
+      window.location.reload();
+    }
+  };
+
   render() {
-    const { classes, data } = this.props;
+    const { classes, data, app } = this.props;
     const { open } = this.state;
+    const appAll = app.map(it => ({ name: it.name, value: it.code }));
+    let defaultApp = config.app;
+    if (typeof window !== 'undefined') {
+      defaultApp = window.localStorage.getItem('appCode') || config.app;
+    }
     return (
       <div className={classes.root}>
         <AppBar className={classes.appBar}>
@@ -83,6 +100,7 @@ class Navbar extends React.Component {
               </Typography>
             </MuiThemeProvider>
             <div className={classes.grow} />
+            {(data.user.type === 'SYSTEM_SUPER_ADMIN' || data.user.type === 'SYSTEM_ADMIN') && typeof window !== 'undefined' && appAll.length > 0 && <Select className={classes.appSelect} options={appAll} defaultValue={defaultApp} onChange={value => this.handleAppChange(value)} />}
             {data.auth.username &&
             <IconButton
               aria-owns={open ? 'menu-appbar' : null}
@@ -137,4 +155,5 @@ class Navbar extends React.Component {
 
 export default connect(state => ({
   data: state.global,
+  app: state.baseApp.all,
 }))(withStyles(styles)(Navbar));
