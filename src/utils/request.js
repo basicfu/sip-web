@@ -27,9 +27,17 @@ export default function request(url, options) {
   if (appCode !== config.app) {
     headers.call = config.app;
   }
-  // 此接口特殊处理依旧调用sip
+  // 此接口特殊处理
   if (url === '/api/dict/dict/all') {
-    headers.app = config.app;
+    const requestApp = options.body && options.body.app;
+    if (requestApp && requestApp !== 'sip') {
+      headers.app = requestApp;
+      headers.secret = requestApp;
+      headers.call = config.app;
+      delete newOptions.body.app;
+    } else {
+      headers.app = config.app;
+    }
   }
   if (auth) {
     headers.Authorization = JSON.parse(auth).token;

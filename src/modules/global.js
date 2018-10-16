@@ -14,6 +14,7 @@ const model = {
       menus: [],
     },
     dict: {},
+    otherDict: {},
     auth: {},
   },
   subscriptions: {
@@ -55,15 +56,20 @@ const model = {
         }
       }
     },
-    * dict(_, { call, put }) {
-      const response = yield call(allDict);
+    * dict({ payload }, { call, put }) {
+      const response = yield call(allDict, {...payload});
       if (response.success) {
         const dicts = response.data.children;
         const dict = {};
         dicts.forEach(it => {
           dict[it.value] = it;
         });
-        yield put({ type: 'updateState', payload: { dict } });
+        // 有可能会用到其他应用字典，所以此处区分
+        if (payload && payload.app && payload.app !== 'sip') {
+          yield put({ type: 'updateState', payload: { otherDict: dict } });
+        } else {
+          yield put({ type: 'updateState', payload: { dict } });
+        }
       }
     },
   },

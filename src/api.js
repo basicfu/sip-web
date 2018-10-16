@@ -5,7 +5,7 @@ const base = '/base';
 const dict = '/dict';
 const permission = '/permission';
 
-export async function allDict() { return request(`${prefix}${dict}/dict/all`, { method: 'GET' }); }
+export async function allDict(params) { return request(`${prefix}${dict}/dict/all`, { method: 'GET', body: params }); }
 
 // 用户管理
 export async function user() { return request(`${prefix}${base}/user`, { method: 'GET' }); }

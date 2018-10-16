@@ -71,6 +71,25 @@ export function formatDict(value, dict) {
   }
   return '';
 }
+export function formatOptions(value, options) {
+  const values = options.filter(it => it.value === value);
+  if (values.length !== 0) {
+    return values[0].name;
+  }
+  return '';
+}
+export function formatOtherDict(value, dict) {
+  if (value === undefined || value === null || value === '') {
+    return '';
+  }
+  const data = getOrCreateStore().getState().global.otherDict;
+  const option = [...(data && data[dict] && data[dict].children) || []];
+  const values = option.filter(it => it.value === value);
+  if (values.length !== 0) {
+    return values[0].name;
+  }
+  return '';
+}
 
 export function formatDateTime(data) {
   if (data === undefined || data === null) {
