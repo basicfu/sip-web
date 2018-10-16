@@ -416,7 +416,7 @@ class CustomTable extends React.Component {
     const dispatch = getOrCreateStore().dispatch;
     const { classes, columns, data, keyName, tableName, mode, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent } = this.props;
     const { namespace, data: { list, page }, all } = data;
-    const table = data[tableName];
+    const table = data[tableName] || {};
     const selected = table.selected || [];
     const item = {...table.item} || {};
     //表格当前状态add/edit
