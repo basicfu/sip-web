@@ -79,6 +79,7 @@ class User extends React.Component {
     const columns = [];
     columns.push({ id: 'username', label: '用户名', type: FieldType.TEXT, required: true, visible: ['row', 'rowAdd', 'rowEdit', 'dialogAdd'], render: this.renderColumns });
     columns.push({ id: 'type', label: '用户类型', type: FieldType.SELECT, required: true, extra: userTypeDictData, visible: ['row', 'dialogAdd', 'dialogEdit'], render: this.renderColumns });
+    columns.push({ id: 'nickname', label: '昵称', type: FieldType.TEXT, required: false, render: this.renderColumns });
     columns.push({ id: 'roleIds', label: '用户角色', type: FieldType.MULTI_SELECT, required: false, extra: roleData, visible: ['row', 'dialogAdd', 'dialogEdit'], render: this.renderColumns });
     columns.push({ id: 'mobile', label: '手机号', type: FieldType.TEXT, required: false, render: this.renderColumns });
     columns.push({ id: 'email', label: '邮箱', type: FieldType.TEXT, required: false, render: this.renderColumns });
@@ -94,6 +95,7 @@ class User extends React.Component {
     columns.push({ id: 'cdate', label: '创建时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime });
     columns.push({ id: 'udate', label: '更新时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime });
     columns.push({ id: 'ldate', label: '最后登录时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime });
+    columns.push({ id: 'cuname', label: '创建人', required: false, visible: ['row'] });
 
     const tableProps = {
       data,
