@@ -82,7 +82,7 @@ class Role extends React.Component {
     };
     const userTableProps = {
       userData,
-      tableName: 'userTable',
+      // tableName: 'userTable',
       headerChild: <CustomSearch placeholder="用户名、手机号或邮箱" onSearch={(v) => this.handleSearch(v)} />,
       showFooter: false,
       columns: [
@@ -93,7 +93,7 @@ class Role extends React.Component {
     };
     const menuTableProps = {
       data,
-      tableName: 'menuTable',
+      // tableName: 'menuTable',
       headerChild: <CustomSearch placeholder="菜单名" onSearch={(v) => this.handleSearch(v)} />,
       showFooter: false,
       columns: [
@@ -107,7 +107,7 @@ class Role extends React.Component {
     };
     const resourceTableProps = {
       data,
-      tableName: 'resourceTable',
+      // tableName: 'resourceTable',
       headerChild: <CustomSearch placeholder="URL" onSearch={(v) => this.handleSearch(v)} />,
       showFooter: false,
       columns: [
@@ -118,7 +118,7 @@ class Role extends React.Component {
     };
     const permissionTableProps = {
       data,
-      tableName: 'permissionTable',
+      // tableName: 'permissionTable',
       headerChild: <CustomSearch placeholder="权限名" onSearch={(v) => this.handleSearch(v)} />,
       showFooter: false,
       columns: [
@@ -140,31 +140,31 @@ class Role extends React.Component {
                 <Tab label="权限" />
               </Tabs>
             </AppBar>
-            {value === 0 && <div>
-              <CustomTable key={2} {...userTableProps} />
-                            </div>}
-            {value === 1 &&
-            <Grid container>
-              <Grid item xs={7}>
-                <CustomTable {...menuTableProps} />
-              </Grid>
-              <Divider />
-              <Grid item xs={5}>
-                <CustomTable {...resourceTableProps} />
-              </Grid>
-            </Grid>
-            }
-            {value === 2 &&
-            <Grid container>
-              <Grid item xs={7}>
-                <CustomTable {...permissionTableProps} />
-              </Grid>
-              <Divider />
-              <Grid item xs={5}>
-                <CustomTable {...resourceTableProps} />
-              </Grid>
-            </Grid>
-            }
+            {/*{value === 0 && <div>*/}
+              {/*<CustomTable key={2} {...userTableProps} />*/}
+                            {/*</div>}*/}
+            {/*{value === 1 &&*/}
+            {/*<Grid container>*/}
+              {/*<Grid item xs={7}>*/}
+                {/*<CustomTable {...menuTableProps} />*/}
+              {/*</Grid>*/}
+              {/*<Divider />*/}
+              {/*<Grid item xs={5}>*/}
+                {/*<CustomTable {...resourceTableProps} />*/}
+              {/*</Grid>*/}
+            {/*</Grid>*/}
+            {/*}*/}
+            {/*{value === 2 &&*/}
+            {/*<Grid container>*/}
+              {/*<Grid item xs={7}>*/}
+                {/*<CustomTable {...permissionTableProps} />*/}
+              {/*</Grid>*/}
+              {/*<Divider />*/}
+              {/*<Grid item xs={5}>*/}
+                {/*<CustomTable {...resourceTableProps} />*/}
+              {/*</Grid>*/}
+            {/*</Grid>*/}
+            {/*}*/}
           </Grid>
         </Grid>
 
