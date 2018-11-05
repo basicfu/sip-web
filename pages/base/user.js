@@ -52,6 +52,19 @@ class User extends React.Component {
           return <Select key={id} options={extra} default={SelectDefault.CHOOSE} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
         }
         return formatOptions(text, extra);
+      case FieldType.CHECK:
+        if (addOrEdit) {
+          return <ReactSelect key={id} options={extra} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
+        }
+        const texts = [];
+        const obj = {};
+        extra.forEach(it => {
+          obj[it.value] = it.label;
+        });
+        text.forEach(it => {
+          texts.push(obj[it]);
+        });
+        return texts.join(',');
       case FieldType.MULTI_SELECT:
         if (addOrEdit) {
           return <ReactSelect key={id} options={extra} defaultValue={item.roles && item.roles.map(it => it.id)} onChange={value => onChange(id, value)} column={column} />;
@@ -89,6 +102,8 @@ class User extends React.Component {
       let extra = it.extra;
       if (it.type === FieldType.SELECT) {
         extra = [...(otherDictData && otherDictData[extra] && otherDictData[extra].children) || []];
+      } else if (it.type === FieldType.CHECK) {
+        extra = [...(otherDictData && otherDictData[extra] && otherDictData[extra].children) || []].map(d => ({ label: d.name, value: d.value }));
       }
       columns.push({ id: it.enName, label: it.name, type: it.type, required: it.required, addDefaultValue: it.defaultValue, extra, render: this.renderColumns });
     });
