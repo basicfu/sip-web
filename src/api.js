@@ -78,6 +78,7 @@ export async function deletePermissionResource(params) { return request(`${prefi
 
 // 资源
 export async function allResource(params) { return request(`${prefix}${permission}/resource/all`, { method: 'GET', body: params }); }
+export async function syncResource(params) { return request(`${prefix}${permission}/resource/sync`, { method: 'POST', body: params }); }
 export async function listResource(params) { return request(`${prefix}${permission}/resource/list`, { method: 'GET', body: params }); }
 export async function insertResource(params) { return request(`${prefix}${permission}/resource/insert`, { method: 'POST', body: params }); }
 export async function updateResource(params) { return request(`${prefix}${permission}/resource/update`, { method: 'POST', body: params }); }

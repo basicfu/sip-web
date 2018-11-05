@@ -29,7 +29,7 @@ class Select extends React.Component {
     if (dict) {
       newOptions = [...(data && data[dict] && data[dict].children) || []];
     } else {
-      newOptions = options;
+      newOptions = options || [];
     }
     let value = '';
     if (defaultOption) {
@@ -54,13 +54,14 @@ class Select extends React.Component {
   }
 
   render() {
-    const { classes, className, column } = this.props;
+    const { classes, className, column, width } = this.props;
     const { label, required } = column || {};
     const { options, value } = this.state;
     return (
       label === undefined || label === '' ? (
         <MuiSelect
           className={classNames(classes.root, className)}
+          style={{ width }}
           displayEmpty
           value={value}
           onChange={this.handleChange}
@@ -74,6 +75,7 @@ class Select extends React.Component {
           <InputLabel>{`${label}${required ? '*' : ''}`}</InputLabel>
           <MuiSelect
             className={classNames(classes.root, className)}
+            style={{ width }}
             displayEmpty
             value={value}
             onChange={this.handleChange}

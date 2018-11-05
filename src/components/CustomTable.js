@@ -180,12 +180,12 @@ class CustomTable extends React.Component {
   }
 
   handleSelectAllClick = (event, checked) => {
-    const { namespace, keyName, tableName, list, dispatch } = this.data();
+    const { namespace, keyName, tableName, list, dispatch,table } = this.data();
     if (checked) {
-      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: list.map(it => it[keyName]) } } });
+      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table,selected: list.map(it => it[keyName]) } } });
       return;
     }
-    dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: [] } } });
+    dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table,selected: [] } } });
   };
 
   handleChangePage = (event, page) => {
@@ -312,7 +312,7 @@ class CustomTable extends React.Component {
   handleClick = (event, id) => {
     clearTimeout(timerId);
     timerId = setTimeout(() => {
-      const { namespace, keyName, tableName,page, list, dispatch, selected, tableStatus } = this.data();
+      const { namespace, keyName, tableName,page, list, dispatch, selected, tableStatus,table } = this.data();
       //单击当前编辑行无操作
       if (id !== -1) {
         let newSelected=[...selected];
@@ -326,9 +326,9 @@ class CustomTable extends React.Component {
           newSelected=[id]
         }
         if (selected.indexOf(id) === -1) {
-          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: newSelected, item:newItem },data:{page,list} } });
+          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table,selected: newSelected, item:newItem },data:{page,list} } });
           } else if (!(tableStatus==='add'||tableStatus==='edit')) {
-          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { selected: [] },data:{page,list}  } });
+          dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table,selected: [] },data:{page,list}  } });
         }
       }
     }, 200);
@@ -337,7 +337,7 @@ class CustomTable extends React.Component {
   //行checkbox事件
   handleCheckbox = (event, id) => {
     clearTimeout(timerId);
-    const { namespace, selected, tableName, dispatch,page,list } = this.data();
+    const { namespace, selected, tableName, dispatch,page,list,table } = this.data();
     if (id !== -1) {
       let newSelected=selected.filter(it => it !== id);
       let isNull=false;
@@ -348,9 +348,9 @@ class CustomTable extends React.Component {
         isNull=true
       }
       if (event.target.checked&&!isNull) {
-        dispatch({ type: `${namespace}/updateState`, payload: {  data: { page, list },[tableName]: { selected: [...selected, id] } } });
+        dispatch({ type: `${namespace}/updateState`, payload: {  data: { page, list },[tableName]: { ...table,selected: [...selected, id] } } });
       } else {
-        dispatch({ type: `${namespace}/updateState`, payload: {  data: { page, list },[tableName]: { selected: newSelected } } });
+        dispatch({ type: `${namespace}/updateState`, payload: {  data: { page, list },[tableName]: { ...table,selected: newSelected } } });
       }
     }
   };
@@ -403,12 +403,12 @@ class CustomTable extends React.Component {
 
   // cancel
   handleClear=() => {
-    const { namespace, keyName, tableName, dispatch, list, page, item } = this.data();
+    const { namespace, keyName, tableName, dispatch, list, page, table } = this.data();
     if (list.length>0&&list[0][keyName]===-1) {
       list.shift();
-      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {}, data: { page, list } } });
+      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {search:{...table.search}}, data: { page, list } } });
     }else {
-      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {}, data: { page, list } } });
+      dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: {search:{...table.search}}, data: { page, list } } });
     }
   }
 

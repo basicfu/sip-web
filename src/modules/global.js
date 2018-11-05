@@ -49,7 +49,9 @@ const model = {
         if (response.data.type === 'SYSTEM_SUPER_ADMIN' || response.data.user === 'SYSTEM_ADMIN') {
           yield put({ type: 'baseApp/all' });
         }
-        if (roles === undefined || (roles.indexOf('GUEST') !== -1 && roles.length === 1)) {
+        //TODO 不能找到indexoof
+        console.log(roles);
+        if (roles === null || roles === undefined || (roles.indexOf('GUEST') !== -1 && roles.length === 1)) {
           Router.push('/login');
         } else {
           yield put({ type: 'updateState', payload: { user: { ...response.data } } });

@@ -45,3 +45,9 @@ export function getOrCreateStore(initialState) {
   // eslint-disable-next-line
   return window[__NEXT_DVA_STORE__];
 }
+export function getState(namespace) {
+  return getOrCreateStore().getState()[namespace];
+}
+export function getDispatch() {
+  return getOrCreateStore().dispatch;
+}

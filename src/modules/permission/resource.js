@@ -1,19 +1,21 @@
 import {
   listResource,
   allResource,
+  syncResource,
   insertResource,
   updateResource,
   deleteResource,
 } from 'api';
+import { getState } from 'utils/store';
 import dialog from 'utils/dialog';
 
 const modal = {
   effects: {
-    * list({ payload }, { call, put }) {
-      const data = payload;
+    * list(_, { call, put }) {
+      const search = getState('permissionResource').table.search;
       dialog.close();
-      yield put({ type: 'updateState', payload: { table: {} } });
-      const response = yield call(listResource, data);
+      yield put({ type: 'updateState', payload: { table: { search } } });
+      const response = yield call(listResource, search);
       if (response.success) {
         yield put({ type: 'updateState', payload: { ...response } });
       }
@@ -22,6 +24,12 @@ const modal = {
       const response = yield call(allResource);
       if (response.success) {
         yield put({ type: 'updateState', payload: { all: response.data } });
+      }
+    },
+    * sync({ payload }, { call, put }) {
+      const response = yield call(syncResource, payload);
+      if (response.success) {
+        yield put({ type: 'list' });
       }
     },
     * insert({ payload }, { call, put }) {
