@@ -71,10 +71,6 @@ class Resource extends Component {
     }
     notify.info('正在获取变更详情,请稍后...');
     this.props.dispatch({ type: `${namespace}/sync`, payload: { serviceId, type: 1 } });
-    // let serviceName = '全部';
-    // if (serviceId !== undefined) {
-    //   serviceName = appServiceData.all.filter(it => it.id === serviceId)[0].name;
-    // }
   };
 
   handleSyncDetail=(detail, type) => {
@@ -107,35 +103,37 @@ class Resource extends Component {
     });
   }
 
-  // 实时获取拥有的接口地址和现有界面中的数据同步保持一致，如果删除的将会自动解除菜单/权限的资源关系，添加的将不会有任何关联，不变动的的资源不会解除菜单/权限的资源关系
   handleSyncDialog=(sync) => {
     const { classes, dispatch } = this.props;
     dispatch({ type: `${namespace}/updateState`, payload: { sync: [] } });
     dialog.confirm({
       title: '即将执行以下变更操作,请确认操作',
       width: 600,
-      content: <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>服务</TableCell>
-            <TableCell>状态</TableCell>
-            <TableCell>添加数</TableCell>
-            <TableCell>删除数</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {sync.map((item, index) => {
-            return (
-              <TableRow key={index}>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.available ? '可用' : '不可用'}</TableCell>
-                <TableCell><a href="#" className={classes.a} onClick={this.handleSyncDetail.bind(this, item.insertDetail, 1)}>{item.insertCount}</a></TableCell>
-                <TableCell><a href="#" className={classes.a} onClick={this.handleSyncDetail.bind(this, item.deleteDetail, 2)}>{item.deleteCount}</a></TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-               </Table>,
+      content: <div>
+        <p>实时获取拥有的接口地址和现有界面中的数据同步保持一致，如果删除的将会自动解除菜单/权限的资源关系</p>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>服务</TableCell>
+              <TableCell>状态</TableCell>
+              <TableCell>添加数</TableCell>
+              <TableCell>删除数</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sync.map((item, index) => {
+              return (
+                <TableRow key={index}>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.available ? '可用' : '不可用'}</TableCell>
+                  <TableCell><a href="#" className={classes.a} onClick={this.handleSyncDetail.bind(this, item.insertDetail, 1)}>{item.insertCount}</a></TableCell>
+                  <TableCell><a href="#" className={classes.a} onClick={this.handleSyncDetail.bind(this, item.deleteDetail, 2)}>{item.deleteCount}</a></TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>,
       onOk() {
         dispatch({ type: `${namespace}/sync`, payload: { type: 2, serviceId: sync.length > 1 ? undefined : sync[0].serviceId } });
       },
