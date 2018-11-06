@@ -5,12 +5,43 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { withStyles } from '@material-ui/core/styles';
 import dialog from 'utils/dialog';
+import classNames from 'classnames';
 import DialogContentText from '../../node_modules/@material-ui/core/DialogContentText/DialogContentText';
 
 const styles = {
   paper: {
     width: 400,
-    top: -80,
+    maxWidth: 2400,
+  },
+  width100: {
+    width: 100,
+  },
+  width200: {
+    width: 200,
+  },
+  width300: {
+    width: 300,
+  },
+  width400: {
+    width: 400,
+  },
+  width500: {
+    width: 500,
+  },
+  width600: {
+    width: 600,
+  },
+  width700: {
+    width: 700,
+  },
+  width800: {
+    width: 800,
+  },
+  width900: {
+    width: 900,
+  },
+  width1000: {
+    width: 1000,
   },
   warning: {
     verticalAlign: 'bottom',
@@ -23,17 +54,13 @@ const styles = {
   },
 };
 
-/**
- * 如果需要动态控制width
- * 预先提供N种width的宽度，然后选择一种
- */
 class CustomDialog extends React.Component {
   handleClose = () => {
-    const { onClose } = this.props.data;
+    const { key, onClose } = this.props.data;
     if (onClose) {
       onClose();
     }
-    dialog.close();
+    dialog.close(key);
   };
 
   handleOk = () => {
@@ -45,27 +72,28 @@ class CustomDialog extends React.Component {
     const isString = typeof content === 'string' || typeof content === 'undefined';
     return (
       <Fragment>
-      <DialogTitle>
-        {title || '提示'}
-      </DialogTitle>
-      <div className={classes.content}>
-        {isString ?
-          <DialogContentText id="alert-dialog-description">
-            {content}
-          </DialogContentText>
-          :
-          content
-        }
-      </div>
+        <DialogTitle>
+          {title || '提示'}
+        </DialogTitle>
+        <div className={classes.content}>
+          {isString ?
+            <DialogContentText id="alert-dialog-description">
+              {content}
+            </DialogContentText>
+            :
+            content
+          }
+        </div>
       </Fragment>);
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, data: { width } } = this.props;
     return (
       <Dialog
-        classes={{ paper: classes.paper }}
+        classes={{ paper: classNames(classes.paper, classes[`width${width}`]) }}
         open
+        scroll="paper"
         onClose={this.handleClose}
       >
         {this.renderChildren()}
