@@ -1,8 +1,8 @@
 /* eslint-disable react/no-array-index-key */
-import React, {Fragment} from 'react';
+import React, { Fragment } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
@@ -11,7 +11,7 @@ import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import ClearIcon from '@material-ui/icons/Clear';
 import DoneIcon from '@material-ui/icons/Done';
-import {lighten} from '@material-ui/core/styles/colorManipulator';
+import { lighten } from '@material-ui/core/styles/colorManipulator';
 import SpeedDial from '@material-ui/lab/SpeedDial/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction/SpeedDialAction';
@@ -104,48 +104,48 @@ class TableHeader extends React.Component {
   };
 
   renderEdit = () => {
-    const {classes, mode, onEdit} = this.props;
+    const { classes, mode, onEdit } = this.props;
     if (mode === 'all') {
       return (<Fragment>
         <Tooltip title="弹窗修改">
           <IconButton color={'primary'} className={classes.modalIcon} onClick={() => onEdit('modal')}>
-            <Assignment/>
+            <Assignment />
           </IconButton>
         </Tooltip>
         <Tooltip title="修改">
           <IconButton color={'primary'} onClick={() => onEdit('row')}>
-            <EditOutlinedIcon/>
+            <EditOutlinedIcon />
           </IconButton>
         </Tooltip>
-      </Fragment>);
+              </Fragment>);
     }
     if (mode === 'row' || mode === 'modal') {
       return (<Tooltip title="修改">
         <IconButton color={'primary'} onClick={() => onEdit('row')}>
-          <EditOutlinedIcon/>
+          <EditOutlinedIcon />
         </IconButton>
-      </Tooltip>);
+              </Tooltip>);
     }
   }
 
   render() {
-    const {numSelected, classes, tableStatus, onDelete, onDone, onClear, headerChild, mode} = this.props;
-    const {open} = this.state;
+    const { numSelected, classes, tableStatus, onDelete, onDone, onClear, headerChild, mode } = this.props;
+    const { open } = this.state;
     return (
       <Toolbar
         className={classNames(classes.root, {
           [classes.highlight]: numSelected > 0,
         })}
       >
-        <div className={classes.left} style={{display: numSelected > 0 ? 'inherit' : 'none'}}>
+        <div className={classes.left} style={{ display: numSelected > 0 ? 'inherit' : 'none' }}>
           <Typography color="inherit">
             {numSelected} selected
           </Typography>
         </div>
-        <div className={classes.left} style={{display: numSelected > 0 ? 'none' : 'inherit'}}>
+        <div className={classes.left} style={{ display: numSelected > 0 ? 'none' : 'inherit' }}>
           {headerChild.left}
         </div>
-        <div className={classes.spacer}/>
+        <div className={classes.spacer} />
         <div className={classes.actions}>
           {numSelected > 0 ? (
             <div className={classes.iconGroup}>
@@ -153,12 +153,12 @@ class TableHeader extends React.Component {
               <Fragment>
                 <Tooltip title="确定">
                   <IconButton color={'primary'} className={classes.rowDoneIcon} onClick={() => onDone()}>
-                    <DoneIcon/>
+                    <DoneIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="取消">
                   <IconButton color={'secondary'} className={classes.rowClearIcon} onClick={() => onClear()}>
-                    <ClearIcon/>
+                    <ClearIcon />
                   </IconButton>
                 </Tooltip>
               </Fragment>
@@ -168,7 +168,7 @@ class TableHeader extends React.Component {
                 {numSelected === 1 && this.renderEdit()}
                 <Tooltip title="删除">
                   <IconButton color={'secondary'} onClick={() => onDelete()}>
-                    <DeleteOutlinedIcon/>
+                    <DeleteOutlinedIcon />
                   </IconButton>
                 </Tooltip>
               </Fragment>
@@ -183,9 +183,9 @@ class TableHeader extends React.Component {
                 direction="down"
                 ariaLabel="SpeedDial"
                 className={classes.speedDial}
-                classes={{fab: classes.fab, actions: classes.speedActions}}
+                classes={{ fab: classes.fab, actions: classes.speedActions }}
                 hidden={false}
-                icon={<SpeedDialIcon openIcon={<EditOutlinedIcon/>}/>}
+                icon={<SpeedDialIcon openIcon={<EditOutlinedIcon />} />}
                 onBlur={this.handleClose}
                 onClick={() => this.handleAdd('row')}
                 onClose={this.handleClose}
@@ -197,14 +197,14 @@ class TableHeader extends React.Component {
                 {mode === 'all' ?
                   <SpeedDialAction
                     key="1"
-                    icon={<Assignment/>}
+                    icon={<Assignment />}
                     tooltipTitle="弹窗添加"
                     onClick={() => this.handleAdd('modal')}
                   />
                   :
                   'tip'
                 }
-              </SpeedDial>}
+                                   </SpeedDial>}
             </Fragment>
           )}
         </div>
