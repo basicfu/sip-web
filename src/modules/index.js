@@ -28,6 +28,9 @@ for (let i = 0; i < keys.length; i += 1) {
     queryState(s, { payload }) {
       return { ...s, table: { ...s.table, search: { ...s.table.search, ...payload } } };
     },
+    resetQuery(s, { _ }) {
+      return { ...s, table: { ...s.table, search: { } } };
+    },
   };
   models.push(value);
 }

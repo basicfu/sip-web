@@ -10,58 +10,151 @@ import IconButton from '@material-ui/core/IconButton';
 import Sync from '../../node_modules/@material-ui/icons/Sync';
 import Tooltip from '@material-ui/core/Tooltip';
 import dialog from 'utils/dialog';
+import Component from 'components/Component';
+import { formatOptions } from 'utils';
+import notify from 'utils/notify';
+import Table from '../../node_modules/@material-ui/core/Table/Table';
+import TableHead from '../../node_modules/@material-ui/core/TableHead/TableHead';
+import TableRow from '../../node_modules/@material-ui/core/TableRow/TableRow';
+import TableCell from '../../node_modules/@material-ui/core/TableCell/TableCell';
+import TableBody from '../../node_modules/@material-ui/core/TableBody/TableBody';
 
 const styles = {
   appServiceSelect: {
     width: 150,
     marginRight: 10,
   },
+  a: {
+    color: '#2196f3',
+    ':visited': {
+      color: '#2196f3',
+    },
+  },
 };
 
 const namespace = 'permissionResource';
 const appServiceNamespace = 'baseAppService';
 
-class Resource extends React.Component {
+class Resource extends Component {
   componentDidMount() {
-    this.props.dispatch({ type: 'baseAppService/all' });
+    this.dispatch({ type: 'baseAppService/all' });
     this.handleSearch();
   }
 
+  componentWillUpdate(nextProps, _) {
+    const sync = nextProps.data.sync;
+    if (sync.length > 0) {
+      this.handleSyncDialog(sync);
+    }
+  }
+
+  componentWillUnmount() {
+    this.resetQuery(namespace);
+  }
+
   handleSearch = (value) => {
-    this.props.dispatch({ type: `${namespace}/queryState`, payload: { q: value } });
-    this.props.dispatch({ type: `${namespace}/list` });
+    this.dispatch({ type: `${namespace}/queryState`, payload: { q: value } });
+    this.dispatch({ type: `${namespace}/list` });
   };
 
   handleAppServiceChange = (value) => {
-    this.props.dispatch({ type: `${namespace}/queryState`, payload: { serviceId: value } });
-    this.props.dispatch({ type: `${namespace}/list` });
+    this.dispatch({ type: `${namespace}/queryState`, payload: { serviceId: value } });
+    this.dispatch({ type: `${namespace}/list` });
   };
 
   handleSyncResource = () => {
-    const dispatch = this.props.dispatch;
     const { serviceId } = this.props.data.table.search;
-    let serviceName = '全部';
-    if (serviceId !== undefined) {
-      const appServiceData = this.props.appServiceData;
-      serviceName = appServiceData.all.filter(it => it.id === serviceId)[0].name;
+    const appServiceData = this.props.appServiceData;
+    if (appServiceData.all.length === 0) {
+      notify.error('还没有应用服务,请先添加服务后再次操作');
+      return;
     }
+    notify.info('正在获取变更详情,请稍后...');
+    this.props.dispatch({ type: `${namespace}/sync`, payload: { serviceId, type: 1 } });
+    // let serviceName = '全部';
+    // if (serviceId !== undefined) {
+    //   serviceName = appServiceData.all.filter(it => it.id === serviceId)[0].name;
+    // }
+  };
+
+  handleSyncDetail=(detail, type) => {
+    const key = 2;
     dialog.confirm({
-      title: `确定要同步${serviceName}服务接口地址吗？`,
-      content: `将在${serviceName}服务中实时获取拥有的接口地址和现有界面中的数据同步保持一致，如果删除的将会自动解除菜单/权限的资源关系，添加的将不会有任何关联，不变动的的资源不会解除菜单/权限的资源关系`,
+      key,
+      title: `${type === 1 ? '添加' : '删除'}明细`,
+      width: 400,
+      content: <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>URL</TableCell>
+            <TableCell>方法</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {detail.map((item, index) => {
+            return (
+              <TableRow key={index}>
+                <TableCell>{item.url}</TableCell>
+                <TableCell>{item.method}</TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+               </Table>,
       onOk() {
-        dispatch({ type: `${namespace}/sync`, payload: { serviceId } });
+                 dialog.close(key);
+      },
+    });
+  }
+
+  // 实时获取拥有的接口地址和现有界面中的数据同步保持一致，如果删除的将会自动解除菜单/权限的资源关系，添加的将不会有任何关联，不变动的的资源不会解除菜单/权限的资源关系
+  handleSyncDialog=(sync) => {
+    const { classes, dispatch } = this.props;
+    dispatch({ type: `${namespace}/updateState`, payload: { sync: [] } });
+    dialog.confirm({
+      title: '即将执行以下变更操作,请确认操作',
+      width: 600,
+      content: <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>服务</TableCell>
+            <TableCell>状态</TableCell>
+            <TableCell>添加数</TableCell>
+            <TableCell>删除数</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {sync.map((item, index) => {
+            return (
+              <TableRow key={index}>
+                <TableCell>{item.name}</TableCell>
+                <TableCell>{item.available ? '可用' : '不可用'}</TableCell>
+                <TableCell><a href="#" className={classes.a} onClick={this.handleSyncDetail.bind(this, item.insertDetail, 1)}>{item.insertCount}</a></TableCell>
+                <TableCell><a href="#" className={classes.a} onClick={this.handleSyncDetail.bind(this, item.deleteDetail, 2)}>{item.deleteCount}</a></TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+               </Table>,
+      onOk() {
+        dispatch({ type: `${namespace}/sync`, payload: { type: 2, serviceId: sync.length > 1 ? undefined : sync[0].serviceId } });
       },
     });
   }
 
   renderColumns = (text, column, addOrEdit, item, onChange) => {
-    const { id, type } = column;
+    const { id, type, extra } = column;
     switch (type) {
       case FieldType.TEXT:
         if (addOrEdit) {
           return <Input key={id} defaultValue={text} onChange={e => onChange(id, e.target.value)} column={column} />;
         }
         return text;
+      case FieldType.SELECT:
+        if (addOrEdit) {
+          return <Select key={id} options={extra} default={SelectDefault.CHOOSE} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
+        }
+        return formatOptions(text, extra);
       default:
         break;
     }
@@ -93,10 +186,11 @@ class Resource extends React.Component {
                </div>,
       },
       columns: [
-        { id: 'service', label: '服务', type: FieldType.TEXT, required: true, render: this.renderColumns },
+        { id: 'id', label: 'ID', visible: ['row', 'rowAdd', 'rowEdit'] },
+        { id: 'serviceId', label: '服务', type: FieldType.SELECT, required: true, extra: appServiceAll, render: this.renderColumns },
         { id: 'url', label: 'URL', type: FieldType.TEXT, required: true, render: this.renderColumns },
         { id: 'method', label: '方法', type: FieldType.TEXT, required: true, render: this.renderColumns },
-        { id: 'name', label: '名称', type: FieldType.TEXT, required: true, render: this.renderColumns },
+        { id: 'name', label: '名称', type: FieldType.TEXT, required: false, render: this.renderColumns },
       ],
     };
     return (

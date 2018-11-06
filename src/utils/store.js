@@ -48,6 +48,3 @@ export function getOrCreateStore(initialState) {
 export function getState(namespace) {
   return getOrCreateStore().getState()[namespace];
 }
-export function getDispatch() {
-  return getOrCreateStore().dispatch;
-}

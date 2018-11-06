@@ -112,7 +112,6 @@ class MyApp extends App {
               theme={this.pageContext.theme}
               sheetsManager={this.pageContext.sheetsManager}
             >
-              <div id={'dialog'} />
               <CssBaseline />
               <Notifications />
               {pathRule.navbar !== false && <Navbar />}

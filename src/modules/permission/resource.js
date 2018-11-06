@@ -10,6 +10,9 @@ import { getState } from 'utils/store';
 import dialog from 'utils/dialog';
 
 const modal = {
+  state: {
+    sync: [],
+  },
   effects: {
     * list(_, { call, put }) {
       const search = getState('permissionResource').table.search;
@@ -29,7 +32,13 @@ const modal = {
     * sync({ payload }, { call, put }) {
       const response = yield call(syncResource, payload);
       if (response.success) {
-        yield put({ type: 'list' });
+        if (response.data === null) {
+          // 确认之后操作
+          yield put({ type: 'list' });
+        } else {
+          // 预览之后操作
+          yield put({ type: 'updateState', payload: { sync: response.data } });
+        }
       }
     },
     * insert({ payload }, { call, put }) {
