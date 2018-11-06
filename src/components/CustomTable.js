@@ -190,12 +190,14 @@ class CustomTable extends React.Component {
 
   handleChangePage = (event, page) => {
     const { namespace, page: { pageSize }, dispatch } = this.data();
-    dispatch({ type: `${namespace}/list`, payload: { pageNum: page + 1, pageSize } });
+    dispatch({ type: `${namespace}/queryState`, payload: { pageNum: page + 1, pageSize } });
+    dispatch({ type: `${namespace}/list` });
   };
 
   handleChangeRowsPerPage = event => {
     const { namespace, page: { pageNum }, dispatch } = this.data();
-    dispatch({ type: `${namespace}/list`, payload: { pageNum, pageSize: event.target.value } });
+    dispatch({ type: `${namespace}/queryState`, payload: { pageNum, pageSize: event.target.value } });
+    dispatch({ type: `${namespace}/list` });
   };
 
   // 预添加模式
@@ -207,7 +209,10 @@ class CustomTable extends React.Component {
         [keyName]: -1,
       };
       columns.forEach(it=>{
-        defaultItem[it.id]=it.addDefaultValue;
+        //默认值需要忽略主键，不处理主键添加
+        if(keyName!==it.id){
+          defaultItem[it.id]=it.addDefaultValue;
+        }
       });
       let currentMode=edit;
       //行添加模式
@@ -442,6 +447,7 @@ class CustomTable extends React.Component {
     }else if(!(edit&&edit==='modal')){
       newColumn.label=''
     }
+    console.log('111')
     return column.render ? column.render(listItem[column.id], newColumn ,addOrEdit,listItem,this.handleItemChange) : listItem[column.id]
   }
   // 计算自适应宽度
