@@ -6,18 +6,23 @@ import styles from 'styles/user-template';
 import CustomSearch from 'components/CustomSearch';
 import Input from 'components/Input';
 import { FieldType } from 'enum';
-import Switch from 'components/Switch';
-import { formatFlag } from 'utils';
+import { formatDateTime } from 'utils';
+import Component from 'components/Component';
 
 const namespace = 'permissionPermission';
 
-class Permission extends React.Component {
+class Permission extends Component {
   componentDidMount() {
     this.handleSearch();
   }
 
+  componentWillUnmount() {
+    this.resetQuery(namespace);
+  }
+
   handleSearch = (value) => {
-    this.props.dispatch({ type: `${namespace}/list`, payload: { q: value } });
+    this.dispatch({ type: `${namespace}/queryState`, payload: { q: value } });
+    this.dispatch({ type: `${namespace}/list` });
   };
 
   renderColumns = (text, column, addOrEdit, item, onChange) => {
@@ -37,10 +42,13 @@ class Permission extends React.Component {
     const { data } = this.props;
     const tableProps = {
       data,
-      headerChild: <CustomSearch placeholder="应用名或code" onSearch={(value) => this.handleSearch(value)} />,
+      headerChild: { left: <CustomSearch placeholder="权限名或code" onSearch={(value) => this.handleSearch(value)} /> },
       columns: [
+        { id: 'id', label: 'ID', visible: ['row', 'rowAdd', 'rowEdit'] },
         { id: 'name', label: '权限名', type: FieldType.TEXT, required: true, render: this.renderColumns },
-        { id: 'code', label: '权限Code', type: FieldType.TEXT, required: true, render: this.renderColumns },
+        { id: 'code', label: 'CODE', type: FieldType.TEXT, required: true, render: this.renderColumns },
+        { id: 'cdate', label: '创建时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime },
+        { id: 'udate', label: '更新时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime },
       ],
     };
     return (
@@ -48,6 +56,7 @@ class Permission extends React.Component {
     );
   }
 }
+
 export default connect(state => ({
   data: state[namespace],
 }))(withStyles(styles)(Permission));

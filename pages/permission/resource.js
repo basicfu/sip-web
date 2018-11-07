@@ -11,7 +11,7 @@ import Sync from '../../node_modules/@material-ui/icons/Sync';
 import Tooltip from '@material-ui/core/Tooltip';
 import dialog from 'utils/dialog';
 import Component from 'components/Component';
-import { formatOptions } from 'utils';
+import {formatDateTime, formatOptions} from 'utils';
 import notify from 'utils/notify';
 import Table from '../../node_modules/@material-ui/core/Table/Table';
 import TableHead from '../../node_modules/@material-ui/core/TableHead/TableHead';
@@ -186,9 +186,11 @@ class Resource extends Component {
       columns: [
         { id: 'id', label: 'ID', visible: ['row', 'rowAdd', 'rowEdit'] },
         { id: 'serviceId', label: '服务', type: FieldType.SELECT, required: true, extra: appServiceAll, render: this.renderColumns },
+        { id: 'name', label: '名称', type: FieldType.TEXT, required: false, render: this.renderColumns },
         { id: 'url', label: 'URL', type: FieldType.TEXT, required: true, render: this.renderColumns },
         { id: 'method', label: '方法', type: FieldType.TEXT, required: true, render: this.renderColumns },
-        { id: 'name', label: '名称', type: FieldType.TEXT, required: false, render: this.renderColumns },
+        { id: 'cdate', label: '创建时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime },
+        { id: 'udate', label: '更新时间', required: false, visible: ['row', 'rowAdd', 'rowEdit'], render: formatDateTime },
       ],
     };
     return (
