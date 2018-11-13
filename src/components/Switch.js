@@ -17,18 +17,21 @@ const styles = {
 };
 
 class Switch extends React.Component {
-  state={
+  state = {
     checked: false,
   };
 
   componentDidMount() {
     const { checked } = this.props;
     this.setState({ checked: checked === true });
-    // 更新原有值,避免发生bool存在null的情况
-    this.props.onChange(checked);
   }
 
-  handleChange=(e) => {
+  componentWillReceiveProps(nextProps, _) {
+    const { checked } = nextProps;
+    this.setState({ checked: checked === true });
+  }
+
+  handleChange = (e) => {
     const checked = e.target.checked;
     this.setState({ checked });
     this.props.onChange(checked);
@@ -36,7 +39,8 @@ class Switch extends React.Component {
 
   render() {
     const { checked } = this.state;
-    const { column: { label, required } } = this.props;
+    const { column } = this.props;
+    const { label, required } = column || {};
     return (
       label === undefined || label === '' ? (
         <MuiSwitch

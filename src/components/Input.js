@@ -5,20 +5,21 @@ import MuiInput from '../../node_modules/@material-ui/core/Input';
 import FormControl from '../../node_modules/@material-ui/core/FormControl/FormControl';
 
 const styles = {
-  input: {
-    '& input': {
-      width: '100%',
-    },
+  root: {
+    position: 'relative',
+    width: '100%',
   },
 };
 
 class Input extends React.Component {
   render() {
-    const { classes, defaultValue, onChange,type, column: { label, required } } = this.props;
+    const { classes, defaultValue, onChange, type, column, width } = this.props;
+    const { label, required } = column || {};
     return (
       label === undefined || label === '' ? (
         <MuiInput
-          className={classes.input}
+          classes={{ root: classes.root }}
+          style={{ width }}
           onChange={onChange}
           defaultValue={defaultValue}
           type={type}
@@ -28,7 +29,8 @@ class Input extends React.Component {
         >
           <InputLabel>{`${label}${required ? '*' : ''}`}</InputLabel>
           <MuiInput
-            className={classes.input}
+            classes={{ root: classes.root }}
+            style={{ width }}
             onChange={onChange}
             defaultValue={defaultValue}
             type={type}

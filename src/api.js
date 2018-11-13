@@ -64,6 +64,8 @@ export async function listMenu(params) { return request(`${prefix}${permission}/
 export async function insertMenu(params) { return request(`${prefix}${permission}/menu/insert`, { method: 'POST', body: params }); }
 export async function insertMenuResource(params) { return request(`${prefix}${permission}/menu/insert/resource`, { method: 'POST', body: params }); }
 export async function updateMenu(params) { return request(`${prefix}${permission}/menu/update`, { method: 'POST', body: params }); }
+export async function updateDisplayMenu(params) { return request(`${prefix}${permission}/menu/update/${params.id}/${params.display}`, { method: 'POST' }); }
+export async function updateSortMenu(params) { return request(`${prefix}${permission}/menu/update/sort/${params.dragId}/${params.hoverId}`, { method: 'POST' }); }
 export async function deleteMenu(params) { return request(`${prefix}${permission}/menu/delete`, { method: 'DELETE', body: params }); }
 export async function deleteMenuResource(params) { return request(`${prefix}${permission}/menu/delete/resource`, { method: 'DELETE', body: params }); }
 
