@@ -17,7 +17,21 @@ import { formatDict, formatFlag } from 'utils';
 import InputNumber from 'components/InputNumber';
 import Select from 'components/Select';
 import ReactSelect from 'components/ReactSelect';
-import Switch from "components/Switch";
+import Switch from 'components/Switch';
+import TableHead from '../../node_modules/@material-ui/core/TableHead/TableHead';
+import TableRow from '../../node_modules/@material-ui/core/TableRow/TableRow';
+import TableBody from '../../node_modules/@material-ui/core/TableBody/TableBody';
+import Table from '../../node_modules/@material-ui/core/Table/Table';
+import CustomTableCell from 'components/CustomTableCell';
+import Paper from '@material-ui/core/Paper';
+import SpeedDial from '../../node_modules/@material-ui/lab/SpeedDial/SpeedDial';
+import SpeedDialIcon from '../../node_modules/@material-ui/lab/SpeedDialIcon/SpeedDialIcon';
+import EditOutlinedIcon from '../../node_modules/@material-ui/icons/EditOutlined';
+import Component from 'components/Component';
+import request from 'utils/request';
+import { suggest } from 'api';
+import notify from 'utils/notify';
+import dialog from 'utils/dialog';
 
 const namespace = 'permissionRole';
 const userNamespace = 'baseUser';
@@ -31,7 +45,7 @@ const styles = theme => ({
     backgroundColor: theme.palette.background.paper,
   },
 });
-class Role extends React.Component {
+class Role extends Component {
   state = {
     value: 0,
   };
@@ -40,13 +54,31 @@ class Role extends React.Component {
     this.handleSearch();
   }
 
+  componentWillReceiveProps(nextProps, _) {
+    const { selected } = nextProps.data.table;
+    const { list } = nextProps.userData.data;
+    if (selected && selected.length !== 1 && list.length !== 0) {
+      this.dispatch({ type: `${userNamespace}/updateState`, payload: { data: { list: [], page: {} } } });
+    }
+  }
+
   handleSearch = (value) => {
-    this.props.dispatch({ type: `${namespace}/list`, payload: { q: value } });
-    this.props.dispatch({ type: `${userNamespace}/list`, payload: { q: value } });
+    this.dispatch({ type: `${namespace}/list`, payload: { q: value } });
   };
 
   handleChange = (event, value) => {
     this.setState({ value });
+  };
+
+  handleUser=(roleCode) => {
+    this.props.dispatch({ type: `${userNamespace}/list`, payload: { condition: JSON.stringify({ roleCode: { condition: 'EQUAL_TO', value: roleCode } }) } });
+  };
+
+  handleDeleteUser=(selected) => {
+    const { dispatch,data } = this.props;
+    const selectedRole = data.table.selected || [];
+    const item = data.table.item || {};
+    dialog.confirm({ title: '确定解除角色-用户关系吗？', onOk() { dispatch({ type: `${namespace}/deleteUser`, payload: { id: selectedRole[0], userIds: selected, roleCode: item.code } }); } });
   };
 
   renderColumns=(text, column, addOrEdit, item, onChange) => {
@@ -67,32 +99,92 @@ class Role extends React.Component {
     }
   };
 
+  // renderUserTable() {
+  //   const { classes,userData } = this.props;
+  //   console.log(userData.data.list);
+  //   return (
+  //     <Paper className={classes.root}>
+  //       <Toolbar>
+  //         <CustomSearch placeholder="查询并添加用户" onSearch={(value) => this.handleSearch(value)} />
+  //         <div className={classes.spacer} />
+  //       </Toolbar>
+  //     <Table>
+  //     <TableHead>
+  //       <TableRow>
+  //         <CustomTableCell width="25%">check</CustomTableCell>
+  //         <CustomTableCell width="25%">用户名</CustomTableCell>
+  //         <CustomTableCell width="10%">昵称</CustomTableCell>
+  //         <CustomTableCell width="10%">手机号</CustomTableCell>
+  //         <CustomTableCell width="12%">邮箱</CustomTableCell>
+  //       </TableRow>
+  //     </TableHead>
+  //     <TableBody>
+  //       {userData.data.list.map((item, index) =>
+  //         <TableRow key={index}>
+  //           <CustomTableCell>check</CustomTableCell>
+  //           <CustomTableCell>{item.username}</CustomTableCell>
+  //           <CustomTableCell>{item.nickname}</CustomTableCell>
+  //           <CustomTableCell>{item.mobile}</CustomTableCell>
+  //           <CustomTableCell>{item.email}</CustomTableCell>
+  //         </TableRow>,
+  //       )}
+  //     </TableBody>
+  //     </Table>
+  //     </Paper>
+  //       );
+  // }
+
   render() {
     const { data, userData, menuData, permissionData, resourceData } = this.props;
     const { value } = this.state;
+    const loadOptions = (inputValue, callback) => {
+      if (inputValue) {
+        const promise = suggest({ q: 'b' });
+        promise.then(response => {
+          callback(response.data.map(it => ({ label: `${it.username}(${it.nickname})`, value: it.id })));
+        });
+      } else {
+        callback([]);
+      }
+    };
+    const onChange = value => {
+      const selected = data.table.selected || [];
+      const item = data.table.item || {};
+      if (selected.length !== 1) {
+        notify.warning('请选择一个角色后再继续操作');
+        return;
+      }
+      this.dispatch({ type: `${namespace}/insertUser`, payload: { id: selected[0], userIds: [value], roleCode: item.code } });
+    };
     const tableProps = {
       data,
-      headerChild: <CustomSearch placeholder="应用名或code" onSearch={(v) => this.handleSearch(v)} />,
-      showFooter: false,
+      onClick: (record) => {
+        this.handleUser(record.code);
+      },
+      deleteContent: '删除后将自动解除角色-用户、角色-菜单、角色-权限关系',
+      headerChild: { left: <CustomSearch placeholder="应用名或code" onSearch={(v) => this.handleSearch(v)} /> },
       columns: [
         { id: 'name', label: '角色名', type: FieldType.TEXT, required: true, render: this.renderColumns },
         { id: 'code', label: 'CODE', type: FieldType.TEXT, required: true, render: this.renderColumns },
-        { id: 'enalbe', label: '启用', type: FieldType.SWITCH, required: true, render: this.renderColumns },
+        { id: 'enable', label: '启用', type: FieldType.SWITCH, required: true, addDefaultValue: true, render: this.renderColumns },
       ],
     };
     const userTableProps = {
-      userData,
-      // tableName: 'userTable',
-      headerChild: <CustomSearch placeholder="用户名、手机号或邮箱" onSearch={(v) => this.handleSearch(v)} />,
-      showFooter: false,
+      data: userData,
+      mode: 'false',
+      onDelete: (selected) => {
+        this.handleDeleteUser(selected);
+      },
+      headerChild: { left: <div style={{ width: 300 }}><ReactSelect defaultValue={[]} async loadOptions={loadOptions} onChange={onChange} /></div> },
       columns: [
         { id: 'username', label: '用户名', type: FieldType.TEXT, required: true, render: this.renderColumns },
+        { id: 'nickname', label: '昵称', type: FieldType.TEXT, required: true, render: this.renderColumns },
         { id: 'mobile', label: '手机号', type: FieldType.TEXT, required: true, render: this.renderColumns },
-        { id: 'email', label: '邮箱', type: FieldType.TEXT, required: true, render: formatFlag },
+        { id: 'email', label: '邮箱', type: FieldType.TEXT, required: true, render: this.renderColumns },
       ],
     };
     const menuTableProps = {
-      data,
+      data: menuData,
       // tableName: 'menuTable',
       headerChild: <CustomSearch placeholder="菜单名" onSearch={(v) => this.handleSearch(v)} />,
       showFooter: false,
@@ -106,33 +198,32 @@ class Role extends React.Component {
       ],
     };
     const resourceTableProps = {
-      data,
+      data: resourceData,
       // tableName: 'resourceTable',
       headerChild: <CustomSearch placeholder="URL" onSearch={(v) => this.handleSearch(v)} />,
       showFooter: false,
       columns: [
-        { id: 'username', label: 'URL', type: FieldType.TEXT, required: true, render: this.renderColumns },
-        { id: 'mobile', label: '方法', type: FieldType.TEXT, required: true, render: this.renderColumns },
-        { id: 'email', label: '名称', type: FieldType.TEXT, required: true, render: formatFlag },
+        { id: 'url', label: 'URL', type: FieldType.TEXT, required: true, render: this.renderColumns },
+        { id: 'method', label: '方法', type: FieldType.TEXT, required: true, render: this.renderColumns },
       ],
     };
     const permissionTableProps = {
-      data,
+      data: permissionData,
       // tableName: 'permissionTable',
       headerChild: <CustomSearch placeholder="权限名" onSearch={(v) => this.handleSearch(v)} />,
       showFooter: false,
       columns: [
-        { id: 'username', label: '权限名', type: FieldType.TEXT, required: true, render: this.renderColumns },
-        { id: 'mobile', label: '权限Code', type: FieldType.TEXT, required: true, render: this.renderColumns },
+        { id: 'name', label: '权限名', type: FieldType.TEXT, required: true, render: this.renderColumns },
+        { id: 'code', label: '权限Code', type: FieldType.TEXT, required: true, render: this.renderColumns },
       ],
     };
     return (
         <Grid container>
-          <Grid item xs={4}>
+          <Grid item xs={5}>
             <CustomTable key={1} {...tableProps} />
           </Grid>
           <Divider />
-          <Grid item xs={8}>
+          <Grid item xs={7}>
             <AppBar position="static">
               <Tabs value={value} onChange={this.handleChange}>
                 <Tab label="用户" />
@@ -140,31 +231,13 @@ class Role extends React.Component {
                 <Tab label="权限" />
               </Tabs>
             </AppBar>
-            {/*{value === 0 && <div>*/}
-              {/*<CustomTable key={2} {...userTableProps} />*/}
-                            {/*</div>}*/}
-            {/*{value === 1 &&*/}
-            {/*<Grid container>*/}
-              {/*<Grid item xs={7}>*/}
-                {/*<CustomTable {...menuTableProps} />*/}
-              {/*</Grid>*/}
-              {/*<Divider />*/}
-              {/*<Grid item xs={5}>*/}
-                {/*<CustomTable {...resourceTableProps} />*/}
-              {/*</Grid>*/}
-            {/*</Grid>*/}
-            {/*}*/}
-            {/*{value === 2 &&*/}
-            {/*<Grid container>*/}
-              {/*<Grid item xs={7}>*/}
-                {/*<CustomTable {...permissionTableProps} />*/}
-              {/*</Grid>*/}
-              {/*<Divider />*/}
-              {/*<Grid item xs={5}>*/}
-                {/*<CustomTable {...resourceTableProps} />*/}
-              {/*</Grid>*/}
-            {/*</Grid>*/}
-            {/*}*/}
+            {value === 0 && <CustomTable {...userTableProps} />}
+             {value === 1 &&
+             <CustomTable {...menuTableProps} />
+             }
+             {value === 2 &&
+             <CustomTable {...permissionTableProps} />
+             }
           </Grid>
         </Grid>
 

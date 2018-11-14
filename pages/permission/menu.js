@@ -498,7 +498,7 @@ class Menu extends Component {
   };
 
   renderRow = (items, level = 0) => {
-    const { classes } = this.props;
+    const { classes, data } = this.props;
     const { status, item } = this.state;
     const rowItem = [];
     items.forEach((row, index) => {
@@ -517,7 +517,7 @@ class Menu extends Component {
           <CustomTableCell>{this.renderColumns(row, 'type', FieldType.TEXT, addOrEdit)}</CustomTableCell>
           <CustomTableCell>
             <Switch
-key={'display'}
+key={!addOrEdit ? row.display : item.display}
 checked={!addOrEdit ? row.display : item.display}
                     onChange={checked => this.handleSwitchDisplay('display', row.id, checked)} />
           </CustomTableCell>

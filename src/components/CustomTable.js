@@ -314,10 +314,12 @@ class CustomTable extends React.Component {
   };
 
   // 单击事件，处理单击/双击冲突事件
-  handleClick = (event, id) => {
+  handleClick = (event, record) => {
     clearTimeout(timerId);
     timerId = setTimeout(() => {
-      const { namespace, keyName, tableName,page, list, dispatch, selected, tableStatus,table } = this.data();
+      const { namespace, keyName, tableName,page, list, dispatch, selected, tableStatus,table,onClick } = this.data();
+      const id=record[keyName];
+      onClick&&onClick(record);
       //单击当前编辑行无操作
       if (id !== -1) {
         let newSelected=[...selected];
@@ -361,8 +363,12 @@ class CustomTable extends React.Component {
   };
 
   handleDelete = () => {
-    const { namespace, dispatch, selected,deleteTitle,deleteContent } = this.data();
-    dialog.confirm({ title:deleteTitle||"确定要删除吗？",content:deleteContent,onOk() { dispatch({ type: `${namespace}/delete`, payload: selected }); } });
+    const { namespace, dispatch, selected,deleteTitle,deleteContent,onDelete } = this.data();
+    if(onDelete){
+      onDelete(selected)
+    }else{
+      dialog.confirm({ title:deleteTitle||"确定要删除吗？",content:deleteContent,onOk() { dispatch({ type: `${namespace}/delete`, payload: selected }); } });
+    }
   };
 
   // insert/update
@@ -419,7 +425,7 @@ class CustomTable extends React.Component {
 
   data=() => {
     const dispatch = getOrCreateStore().dispatch;
-    const { classes, columns, data, keyName, tableName, mode, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent } = this.props;
+    const { classes, columns, data, keyName, tableName, mode, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent, onClick,onDoubleClick,onDelete } = this.props;
     const { namespace, data: { list, page }, all } = data;
     const table = data[tableName] || {};
     const selected = table.selected || [];
@@ -429,7 +435,7 @@ class CustomTable extends React.Component {
     //表格当前操作模式row/modal
     const currentMode = table.currentMode;
     return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, currentMode, mode, actionName,
-      showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent,tableStatus };
+      showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent,tableStatus,onClick,onDoubleClick,onDelete };
   }
   handleItemChange = (itemKey, itemValue) => {
     const { dispatch, tableName, namespace, table } = this.data();
@@ -447,7 +453,6 @@ class CustomTable extends React.Component {
     }else if(!(edit&&edit==='modal')){
       newColumn.label=''
     }
-    console.log('111')
     return column.render ? column.render(listItem[column.id], newColumn ,addOrEdit,listItem,this.handleItemChange) : listItem[column.id]
   }
   // 计算自适应宽度
@@ -582,7 +587,7 @@ class CustomTable extends React.Component {
                   return (
                     <TableRow
                       hover
-                      onClick={event => this.handleClick(event, item[keyName])}
+                      onClick={event => this.handleClick(event, item)}
                       onDoubleClick={event => this.handleEdit('row', item[keyName])}
                       aria-checked={isSelected}
                       tabIndex={-1}

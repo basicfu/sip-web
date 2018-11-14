@@ -3,7 +3,7 @@ import {
   allRole,
   insertRole,
   updateRole,
-  deleteRole,
+  deleteRole, insertRoleUser, deleteRoleUser,
 } from 'api';
 import dialog from 'utils/dialog';
 
@@ -28,6 +28,22 @@ const modal = {
       const { success } = yield call(insertRole, payload);
       if (success) {
         yield put({ type: 'list' });
+      }
+    },
+    * insertUser({ payload }, { call, put }) {
+      const roleCode = payload.roleCode;
+      delete payload.roleCode;
+      const { success } = yield call(insertRoleUser, payload);
+      if (success) {
+        yield put({ type: 'baseUser/list', payload: { condition: JSON.stringify({ roleCode: { condition: 'EQUAL_TO', value: roleCode } }) } });
+      }
+    },
+    * deleteUser({ payload }, { call, put }) {
+      const roleCode = payload.roleCode;
+      delete payload.roleCode;
+      const { success } = yield call(deleteRoleUser, payload);
+      if (success) {
+        yield put({ type: 'baseUser/list', payload: { condition: JSON.stringify({ roleCode: { condition: 'EQUAL_TO', value: roleCode } }) } });
       }
     },
     * update({ payload }, { call, put }) {

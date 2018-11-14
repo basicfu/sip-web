@@ -31,6 +31,9 @@ for (let i = 0; i < keys.length; i += 1) {
     resetQuery(s, { _ }) {
       return { ...s, table: { ...s.table, search: { } } };
     },
+    resetState() {
+      return { ...value.state };
+    },
   };
   models.push(value);
 }

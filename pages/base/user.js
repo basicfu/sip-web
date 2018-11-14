@@ -10,10 +10,11 @@ import { Dict, FieldType, SelectDefault } from 'enum';
 import InputNumber from 'components/InputNumber';
 import Select from 'components/Select';
 import ReactSelect from 'components/ReactSelect';
+import Component from 'components/Component';
 
 const namespace = 'baseUser';
 
-class User extends React.Component {
+class User extends Component {
   componentDidMount() {
     this.props.dispatch({ type: 'baseUserTemplate/all' });
     this.props.dispatch({ type: 'permissionRole/all' });
@@ -23,6 +24,10 @@ class User extends React.Component {
       this.props.dispatch({ type: 'global/dict', payload: { app: appCode } });
     }
     this.handleSearch();
+  }
+
+  componentWillUnmount() {
+    this.resetState(namespace);
   }
 
   handleSearch = (value) => {

@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Select from 'react-select';
+import AsyncSelect from 'react-select/lib/Async';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import NoSsr from '@material-ui/core/NoSsr';
@@ -13,6 +14,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { emphasize } from '@material-ui/core/styles/colorManipulator';
 import { getOrCreateStore } from 'utils/store';
+import request from 'utils/request';
+import fetch from 'dva/fetch';
+import notify from 'utils/notify';
 
 const styles = theme => ({
   root: {
@@ -177,19 +181,24 @@ class ReactSelect extends React.Component {
     if (options && defaultValue) {
       const value = options.filter(it => defaultValue.indexOf(it.value) !== -1);
       this.setState({ value });
-      this.props.onChange(defaultValue);
-    } else {
-      this.props.onChange([]);
     }
   }
 
   handleChange = value => {
-    this.props.onChange(value.map(it => it.value));
+    const { multi, onChange } = this.props;
+    if (onChange) {
+      if (multi) {
+        onChange(value.map(it => it.value));
+      } else {
+        onChange(value.value);
+      }
+    }
     this.setState({ value });
   };
 
   render() {
-    const { classes, theme, options, placeholder, column: { label, required } } = this.props;
+    const { classes, theme, options, placeholder, column, multi, async, loadOptions, width } = this.props;
+    const { label, required } = column || {};
     const { value } = this.state;
     const selectStyles = {
       input: base => ({
@@ -198,29 +207,48 @@ class ReactSelect extends React.Component {
         '& input': {
           font: 'inherit',
         },
+        width,
       }),
     };
-
     return (
       <div className={classes.root}>
         <NoSsr>
-          <Select
-            classes={classes}
-            styles={selectStyles}
-            textFieldProps={label && {
-              label: `${label}${required ? '*' : ''}`,
-              InputLabelProps: {
-                shrink: true,
-              },
-            }}
-            isClearable={false}
-            options={options}
-            components={components}
-            value={value}
-            onChange={this.handleChange}
-            placeholder={placeholder || '请选择'}
-            isMulti
-          />
+          {async ?
+            <AsyncSelect
+              classes={classes}
+              styles={selectStyles}
+              textFieldProps={label && {
+                label: `${label}${required ? '*' : ''}`,
+                InputLabelProps: {
+                  shrink: true,
+                },
+              }}
+              components={components}
+              loadOptions={loadOptions}
+              value=""
+              defaultOptions
+              placeholder={placeholder || '请选择'}
+              onChange={this.handleChange}
+            />
+            :
+            <Select
+              classes={classes}
+              styles={selectStyles}
+              textFieldProps={label && {
+                label: `${label}${required ? '*' : ''}`,
+                InputLabelProps: {
+                  shrink: true,
+                },
+              }}
+              isClearable={false}
+              options={options}
+              components={components}
+              value={value}
+              onChange={this.handleChange}
+              placeholder={placeholder || '请选择'}
+              isMulti={multi}
+            />
+          }
         </NoSsr>
       </div>
     );
@@ -229,8 +257,11 @@ class ReactSelect extends React.Component {
 
 ReactSelect.propTypes = {
   classes: PropTypes.object.isRequired,
-  options: PropTypes.array.isRequired,
+  options: PropTypes.array,
   theme: PropTypes.object.isRequired,
 };
-
+ReactSelect.defaultProps = {
+  multi: false,
+  async: false,
+};
 export default withStyles(styles, { withTheme: true })(ReactSelect);

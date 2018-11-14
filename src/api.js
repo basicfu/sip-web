@@ -15,6 +15,7 @@ export async function listUser(params) { return request(`${prefix}${base}/user/l
 export async function insertUser(params) { return request(`${prefix}${base}/user/insert`, { method: 'POST', body: params }); }
 export async function updateUser(params) { return request(`${prefix}${base}/user/update`, { method: 'POST', body: params }); }
 export async function deleteUser(params) { return request(`${prefix}${base}/user/delete`, { method: 'DELETE', body: params }); }
+export async function suggest(params) { return request(`${prefix}${base}/user/suggest/${params.q}`, { method: 'GET' }); }
 
 // 应用管理
 export async function listApp(params) { return request(`${prefix}${base}/app/list`, { method: 'GET', body: params }); }

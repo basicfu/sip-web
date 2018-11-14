@@ -3,12 +3,16 @@ import React from 'react';
 import { getOrCreateStore } from 'utils/store';
 
 class Component extends React.Component {
-  dispatch(json) {
-    this.props.dispatch(json);
-  }
-
   resetQuery(namespace) {
     getOrCreateStore().dispatch({ type: `${namespace}/resetQuery` });
+  }
+
+  resetState(namespace) {
+    getOrCreateStore().dispatch({ type: `${namespace}/resetState` });
+  }
+
+  dispatch(json) {
+    this.props.dispatch(json);
   }
 }
 

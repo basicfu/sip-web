@@ -26,11 +26,6 @@ class Switch extends React.Component {
     this.setState({ checked: checked === true });
   }
 
-  componentWillReceiveProps(nextProps, _) {
-    const { checked } = nextProps;
-    this.setState({ checked: checked === true });
-  }
-
   handleChange = (e) => {
     const checked = e.target.checked;
     this.setState({ checked });
