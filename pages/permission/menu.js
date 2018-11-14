@@ -38,6 +38,7 @@ import MuiThemeProvider from '../../node_modules/@material-ui/core/es/styles/Mui
 import createMuiTheme from '../../node_modules/@material-ui/core/styles/createMuiTheme';
 import dialog from 'utils/dialog';
 import Immutable from 'immutable';
+import CollapseCheckBox from 'components/CollapseCheckBox';
 
 const styles = {
   root: {
@@ -185,37 +186,6 @@ const DragableBodyRow = DropTarget('row', {
     initialClientOffset: monitor.getInitialClientOffset(),
   }))(withStyles(styles)(BodyRow)),
 );
-function CollapseCheckBox(props) {
-  const { onChange, checked } = props;
-  // true显示-号，false显示+号
-  return <Checkbox
-    onChange={onChange}
-    checked={checked}
-    style={{ padding: '10px 12px 14px 12px' }}
-    icon={<svg
-      fill="rgba(0, 0, 0, 0.65)"
-      width="24"
-      height="24"
-      focusable="false"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      role="presentation">
-      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" />
-      <path d="M7 11h10v2H7z" />
-      <rect
-        stroke="null"
-        id="svg_3"
-        height="10.244086"
-        width="2.030457"
-        y="6.81121"
-        x="10.984772"
-        fillOpacity="null"
-        strokeOpacity="null"
-        strokeWidth="null"
-        fill="null" />
-          </svg>}
-    checkedIcon={<IndeterminateCheckBoxOutlined />} />;
-}
 function setItemFlag(list, id, flag) {
   for (let i = 0; i < list.length; i += 1) {
     const item = list[i];
@@ -351,6 +321,10 @@ class Menu extends Component {
     if (this.props.data.rid !== nextProps.data.rid) {
       this.setState({ list: JSON.parse(JSON.stringify(nextProps.data.all)), item: {} });
     }
+  }
+
+  componentWillUnmount() {
+    this.resetState(namespace);
   }
 
   handleSearch = (value) => {

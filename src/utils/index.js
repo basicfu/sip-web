@@ -195,3 +195,26 @@ export function getActivePage(path, menus) {
   }
   return r;
 }
+
+export function getAllIdByTreeData(data) {
+  let ids = [];
+  for (let i = 0; i < data.length; i += 1) {
+    const item = data[i];
+    ids.push(item.id);
+    if (item.children && item.children.length > 0) {
+      ids = ids.concat(getAllIdByTreeData(item.children));
+    }
+  }
+  return ids;
+}
+export function getCountByTreeData(data) {
+  let n = 0;
+  for (let i = 0; i < data.length; i += 1) {
+    const item = data[i];
+    n += 1;
+    if (item.children && item.children.length > 0) {
+      n += getCountByTreeData(item.children);
+    }
+  }
+  return n;
+}

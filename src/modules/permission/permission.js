@@ -21,7 +21,7 @@ const modal = {
     * all(_, { call, put }) {
       const response = yield call(allPermission);
       if (response.success) {
-        yield put({ type: 'updateState', payload: { all: response.data } });
+        yield put({ type: 'updateState', payload: { all: response.data, rid: response.rid } });
       }
     },
     * insert({ payload }, { call, put }) {

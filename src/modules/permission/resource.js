@@ -26,7 +26,7 @@ const modal = {
     * all(_, { call, put }) {
       const response = yield call(allResource);
       if (response.success) {
-        yield put({ type: 'updateState', payload: { all: response.data } });
+        yield put({ type: 'updateState', payload: { all: response.data, rid: response.rid } });
       }
     },
     * sync({ payload }, { call, put }) {

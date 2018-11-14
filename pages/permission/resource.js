@@ -50,6 +50,7 @@ class Resource extends Component {
 
   componentWillUnmount() {
     this.resetQuery(namespace);
+    this.resetState(namespace);
   }
 
   handleSearch = (value) => {

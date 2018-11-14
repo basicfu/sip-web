@@ -49,6 +49,9 @@ export async function deleteUserTemplate(params) { return request(`${prefix}${ba
 // 角色
 export async function allRole(params) { return request(`${prefix}${permission}/role/all`, { method: 'GET', body: params }); }
 export async function listRole(params) { return request(`${prefix}${permission}/role/list`, { method: 'GET', body: params }); }
+export async function listRoleUser(params) { return request(`${prefix}${permission}/role/list/${params.id}/user`, { method: 'GET' }); }
+export async function listRoleMenu(params) { return request(`${prefix}${permission}/role/list/${params.id}/menu`, { method: 'GET' }); }
+export async function listRolePermission(params) { return request(`${prefix}${permission}/role/list/${params.id}/permission`, { method: 'GET' }); }
 export async function insertRole(params) { return request(`${prefix}${permission}/role/insert`, { method: 'POST', body: params }); }
 export async function insertRoleUser(params) { return request(`${prefix}${permission}/role/insert/user`, { method: 'POST', body: params }); }
 export async function insertRoleMenu(params) { return request(`${prefix}${permission}/role/insert/menu`, { method: 'POST', body: params }); }

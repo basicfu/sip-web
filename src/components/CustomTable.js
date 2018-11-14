@@ -332,6 +332,7 @@ class CustomTable extends React.Component {
         }else{
           newSelected=[id]
         }
+        console.log(list);
         if (selected.indexOf(id) === -1) {
           dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table,selected: newSelected, item:newItem },data:{page,list} } });
           } else if (!(tableStatus==='add'||tableStatus==='edit')) {
