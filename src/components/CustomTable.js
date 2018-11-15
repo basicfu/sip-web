@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React from 'react';
+import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -187,17 +187,16 @@ class CustomTable extends React.Component {
     }
     dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table,selected: [] } } });
   };
-
   handleChangePage = (event, page) => {
-    const { namespace, page: { pageSize }, dispatch } = this.data();
-    dispatch({ type: `${namespace}/queryState`, payload: { pageNum: page + 1, pageSize } });
-    dispatch({ type: `${namespace}/list` });
+    const { namespace, page: { pageSize }, dispatch,listAction,tableName } = this.data();
+    dispatch({ type: `${namespace}/queryState`, payload: { tableName,pageNum: page + 1, pageSize } });
+    dispatch({ type: `${namespace}/${listAction}` });
   };
 
   handleChangeRowsPerPage = event => {
-    const { namespace, page: { pageNum }, dispatch } = this.data();
-    dispatch({ type: `${namespace}/queryState`, payload: { pageNum, pageSize: event.target.value } });
-    dispatch({ type: `${namespace}/list` });
+    const { namespace, page: { pageNum }, dispatch,listAction,tableName } = this.data();
+    dispatch({ type: `${namespace}/queryState`, payload: { tableName,pageNum, pageSize: event.target.value } });
+    dispatch({ type: `${namespace}/${listAction}` });
   };
 
   // 预添加模式
@@ -332,7 +331,6 @@ class CustomTable extends React.Component {
         }else{
           newSelected=[id]
         }
-        console.log(list);
         if (selected.indexOf(id) === -1) {
           dispatch({ type: `${namespace}/updateState`, payload: { [tableName]: { ...table,selected: newSelected, item:newItem },data:{page,list} } });
           } else if (!(tableStatus==='add'||tableStatus==='edit')) {
@@ -426,7 +424,8 @@ class CustomTable extends React.Component {
 
   data=() => {
     const dispatch = getOrCreateStore().dispatch;
-    const { classes, columns, data, keyName, tableName, mode, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent, onClick,onDoubleClick,onDelete } = this.props;
+    const { classes, columns, data, keyName, tableName, mode, actionName, showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent
+      ,userPaper,listAction,onClick,onDoubleClick,onDelete } = this.props;
     const { namespace, data: { list, page }, all } = data;
     const table = data[tableName] || {};
     const selected = table.selected || [];
@@ -436,8 +435,8 @@ class CustomTable extends React.Component {
     //表格当前操作模式row/modal
     const currentMode = table.currentMode;
     return { classes, dispatch, columns, keyName, tableName, namespace, list, page, all, table, item, selected, currentMode, mode, actionName,
-      showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent,tableStatus,onClick,onDoubleClick,onDelete };
-  }
+      showCheck, showHeader, headerChild, showFooter, deleteTitle,deleteContent,tableStatus,userPaper,listAction,onClick,onDoubleClick,onDelete };
+  };
   handleItemChange = (itemKey, itemValue) => {
     const { dispatch, tableName, namespace, table } = this.data();
     // TODO 保存会闪原数据
@@ -542,89 +541,98 @@ class CustomTable extends React.Component {
     })
   };
   render() {
-    const { classes, tableStatus, columns, keyName, mode, list, page, table, selected, currentMode, showCheck, showHeader, headerChild, showFooter } = this.data();
+    const { classes, tableStatus, columns, keyName, mode, list, page, table, selected, currentMode, showCheck, showHeader, headerChild, showFooter,userPaper } = this.data();
     const { rowsPerPageOptions, rowsPerPage } = this.state;
     //非添加编辑、弹窗模式进行计算
     if((currentMode===undefined||currentMode==='')&&(tableStatus===undefined||tableStatus==='')){
       this.calcTableAuto({ list, columns, keyName, table,tableStatus,currentMode });
     }
+    const renderElement=()=>{
+      return (<Fragment>
+        {showHeader &&
+        <TableHeader
+          numSelected={selected.length}
+          onAdd={this.handleAdd}
+          onEdit={this.handleEdit}
+          onDelete={this.handleDelete}
+          onDone={this.handleDone}
+          onClear={this.handleClear}
+          headerChild={headerChild}
+          tableStatus={tableStatus}
+          mode={mode}
+        />}
+        <div className={classes.tableWrapper}>
+          <Table className={classes.table}>
+            <TableHead>
+              <TableRow>
+                {showCheck &&
+                <CustomTableCell style={{ textAlign: 'left', width: 56 }}>
+                  <Checkbox
+                    indeterminate={selected.length > 0 && selected.length < list.length}
+                    checked={selected.length === list.length && list.length !== 0}
+                    onChange={this.handleSelectAllClick}
+                  />
+                </CustomTableCell>}
+                {this.renderCell(columns,tableStatus,currentMode,(column,index)=>(
+                  <CustomTableCell key={index} style={{ minWidth: `${this.headerMinWidths[index]}px`, width: `${this.contentWidths[index]}%` }}>
+                    {column.label}
+                  </CustomTableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {list.map((item, itemIndex) => {
+                const isSelected = selected.indexOf(item[keyName]) !== -1;
+                return (
+                  <TableRow
+                    hover
+                    onClick={event => this.handleClick(event, item)}
+                    onDoubleClick={event => this.handleEdit('row', item[keyName])}
+                    aria-checked={isSelected}
+                    tabIndex={-1}
+                    key={item[keyName]}
+                    selected={isSelected}
+                  >
+                    {showCheck &&
+                    <CustomTableCell style={{ textAlign: 'left' }}>
+                      <Checkbox checked={isSelected} onChange={e => this.handleCheckbox(e, item[keyName])} />
+                    </CustomTableCell>}
+                    {this.renderCell(columns,tableStatus,currentMode,(column,index)=>(
+                      <CustomTableCell key={index} style={{textAlign: column.align || undefined}}>
+                        {this.renderField(column, item, table)}
+                      </CustomTableCell>
+                    ))}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+        {showFooter &&
+        <TablePagination
+          classes={{ select: classes.pagination }}
+          colSpan={3}
+          component="div"
+          count={page.total || 0}
+          rowsPerPage={page.pageSize && rowsPerPageOptions.indexOf(page.pageSize) !== -1 ? page.pageSize : rowsPerPage}
+          rowsPerPageOptions={rowsPerPageOptions}
+          labelRowsPerPage={'Rows per page'}
+          page={page.pageNum ? page.pageNum - 1 : 0}
+          onChangePage={this.handleChangePage}
+          onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          ActionsComponent={TablePaginationActionsWrapped}
+        />}
+      </Fragment>)
+    }
     return (
       <MuiThemeProvider theme={theme}>
-        <Paper className={classes.root}>
-          {showHeader &&
-          <TableHeader
-            numSelected={selected.length}
-            onAdd={this.handleAdd}
-            onEdit={this.handleEdit}
-            onDelete={this.handleDelete}
-            onDone={this.handleDone}
-            onClear={this.handleClear}
-            headerChild={headerChild}
-            tableStatus={tableStatus}
-            mode={mode}
-          />}
-          <div className={classes.tableWrapper}>
-            <Table className={classes.table}>
-              <TableHead>
-                <TableRow>
-                  {showCheck &&
-                  <CustomTableCell style={{ textAlign: 'left', width: 56 }}>
-                    <Checkbox
-                      indeterminate={selected.length > 0 && selected.length < list.length}
-                      checked={selected.length === list.length && list.length !== 0}
-                      onChange={this.handleSelectAllClick}
-                    />
-                  </CustomTableCell>}
-                  {this.renderCell(columns,tableStatus,currentMode,(column,index)=>(
-                    <CustomTableCell key={index} style={{ minWidth: `${this.headerMinWidths[index]}px`, width: `${this.contentWidths[index]}%` }}>
-                      {column.label}
-                    </CustomTableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {list.map((item, itemIndex) => {
-                  const isSelected = selected.indexOf(item[keyName]) !== -1;
-                  return (
-                    <TableRow
-                      hover
-                      onClick={event => this.handleClick(event, item)}
-                      onDoubleClick={event => this.handleEdit('row', item[keyName])}
-                      aria-checked={isSelected}
-                      tabIndex={-1}
-                      key={item[keyName]}
-                      selected={isSelected}
-                    >
-                      {showCheck &&
-                      <CustomTableCell style={{ textAlign: 'left' }}>
-                        <Checkbox checked={isSelected} onChange={e => this.handleCheckbox(e, item[keyName])} />
-                      </CustomTableCell>}
-                      {this.renderCell(columns,tableStatus,currentMode,(column,index)=>(
-                        <CustomTableCell key={index} style={{textAlign: column.align || undefined}}>
-                          {this.renderField(column, item, table)}
-                        </CustomTableCell>
-                      ))}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-          {showFooter &&
-          <TablePagination
-            classes={{ select: classes.pagination }}
-            colSpan={3}
-            component="div"
-            count={page.total || 0}
-            rowsPerPage={page.pageSize && rowsPerPageOptions.indexOf(page.pageSize) !== -1 ? page.pageSize : rowsPerPage}
-            rowsPerPageOptions={rowsPerPageOptions}
-            labelRowsPerPage={'Rows per page'}
-            page={page.pageNum ? page.pageNum - 1 : 0}
-            onChangePage={this.handleChangePage}
-            onChangeRowsPerPage={this.handleChangeRowsPerPage}
-            ActionsComponent={TablePaginationActionsWrapped}
-          />}
-        </Paper>
+        {userPaper?
+          <Paper className={classes.root}>
+            {renderElement()}
+          </Paper>
+          :
+          renderElement()
+        }
       </MuiThemeProvider>
     );
   }
@@ -644,5 +652,7 @@ CustomTable.defaultProps = {
   showCheck: true,
   showHeader: true,
   showFooter: true,
+  userPaper: true,
+  listAction: 'list',
 };
 export default withStyles(styles)(CustomTable);

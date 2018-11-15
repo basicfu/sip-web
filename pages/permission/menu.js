@@ -12,8 +12,6 @@ import TableCell from '../../node_modules/@material-ui/core/TableCell/TableCell'
 import TableRow from '../../node_modules/@material-ui/core/TableRow/TableRow';
 import { findDOMNode } from 'react-dom';
 import update from 'immutability-helper';
-import Checkbox from '../../node_modules/@material-ui/core/Checkbox/Checkbox';
-import IndeterminateCheckBoxOutlined from '@material-ui/icons/IndeterminateCheckBoxOutlined';
 import Paper from '@material-ui/core/Paper';
 import CustomSearch from 'components/CustomSearch';
 import Toolbar from '../../node_modules/@material-ui/core/Toolbar/Toolbar';
@@ -26,19 +24,16 @@ import EditOutlinedIcon from '../../node_modules/@material-ui/icons/EditOutlined
 import notify from 'utils/notify';
 import DoneIcon from '../../node_modules/@material-ui/icons/Done';
 import ClearIcon from '../../node_modules/@material-ui/icons/Clear';
-import InputNumber from 'components/InputNumber';
+import LaunchIcon from '../../node_modules/@material-ui/icons/Launch';
 import Switch from 'components/Switch';
-import { formatFlag } from 'utils';
 import Component from 'components/Component';
 import SpeedDialIcon from '../../node_modules/@material-ui/lab/SpeedDialIcon/SpeedDialIcon';
-import SpeedDialAction from '../../node_modules/@material-ui/lab/SpeedDialAction/SpeedDialAction';
-import Assignment from '../../node_modules/@material-ui/icons/Assignment';
 import SpeedDial from '../../node_modules/@material-ui/lab/SpeedDial/SpeedDial';
 import MuiThemeProvider from '../../node_modules/@material-ui/core/es/styles/MuiThemeProvider';
 import createMuiTheme from '../../node_modules/@material-ui/core/styles/createMuiTheme';
 import dialog from 'utils/dialog';
-import Immutable from 'immutable';
 import CollapseCheckBox from 'components/CollapseCheckBox';
+import ResourceDialog from 'components/ResourceDialog';
 
 const styles = {
   root: {
@@ -79,6 +74,12 @@ const styles = {
   editInputBottom: {
     '& :before': {
       bottom: 2,
+    },
+  },
+  a: {
+    color: '#2196f3',
+    ':visited': {
+      color: '#2196f3',
     },
   },
 };
@@ -301,6 +302,8 @@ class Menu extends Component {
     status: '',
     item: {},
     speedDialOpen: false,
+    open: false,
+    id: 0,
   };
 
   componentDidMount() {
@@ -455,6 +458,15 @@ class Menu extends Component {
     }
   };
 
+  handleOpen=(id) => {
+    this.setState({ id, open: true });
+  };
+
+  handleClose=() => {
+    this.dispatch({ type: `${namespace}/all` });
+    this.setState({ open: false });
+  };
+
   renderColumns = (row, id, type, addOrEdit, width) => {
     const text = row[id];
     switch (type) {
@@ -462,8 +474,8 @@ class Menu extends Component {
         if (addOrEdit) {
           return <Input key={id} defaultValue={text} onChange={e => this.handleChange(id, e.target.value)} width={width} />;
         }
-        if (id === 'icon' && text.length > 40) {
-          return `${text.substring(0, 40)}...`;
+        if (id === 'icon' && text.length > 30) {
+          return `${text.substring(0, 30)}...`;
         }
         return text;
       default:
@@ -495,6 +507,7 @@ key={!addOrEdit ? row.display : item.display}
 checked={!addOrEdit ? row.display : item.display}
                     onChange={checked => this.handleSwitchDisplay('display', row.id, checked)} />
           </CustomTableCell>
+          <CustomTableCell><a href="#" className={classes.a} onClick={e => this.handleOpen(row.id)}>{row.resourceCount}</a></CustomTableCell>
           <CustomTableCell>
             {!addOrEdit ?
               <Fragment>
@@ -556,9 +569,10 @@ checked={!addOrEdit ? row.display : item.display}
 
   render() {
     const { classes } = this.props;
-    const { list, speedDialOpen } = this.state;
+    const { list, speedDialOpen, id, open } = this.state;
     return (
       <Paper className={classes.root}>
+        <ResourceDialog id={id} open={open} namespace={namespace} onClose={this.handleClose} />
         <Toolbar>
           <CustomSearch placeholder="菜单名或路径" onSearch={(value) => this.handleSearch(value)} />
           <div className={classes.spacer} />
@@ -590,9 +604,10 @@ checked={!addOrEdit ? row.display : item.display}
             </CustomTableCell>
             <CustomTableCell width="25%">路径</CustomTableCell>
             <CustomTableCell width="10%">排序</CustomTableCell>
-            <CustomTableCell width="15%" style={{ minWidth: 280 }}>icon</CustomTableCell>
+            <CustomTableCell width="15%" style={{ minWidth: 220 }}>icon</CustomTableCell>
             <CustomTableCell width="10%">类型</CustomTableCell>
-            <CustomTableCell width="12%">是否显示</CustomTableCell>
+            <CustomTableCell width="12%">显示</CustomTableCell>
+            <CustomTableCell width="10%" style={{ minWidth: 40 }}>资源</CustomTableCell>
             <CustomTableCell style={{ minWidth: 220, maxWidth: 220, paddingLeft: 20 }}>操作</CustomTableCell>
           </TableRow>
         </TableHead>

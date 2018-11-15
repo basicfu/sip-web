@@ -8,19 +8,19 @@ export default {
    * @param data
    */
   confirm(data) {
-    const id = `dialog-${data.key || 1}`;
-    if (document.getElementById(id) === null) {
+    const idStr = `dialog-${data.id || 1}`;
+    if (document.getElementById(idStr) === null) {
       const div = document.createElement('div');
-      div.setAttribute('id', id);
+      div.setAttribute('id', idStr);
       document.getElementById('__next').appendChild(div);
     }
-    ReactDOM.render(<CustomDialog data={data} />, document.querySelector(`#${id}`));
+    ReactDOM.render(<CustomDialog {...data} />, document.querySelector(`#${idStr}`));
   },
-  close(key) {
-    const id = `dialog-${key || 1}`;
-    const dialogElement = document.getElementById(id);
+  close(id) {
+    const idStr = `dialog-${id || 1}`;
+    const dialogElement = document.getElementById(idStr);
     if (dialogElement !== null) {
-      ReactDOM.unmountComponentAtNode(document.querySelector(`#${id}`));
+      ReactDOM.unmountComponentAtNode(document.querySelector(`#${idStr}`));
       document.getElementById('__next').removeChild(dialogElement);
     }
   },

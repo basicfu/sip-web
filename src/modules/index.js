@@ -26,10 +26,14 @@ for (let i = 0; i < keys.length; i += 1) {
       return { ...s, ...payload };
     },
     queryState(s, { payload }) {
-      return { ...s, table: { ...s.table, search: { ...s.table.search, ...payload } } };
+      const tableName = payload.tableName || 'table';
+      delete payload.tableName;
+      const table = s[tableName] || {};
+      return { ...s, [tableName]: { ...table, search: { ...table.search, ...payload } } };
     },
-    resetQuery(s, { _ }) {
-      return { ...s, table: { ...s.table, search: { } } };
+    resetQuery(s, { payload }) {
+      const tableName = (payload || {}).tableName || 'table';
+      return { ...s, [tableName]: { ...s[tableName], search: { } } };
     },
     resetState() {
       return { ...value.state };

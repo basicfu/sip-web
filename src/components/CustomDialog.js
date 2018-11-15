@@ -10,7 +10,6 @@ import DialogContentText from '../../node_modules/@material-ui/core/DialogConten
 
 const styles = {
   paper: {
-    width: 400,
     maxWidth: 2400,
   },
   width100: {
@@ -43,6 +42,26 @@ const styles = {
   width1000: {
     width: 1000,
   },
+  top100: {
+    position: 'absolute',
+    top: 100,
+  },
+  top200: {
+    position: 'absolute',
+    top: 200,
+  },
+  top300: {
+    position: 'absolute',
+    top: 300,
+  },
+  top400: {
+    position: 'absolute',
+    top: 400,
+  },
+  top500: {
+    position: 'absolute',
+    top: 500,
+  },
   warning: {
     verticalAlign: 'bottom',
     marginRight: '10px',
@@ -56,19 +75,19 @@ const styles = {
 
 class CustomDialog extends React.Component {
   handleClose = () => {
-    const { key, onClose } = this.props.data;
+    const { id, onClose } = this.props;
     if (onClose) {
       onClose();
     }
-    dialog.close(key);
+    dialog.close(id);
   };
 
   handleOk = () => {
-    this.props.data.onOk();
+    this.props.onOk();
   };
 
   renderChildren() {
-    const { classes, data: { title, content } } = this.props;
+    const { classes, title, content } = this.props;
     const isString = typeof content === 'string' || typeof content === 'undefined';
     return (
       <Fragment>
@@ -88,10 +107,10 @@ class CustomDialog extends React.Component {
   }
 
   render() {
-    const { classes, data: { width } } = this.props;
+    const { classes, width, top } = this.props;
     return (
       <Dialog
-        classes={{ paper: classNames(classes.paper, classes[`width${width}`]) }}
+        classes={{ paper: classNames(classes.paper, classes[`width${width}`], classes[`top${top}`]) }}
         open
         scroll="paper"
         onClose={this.handleClose}
@@ -109,5 +128,7 @@ class CustomDialog extends React.Component {
     );
   }
 }
-
+CustomDialog.defaultProps = {
+  width: 400,
+};
 export default withStyles(styles)(CustomDialog);

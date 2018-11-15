@@ -12,6 +12,7 @@ import {
   insertRolePermission, deleteRolePermission, listRolePermission, listRoleUser,
 } from 'api';
 import dialog from 'utils/dialog';
+import {getState} from "utils/store";
 
 const modal = {
   state: {
@@ -20,11 +21,11 @@ const modal = {
     rolePermission: [],
   },
   effects: {
-    * list({ payload }, { call, put }) {
-      const data = payload;
+    * list(_ , { call, put }) {
+      const search = getState('permissionRole').table.search;
       dialog.close();
-      yield put({ type: 'updateState', payload: { table: {} } });
-      const response = yield call(listRole, data);
+      yield put({ type: 'updateState', payload: { table: { search } } });
+      const response = yield call(listRole, search);
       if (response.success) {
         yield put({ type: 'updateState', payload: { ...response } });
       }

@@ -49,7 +49,6 @@ class Resource extends Component {
   }
 
   componentWillUnmount() {
-    this.resetQuery(namespace);
     this.resetState(namespace);
   }
 
@@ -75,9 +74,9 @@ class Resource extends Component {
   };
 
   handleSyncDetail=(detail, type) => {
-    const key = 2;
+    const id = 2;
     dialog.confirm({
-      key,
+      id,
       title: `${type === 1 ? '添加' : '删除'}明细`,
       width: 400,
       content: <Table>
@@ -99,7 +98,7 @@ class Resource extends Component {
         </TableBody>
                </Table>,
       onOk() {
-                 dialog.close(key);
+                 dialog.close(id);
       },
     });
   }

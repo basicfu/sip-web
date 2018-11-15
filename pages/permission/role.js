@@ -23,7 +23,7 @@ import Table from '../../node_modules/@material-ui/core/Table/Table';
 import CustomTableCell from 'components/CustomTableCell';
 import Paper from '@material-ui/core/Paper';
 import Component from 'components/Component';
-import { suggest } from 'api';
+import { suggestUser } from 'api';
 import notify from 'utils/notify';
 import dialog from 'utils/dialog';
 import CollapseCheckBox from 'components/CollapseCheckBox';
@@ -220,7 +220,7 @@ class Role extends Component {
 
   handleSuggestLoadOptions = (inputValue, callback) => {
     if (inputValue) {
-      const promise = suggest({ q: 'b' });
+      const promise = suggestUser({ q: inputValue });
       promise.then(response => {
         callback(response.data.map(it => ({ label: `${it.username}(${it.nickname})`, value: it.id })));
       });

@@ -1,21 +1,36 @@
 import {
-  listPermission,
   allPermission,
-  insertPermission,
+  deletePermission, deletePermissionResource, deleteRoleMenu,
+  insertPermission, insertPermissionResource,
+  listPermission,
+  listPermissionResource,
   updatePermission,
-  deletePermission,
 } from 'api';
 import dialog from 'utils/dialog';
+import { getState } from 'utils/store';
 
 const modal = {
+  state: {
+    permissionResource: { list: [], page: {} },
+  },
   effects: {
-    * list({ payload }, { call, put }) {
-      const data = payload;
+    * list(_, { call, put }) {
+      const search = getState('permissionPermission').table.search;
       dialog.close();
-      yield put({ type: 'updateState', payload: { table: {} } });
-      const response = yield call(listPermission, data);
+      yield put({ type: 'updateState', payload: { table: { search } } });
+      const response = yield call(listPermission, search);
       if (response.success) {
         yield put({ type: 'updateState', payload: { ...response } });
+      }
+    },
+    * listResource(_, { call, put }) {
+      const { id, resource } = getState('permissionPermission');
+      const search = (resource || {}).search || {};
+      dialog.close();
+      yield put({ type: 'updateState', payload: { id, resource: { search } } });
+      const response = yield call(listPermissionResource, search);
+      if (response.success) {
+        yield put({ type: 'updateState', payload: { permissionResource: response.data } });
       }
     },
     * all(_, { call, put }) {
@@ -30,6 +45,12 @@ const modal = {
         yield put({ type: 'list' });
       }
     },
+    * insertResource({ payload }, { call, put }) {
+      const { success } = yield call(insertPermissionResource, payload);
+      if (success) {
+        yield put({ type: 'listResource', payload: { id: payload.id } });
+      }
+    },
     * update({ payload }, { call, put }) {
       const { success } = yield call(updatePermission, payload);
       if (success) {
@@ -40,6 +61,12 @@ const modal = {
       const { success } = yield call(deletePermission, payload);
       if (success) {
         yield put({ type: 'list' });
+      }
+    },
+    * deleteResource({ payload }, { call, put }) {
+      const { success } = yield call(deletePermissionResource, payload);
+      if (success) {
+        yield put({ type: 'listResource', payload: { id: payload.id } });
       }
     },
   },
