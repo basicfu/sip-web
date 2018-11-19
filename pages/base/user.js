@@ -62,13 +62,15 @@ class User extends Component {
           return <ReactSelect key={id} options={extra} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
         }
         const texts = [];
-        const obj = {};
-        extra.forEach(it => {
-          obj[it.value] = it.label;
-        });
-        text.forEach(it => {
-          texts.push(obj[it]);
-        });
+        if (text && text instanceof Array) {
+          const obj = {};
+          extra.forEach(it => {
+            obj[it.value] = it.label;
+          });
+          text.forEach(it => {
+            texts.push(obj[it]);
+          });
+        }
         return texts.join(',');
       case FieldType.MULTI_SELECT:
         if (addOrEdit) {
