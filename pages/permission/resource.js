@@ -78,7 +78,7 @@ class Resource extends Component {
     dialog.confirm({
       id,
       title: `${type === 1 ? '添加' : '删除'}明细`,
-      width: 400,
+      width: 600,
       content: <Table>
         <TableHead>
           <TableRow>
@@ -108,7 +108,7 @@ class Resource extends Component {
     dispatch({ type: `${namespace}/updateState`, payload: { sync: [] } });
     dialog.confirm({
       title: '即将执行以下变更操作,请确认操作',
-      width: 600,
+      width: 700,
       content: <div>
         <p>实时获取拥有的接口地址和现有界面中的数据同步保持一致，如果删除的将会自动解除菜单/权限的资源关系</p>
         <Table>
