@@ -50,6 +50,7 @@ class Resource extends Component {
 
   componentWillUnmount() {
     this.resetState(namespace);
+    this.resetState(appServiceNamespace);
   }
 
   handleSearch = (value) => {

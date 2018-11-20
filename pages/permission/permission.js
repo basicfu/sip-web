@@ -23,7 +23,7 @@ const styles = {
 };
 const namespace = 'permissionPermission';
 const resourceNamespace = 'permissionResource';
-const appServiceNamespace = 'baseApp';
+const appServiceNamespace = 'baseAppService';
 
 class Permission extends Component {
   state={
@@ -37,6 +37,8 @@ class Permission extends Component {
 
   componentWillUnmount() {
     this.resetState(namespace);
+    this.resetState(resourceNamespace);
+    this.resetState(appServiceNamespace);
   }
 
   handleSearch = (value) => {

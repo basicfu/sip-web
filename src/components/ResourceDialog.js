@@ -49,7 +49,7 @@ class ResourceDialog extends Component {
     const { id } = nextProps;
     if (open === false && nextOpen === true) {
       this.setState({ dynamicNamespace: nextProps.namespace });
-      this.props.dispatch({ type: `${appServiceNamespace}/all` });
+      this.props.dispatch({ type: `${appServiceNamespace}/all`, payload: { type: 1 } });
       this.handleSearch(id, undefined, nextProps.namespace);
     } else if (open === true && nextOpen === false) {
       this.resetQuery(nextProps.namespace, 'resource');
@@ -58,9 +58,12 @@ class ResourceDialog extends Component {
 
   handleSuggestLoadOptions = (inputValue, callback) => {
     if (inputValue) {
+      const appService = this.props.appServiceData.all;
+      const obj = {};
+      appService.forEach(app => obj[app.id] = app.name);
       const promise = suggestResource({ q: inputValue });
       promise.then(response => {
-        callback(response.data.map(it => ({ label: `${it.url}(${it.method})(${it.name})`, value: it.id })));
+        callback(response.data.map(it => ({ label: `${it.url}(${it.method})(${obj[it.serviceId]})${it.name && `(${it.name})`}`, value: it.id })));
       });
     } else {
       callback([]);
@@ -111,11 +114,11 @@ class ResourceDialog extends Component {
       onDelete: (selected) => { this.handleDeleteResource(id, selected); },
       headerChild: {
         left: (
-          <div style={{ width: 300 }}>
+          <div style={{ width: 450 }}>
             <ReactSelect
               defaultValue={[]}
               async
-              placeholder="搜索资源URL/名并添加"
+              placeholder="搜索资源URL或资源名并添加"
               loadOptions={this.handleSuggestLoadOptions}
               onChange={this.handleSuggestOnChange}
             />

@@ -18,10 +18,10 @@ const modal = {
         yield put({ type: 'updateState', payload: { ...response } });
       }
     },
-    * all(_, { call, put }) {
-      const response = yield call(allAppService);
+    * all({ payload }, { call, put }) {
+      const response = yield call(allAppService, payload);
       if (response.success) {
-        yield put({ type: 'updateState', payload: { all: response.data } });
+        yield put({ type: 'updateState', payload: { all: response.data, rid: response.rid } });
       }
     },
     * insert({ payload }, { call, put }) {
