@@ -59,7 +59,7 @@ class User extends Component {
         return formatOptions(text, extra);
       case FieldType.CHECK:
         if (addOrEdit) {
-          return <ReactSelect key={id} options={extra} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
+          return <ReactSelect key={id} multi options={extra} defaultValue={text} onChange={value => onChange(id, value)} column={column} />;
         }
         const texts = [];
         if (text && text instanceof Array) {
@@ -73,10 +73,11 @@ class User extends Component {
         }
         return texts.join(',');
       case FieldType.MULTI_SELECT:
+        const roles = item.roles && this.props.role.filter(it => item.roles.indexOf(it.code) !== -1) || [];
         if (addOrEdit) {
-          return <ReactSelect key={id} options={extra} defaultValue={item.roles && item.roles.map(it => it.id)} onChange={value => onChange(id, value)} column={column} />;
+          return <ReactSelect key={id} multi options={extra} defaultValue={roles.map(it => it.id)} onChange={value => onChange(id, value)} column={column} />;
         }
-        return item.roles && item.roles.map(it => it.name).join(',');
+        return roles.map(it => it.name).join(',');
       default:
         break;
     }
