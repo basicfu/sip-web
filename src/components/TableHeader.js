@@ -38,6 +38,7 @@ const toolbarStyles = theme => ({
     flex: '0 0 auto',
     color: theme.palette.text.secondary,
     marginRight: 60,
+    display: 'inline-flex',
   },
   left: {
     flex: '0 0 auto',

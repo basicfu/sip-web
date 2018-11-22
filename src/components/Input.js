@@ -13,7 +13,7 @@ const styles = {
 
 class Input extends React.Component {
   render() {
-    const { classes, defaultValue, onChange, type, column, width } = this.props;
+    const { classes, defaultValue, onChange, type, column, width, multi } = this.props;
     const { label, required } = column || {};
     return (
       label === undefined || label === '' ? (
@@ -23,6 +23,7 @@ class Input extends React.Component {
           onChange={onChange}
           defaultValue={defaultValue}
           type={type}
+          multiline={multi}
         />
       ) : (
         <FormControl
@@ -34,11 +35,14 @@ class Input extends React.Component {
             onChange={onChange}
             defaultValue={defaultValue}
             type={type}
+            multiline={multi}
           />
         </FormControl>
       )
     );
   }
 }
-
+Input.defaultProps = {
+  multi: false,
+};
 export default withStyles(styles)(Input);

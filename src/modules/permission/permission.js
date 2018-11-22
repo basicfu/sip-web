@@ -1,6 +1,6 @@
 import {
   allPermission,
-  deletePermission, deletePermissionResource, deleteRoleMenu,
+  deletePermission, deletePermissionResource, exportPermission, importPermission,
   insertPermission, insertPermissionResource,
   listPermission,
   listPermissionResource,
@@ -8,6 +8,7 @@ import {
 } from 'api';
 import dialog from 'utils/dialog';
 import { getState } from 'utils/store';
+import React from 'react';
 
 const modal = {
   state: {
@@ -67,6 +68,19 @@ const modal = {
       const { success } = yield call(deletePermissionResource, payload);
       if (success) {
         yield put({ type: 'listResource', payload: { id: payload.id } });
+      }
+    },
+    * import({ payload }, { call, put }) {
+      const { success } = yield call(importPermission, payload);
+      if (success) {
+        yield put({ type: 'list' });
+      }
+    },
+    * export({ payload }, { call, put }) {
+      const { success, data } = yield call(exportPermission, payload);
+      if (success) {
+        const html = data.split('\r\n').join('<br/>').replace(/ /g, '&nbsp;');
+        dialog.confirm({ title: '导出结果', content: <span dangerouslySetInnerHTML={{ __html: html }} />, width: 600, onOk() { dialog.close(); } });
       }
     },
   },

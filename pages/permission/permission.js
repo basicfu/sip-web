@@ -8,11 +8,20 @@ import { FieldType } from 'enum';
 import { formatDateTime, formatOptions } from 'utils';
 import Component from 'components/Component';
 import ResourceDialog from 'components/ResourceDialog';
+import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@material-ui/core/IconButton';
+import SaveAlt from '../../node_modules/@material-ui/icons/SaveAlt';
+import ExitToApp from '../../node_modules/@material-ui/icons/ExitToApp';
+import dialog from 'utils/dialog';
+import notify from 'utils/notify';
 
 
 const styles = {
   resourceManage: {
     color: '#ef6c00',
+  },
+  spacer: {
+    flex: '1 1 100%',
   },
   a: {
     color: '#2196f3',
@@ -26,9 +35,10 @@ const resourceNamespace = 'permissionResource';
 const appServiceNamespace = 'baseAppService';
 
 class Permission extends Component {
-  state={
+  state = {
     open: false,
     id: 0,
+    value: '',
   };
 
   componentDidMount() {
@@ -46,13 +56,32 @@ class Permission extends Component {
     this.dispatch({ type: `${namespace}/list` });
   };
 
-  handleOpen=(id) => {
+  handleOpen = (id) => {
     this.setState({ id, open: true });
   };
 
-  handleClose=() => {
+  handleClose = () => {
     this.dispatch({ type: `${namespace}/list` });
     this.setState({ open: false });
+  };
+
+  handleImport = (e) => {
+    const { dispatch } = this.props;
+    let v = '';
+    // notify.info('导入中,请稍后...');
+    dialog.confirm({
+      title: '导入',
+      content: <Input multi onChange={e => v = e.target.value} />,
+      width: 600,
+      onOk() {
+        dispatch({ type: `${namespace}/import`, payload: { value: v } });
+      },
+    });
+  };
+
+  handleExport = (e) => {
+    notify.info('导出中,请稍后...');
+    this.dispatch({ type: `${namespace}/export` });
   };
 
   renderColumns = (text, column, addOrEdit, item, onChange) => {
@@ -76,11 +105,25 @@ class Permission extends Component {
   };
 
   render() {
-    const { data } = this.props;
+    const { classes, data } = this.props;
     const { id, open } = this.state;
     const tableProps = {
       data,
-      headerChild: { left: <CustomSearch placeholder="权限名或code" onSearch={(value) => this.handleSearch(value)} /> },
+      headerChild: {
+        left: <CustomSearch placeholder="权限名或code" onSearch={(value) => this.handleSearch(value)} />,
+        right: <Fragment>
+          <Tooltip title="导入">
+            <IconButton color={'primary'} onClick={this.handleImport}>
+              <ExitToApp />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="导出">
+            <IconButton color={'secondary'} onClick={this.handleExport}>
+              <SaveAlt />
+            </IconButton>
+          </Tooltip>
+               </Fragment>,
+      },
       columns: [
         { id: 'id', label: 'ID', visible: ['row', 'rowAdd', 'rowEdit'] },
         { id: 'name', label: '权限名', type: FieldType.TEXT, required: true, render: this.renderColumns },
