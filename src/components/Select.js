@@ -1,13 +1,13 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import MuiSelect from '../../node_modules/@material-ui/core/Select';
-import MenuItem from '../../node_modules/@material-ui/core/MenuItem/MenuItem';
+import MuiSelect from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem/MenuItem';
 import { getOrCreateStore } from 'utils/store';
-import MuiSwitch from '../../node_modules/@material-ui/core/Switch/Switch';
-import FormControlLabel from '../../node_modules/@material-ui/core/FormControlLabel/FormControlLabel';
+import MuiSwitch from '@material-ui/core/Switch/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import classNames from 'classnames';
-import FormControl from '../../node_modules/@material-ui/core/FormControl/FormControl';
-import InputLabel from '../../node_modules/@material-ui/core/InputLabel/InputLabel';
+import FormControl from '@material-ui/core/FormControl/FormControl';
+import InputLabel from '@material-ui/core/InputLabel/InputLabel';
 
 const styles = {
   root: {

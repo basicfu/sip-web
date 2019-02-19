@@ -1,4 +1,4 @@
-import Checkbox from '../../node_modules/@material-ui/core/Checkbox/Checkbox';
+import Checkbox from '@material-ui/core/Checkbox/Checkbox';
 import IndeterminateCheckBoxOutlined from '../../node_modules/@material-ui/icons/IndeterminateCheckBoxOutlined';
 import React from 'react';
 
@@ -8,7 +8,7 @@ function CollapseCheckBox(props) {
   return <Checkbox
     onChange={onChange}
     checked={checked}
-    style={{ padding: '10px 12px 14px 12px' }}
+    style={{ padding: '10px 12px 14px 12px', position: 'relative' }}
     icon={<svg
       fill="rgba(0, 0, 0, 0.65)"
       width="24"

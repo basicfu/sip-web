@@ -2,14 +2,13 @@
 import 'isomorphic-fetch';
 import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
-import { withStyles } from '@material-ui/core/styles';
+import {createMuiTheme, withStyles} from '@material-ui/core/styles';
 import green from '@material-ui/core/colors/green';
 import amber from '@material-ui/core/colors/amber';
 import CloseIcon from '@material-ui/icons/Close';
-import { connect } from 'dva';
-import { IconButton, SnackbarContent } from '@material-ui/core';
-import MuiThemeProvider from '../../node_modules/@material-ui/core/es/styles/MuiThemeProvider';
-import { createMuiTheme } from '@material-ui/core/styles';
+import {connect} from 'dva';
+import {IconButton, SnackbarContent} from '@material-ui/core';
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 
 const styles = theme => ({
   margin: {
@@ -46,7 +45,7 @@ const styles = theme => ({
 });
 const theme = createMuiTheme({
   typography: {
-    useNextVariants: false,
+    useNextVariants: true,
   },
 });
 class Notifications extends React.Component {

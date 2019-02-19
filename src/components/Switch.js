@@ -1,7 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import MuiSwitch from '../../node_modules/@material-ui/core/Switch/Switch';
-import FormControlLabel from '../../node_modules/@material-ui/core/FormControlLabel/FormControlLabel';
+import MuiSwitch from '@material-ui/core/Switch/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 
 const styles = {
   paper: {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import InputLabel from '../../node_modules/@material-ui/core/InputLabel/InputLabel';
-import MuiInput from '../../node_modules/@material-ui/core/Input';
-import FormControl from '../../node_modules/@material-ui/core/FormControl/FormControl';
+import InputLabel from '@material-ui/core/InputLabel/InputLabel';
+import MuiInput from '@material-ui/core/Input';
+import FormControl from '@material-ui/core/FormControl/FormControl';
 
 const styles = {
   root: {

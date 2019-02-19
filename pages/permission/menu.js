@@ -3,19 +3,19 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'dva';
 import Input from 'components/Input';
 import { FieldType } from 'enum';
-import Table from '../../node_modules/@material-ui/core/Table/Table';
-import TableHead from '../../node_modules/@material-ui/core/TableHead/TableHead';
-import TableBody from '../../node_modules/@material-ui/core/TableBody/TableBody';
+import Table from '@material-ui/core/Table/Table';
+import TableHead from '@material-ui/core/TableHead/TableHead';
+import TableBody from '@material-ui/core/TableBody/TableBody';
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import TableCell from '../../node_modules/@material-ui/core/TableCell/TableCell';
-import TableRow from '../../node_modules/@material-ui/core/TableRow/TableRow';
+import TableCell from '@material-ui/core/TableCell/TableCell';
+import TableRow from '@material-ui/core/TableRow/TableRow';
 import { findDOMNode } from 'react-dom';
 import update from 'immutability-helper';
 import Paper from '@material-ui/core/Paper';
 import CustomSearch from 'components/CustomSearch';
-import Toolbar from '../../node_modules/@material-ui/core/Toolbar/Toolbar';
-import IconButton from '../../node_modules/@material-ui/core/IconButton/IconButton';
+import Toolbar from '@material-ui/core/Toolbar/Toolbar';
+import IconButton from '@material-ui/core/IconButton/IconButton';
 import DeleteOutlinedIcon from '../../node_modules/@material-ui/icons/DeleteOutlined';
 import PlaylistAddIcon from '../../node_modules/@material-ui/icons/PlaylistAdd';
 import AddIcon from '../../node_modules/@material-ui/icons/Add';
@@ -29,8 +29,8 @@ import Switch from 'components/Switch';
 import Component from 'components/Component';
 import SpeedDialIcon from '../../node_modules/@material-ui/lab/SpeedDialIcon/SpeedDialIcon';
 import SpeedDial from '../../node_modules/@material-ui/lab/SpeedDial/SpeedDial';
-import MuiThemeProvider from '../../node_modules/@material-ui/core/es/styles/MuiThemeProvider';
-import createMuiTheme from '../../node_modules/@material-ui/core/styles/createMuiTheme';
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import dialog from 'utils/dialog';
 import CollapseCheckBox from 'components/CollapseCheckBox';
 import ResourceDialog from 'components/ResourceDialog';
@@ -503,9 +503,9 @@ class Menu extends Component {
           <CustomTableCell>{this.renderColumns(row, 'type', FieldType.TEXT, addOrEdit)}</CustomTableCell>
           <CustomTableCell>
             <Switch
-key={!addOrEdit ? row.display : item.display}
-checked={!addOrEdit ? row.display : item.display}
-                    onChange={checked => this.handleSwitchDisplay('display', row.id, checked)} />
+              key={!addOrEdit ? row.display : item.display}
+              checked={!addOrEdit ? row.display : item.display}
+              onChange={checked => this.handleSwitchDisplay('display', row.id, checked)} />
           </CustomTableCell>
           <CustomTableCell><a href="#" className={classes.a} onClick={e => this.handleOpen(row.id)}>{row.resourceCount}</a></CustomTableCell>
           <CustomTableCell>
