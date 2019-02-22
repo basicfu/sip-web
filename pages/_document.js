@@ -23,7 +23,7 @@ class MyDocument extends Document {
         {/* PWA primary color */}
         <meta name="theme-color" content={pageContext.theme.palette.primary.main} />
         <style id="insertion-point-jss" />
-        <link href="/static/css/codemirror.css" rel="stylesheet"/>
+        {/*<link href="/static/css/codemirror.css" rel="stylesheet"/>*/}
         <link href="/static/css/test.css" rel="stylesheet"/>
       </Head>
       <body>

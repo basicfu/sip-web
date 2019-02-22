@@ -9,8 +9,6 @@ import {withStyles} from '@material-ui/core';
 import Checkbox from "@material-ui/core/Checkbox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import {DragDropContext} from "react-dnd";
-import HTML5Backend from "react-dnd-html5-backend";
 
 const styles = {
   table: {
@@ -211,7 +209,7 @@ function QueryEditTable(props) {
   );
 }
 
-export default DragDropContext(HTML5Backend)(withStyles(styles)(QueryEditTable));
+export default (withStyles(styles)(QueryEditTable));
 
 // {columns.map(col =>
 //   editCell===`${index}${col.id}`?

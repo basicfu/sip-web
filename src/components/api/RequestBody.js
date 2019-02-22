@@ -9,6 +9,8 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormEditTable from 'components/api/FormEditTable';
 import PathEditTable from "components/api/PathEditTable";
 import {formatFlag} from "utils";
+import {UnControlled as CodeMirror} from "react-codemirror2";
+import NoSsr from "@material-ui/core/NoSsr";
 
 const styles = {
   tabs: {
@@ -24,13 +26,32 @@ const styles = {
   radio:{
     // width: 32,
     height:32,
+  },
+  codeMirror:{
+    height: 'calc( 100% - 80px )',
+    margin: '0 0 10px 0',
+    '& .CodeMirror':{
+      height: '100%',
+    }
   }
 };
+if (process.browser) {
+  // 引用js
+  require('codemirror/mode/javascript/javascript');
+  require('codemirror/mode/xml/xml');
+  // 引用css
+  const codemirror = require('codemirror/lib/codemirror.css');
+  // 注入
+  const styleNode = document.createElement('style');
+  styleNode.setAttribute('data-prism', 'true');
+  styleNode.textContent = codemirror;
+  document.head.appendChild(styleNode);
+}
 function RequestBody(props) {
   // console.log(props);
   const { classes } = props;
   const [tabValue, setTabValue] = React.useState(0);
-  const [radioValue, setRadioValue] = React.useState('form');
+  const [radioValue, setRadioValue] = React.useState('json');
   const formData=[
     { key: 'nickname', value: '小明', require: true, description: '昵称' },
     { key: 'test', value: '', require: false, description: '' },
@@ -58,6 +79,25 @@ function RequestBody(props) {
           <FormControlLabel value="raw" control={<Radio className={classes.radio}/>} label="raw" />
         </RadioGroup>
         {radioValue === 'form' && <FormEditTable value={form} setValue={setForm} columns={formColumns}/>}
+        {radioValue === 'json' && <NoSsr>
+          <CodeMirror
+            className={classes.codeMirror}
+            options={
+              {
+                mode: 'javascript',
+                lineWrapping: true,
+                foldGutter: true,
+                // gutters:["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                lineNumbers: true,
+                matchBrackets: true,
+                autofocus: true,
+              }
+            }
+          />
+        </NoSsr>
+        }
+        {radioValue==='binary'&&<input type="file"/>}
+        {radioValue==='raw'&&<input />}
       </Fragment>
       }
     </Fragment>

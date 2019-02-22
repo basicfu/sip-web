@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -7,8 +7,11 @@ import Run from 'components/api/Run';
 
 const styles = {
   tab: {
-    minWidth: 140,
+    minWidth: 100,
   },
+  content:{
+    height: 'calc( 100% - 48px )',
+  }
 };
 
 function Interface(props) {
@@ -16,16 +19,16 @@ function Interface(props) {
 
   const { classes } = props;
   return (
-    <div>
+    <Fragment>
       <Tabs value={value} indicatorColor="primary" textColor="primary" onChange={(e, v) => setValue(v)}>
         <Tab className={classes.tab} label="预览" />
         <Tab className={classes.tab} label="运行" />
       </Tabs>
-      <div>
+      <div className={classes.content}>
         {value === 0 && <Preview {...props} />}
         {value === 1 && <Run />}
       </div>
-    </div>
+    </Fragment>
   );
 }
 

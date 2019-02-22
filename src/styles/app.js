@@ -1,15 +1,15 @@
 const drawerWidth = 230;
 export default theme => ({
-  '@global': {
-    'html,body': {
-      height: '100%',
-      overflow: 'hidden',
-    },
-    '#__next': {
-      height: '100%',
-      overflow: 'hidden',
-    },
-  },
+  // '@global': {
+  //   'html,body': {
+  //     height: '100%',
+  //     overflow: 'hidden',
+  //   },
+  //   '#__next': {
+  //     height: '100%',
+  //     overflow: 'hidden',
+  //   },
+  // },
   rootr: {
     flexGrow: 1,
   },

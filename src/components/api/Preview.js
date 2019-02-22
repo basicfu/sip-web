@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import ParamPreviewTable from 'components/api/ParamPreviewTable';
@@ -63,7 +63,7 @@ function Preview(props) {
     <span className={classes.titleBar}>{title}</span>
   </Typography>;
   return (
-    <div>
+    <Fragment>
       <div>
         <PanelHeader title={'基本信息'}/>
         <div className={classes.contentPanel}>
@@ -110,7 +110,8 @@ function Preview(props) {
       <div>
         <PanelHeader title={'返回数据'}/>
       </div>
-    </div>);
+    </Fragment>
+  );
 }
 
 export default withStyles(styles)(Preview);
