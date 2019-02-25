@@ -19,9 +19,9 @@ import dialog from 'utils/dialog';
 import { getOrCreateStore } from 'utils/store';
 import TableHeader from 'components/TableHeader';
 import notify from 'utils/notify';
-import Divider from "../../node_modules/@material-ui/core/Divider/Divider";
-import MuiThemeProvider from "../../node_modules/@material-ui/core/es/styles/MuiThemeProvider";
-import createMuiTheme from "../../node_modules/@material-ui/core/styles/createMuiTheme";
+import Divider from "@material-ui/core/Divider/Divider";
+import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 
 const theme = createMuiTheme({
   typography: {

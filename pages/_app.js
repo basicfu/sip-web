@@ -15,6 +15,7 @@ import Router from 'next/router';
 import Sidebar from 'components/Sidebar';
 import styles from 'styles/app';
 import config from 'config';
+import { loadCSS } from 'fg-loadcss/src/loadCSS';
 
 // Inject the insertion-point-jss after docssearch
 if (process.browser) {
@@ -28,7 +29,7 @@ if (process.browser) {
   //   document.querySelector('#insertion-point-jss'),
   // );
   // loadCSS(
-  //   '/static/assets/index.css',
+  //   '/static/css/codemirror.css',
   //   document.querySelector('#insertion-point-jss'),
   // );
 }
@@ -55,9 +56,9 @@ if (process.browser && !global.__INSERTION_POINT__) {
 }
 
 class MyApp extends App {
-  static childContextTypes: { pages: *, activePage: * };
-
-  static propTypes: { pageContext: *, router: * };
+  // static childContextTypes: { pages: *, activePage: * };
+  //
+  // static propTypes: { pageContext: *, router: * };
 
   constructor(props) {
     super(props);

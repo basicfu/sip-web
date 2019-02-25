@@ -13,6 +13,7 @@ module.exports = {
       styles: path.resolve(__dirname, './src/styles'),
       utils: path.resolve(__dirname, './src/utils'),
       components: path.resolve(__dirname, './src/components'),
+      icons: path.resolve(__dirname, './src/icons'),
       dva: 'dva-no-router',
       notify: path.resolve(__dirname, './src/utils/notify'),
     },

@@ -13,11 +13,11 @@ import dialog from 'utils/dialog';
 import Component from 'components/Component';
 import {formatDateTime, formatOptions} from 'utils';
 import notify from 'utils/notify';
-import Table from '../../node_modules/@material-ui/core/Table/Table';
-import TableHead from '../../node_modules/@material-ui/core/TableHead/TableHead';
-import TableRow from '../../node_modules/@material-ui/core/TableRow/TableRow';
-import TableCell from '../../node_modules/@material-ui/core/TableCell/TableCell';
-import TableBody from '../../node_modules/@material-ui/core/TableBody/TableBody';
+import Table from '@material-ui/core/Table/Table';
+import TableHead from '@material-ui/core/TableHead/TableHead';
+import TableRow from '@material-ui/core/TableRow/TableRow';
+import TableCell from '@material-ui/core/TableCell/TableCell';
+import TableBody from '@material-ui/core/TableBody/TableBody';
 
 const styles = {
   appServiceSelect: {

@@ -4,7 +4,7 @@ const config = {
     '/': {},
     '/login': { target: '/login', sidebar: false, navbar: false },
     '/menu': {},
-    '/user': {},
+    '/sapi': { target: '/sapi', sidebar: false, navbar: true },
     '/base/user-template': {},
   },
 

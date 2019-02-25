@@ -6,7 +6,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { withStyles } from '@material-ui/core/styles';
 import dialog from 'utils/dialog';
 import classNames from 'classnames';
-import DialogContentText from '../../node_modules/@material-ui/core/DialogContentText/DialogContentText';
+import DialogContentText from '@material-ui/core/DialogContentText';
 
 const styles = {
   paper: {
