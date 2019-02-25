@@ -1,10 +1,10 @@
 html,body {
   height: 100%;
-  overflow: hidden;
+  overflow-y: hidden;
 }
 #__next {
   height: 100%;
-  overflow: hidden;
+  overflow-y: hidden;
 }
 #paramSplit .SplitPane{
   position: inherit!important;

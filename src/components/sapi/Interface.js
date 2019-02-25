@@ -1,17 +1,17 @@
-import React, {Fragment} from 'react';
+import React, { Fragment } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Preview from 'components/api/Preview';
-import Run from 'components/api/Run';
+import Preview from 'components/sapi/Preview';
+import Run from 'components/sapi/Run';
 
 const styles = {
   tab: {
     minWidth: 100,
   },
-  content:{
+  content: {
     height: 'calc( 100% - 48px )',
-  }
+  },
 };
 
 function Interface(props) {
@@ -23,9 +23,11 @@ function Interface(props) {
       <Tabs value={value} indicatorColor="primary" textColor="primary" onChange={(e, v) => setValue(v)}>
         <Tab className={classes.tab} label="预览" />
         <Tab className={classes.tab} label="运行" />
+        <Tab className={classes.tab} label="版本" />
+        <Tab className={classes.tab} label="历史" />
       </Tabs>
       <div className={classes.content}>
-        {value === 0 && <Preview {...props} />}
+        {value === 0 && <Preview />}
         {value === 1 && <Run />}
       </div>
     </Fragment>

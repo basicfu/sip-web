@@ -16,7 +16,7 @@ import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import {loadCSS} from 'fg-loadcss/src/loadCSS';
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import ToggleButton from "@material-ui/lab/ToggleButton";
-import JsonFormat from "components/api/JsonFormat";
+import JsonFormat from "components/sapi/JsonFormat";
 
 
 const styles = theme => ({
@@ -66,23 +66,9 @@ const styles = theme => ({
 });
 
 function ResponseBody(props) {
-  // console.log(props);
-  const {classes} = props;
-  const [tabValue, setTabValue] = React.useState(1);
+  const {classes,responseData} = props;
+  const [tabValue, setTabValue] = React.useState(0);
   const [radioValue, setRadioValue] = React.useState('pretty');
-
-  const formData = [
-    {key: 'nickname', value: '小明', require: true, description: '昵称'},
-    {key: 'test', value: '', require: false, description: ''},
-  ];
-  const formColumns = [
-    {id: 'key', label: '参数名称'},
-    {id: 'type', label: '类型'},
-    {id: 'value', label: '值'},
-    {id: 'require', label: '必选', render: formatFlag},
-    {id: 'description', label: '描述'},
-  ];
-  const [form, setForm] = React.useState({bulk: false, data: formData});
   // https://github.com/JedWatson/react-codemirror/issues/21
   if (process.browser) {
     // 引用js
@@ -96,20 +82,6 @@ function ResponseBody(props) {
     styleNode.textContent = codemirror;
     document.head.appendChild(styleNode);
   }
-
-  const options = {
-    // mode: 'javascript',
-    // lineWrapping:true,
-    // foldGutter: true,
-    // gutters:["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-    // readOnly: true,
-    lineNumbers: true,
-    matchBrackets: true,
-  };
-  const json = {
-    test: 'hello',
-    abcd: 123,
-  };
   return (
     <Fragment>
       <Tabs className={classes.tabs} value={tabValue} indicatorColor="primary" textColor="primary"
@@ -127,7 +99,7 @@ function ResponseBody(props) {
         {/*raw*/}
         {/*</ToggleButton>*/}
         {/*</ToggleButtonGroup>*/}
-        <JsonFormat/>
+        <JsonFormat data={responseData}/>
         {/*<RadioGroup value={radioValue} onChange={(e, v) => setRadioValue(v)} row className={classes.radioGroup}>*/}
         {/*<FormControlLabel value="pretty" control={<Radio className={classes.radio} />} label="pretty" />*/}
         {/*<FormControlLabel value="raw" control={<Radio className={classes.radio} />} label="raw" />*/}

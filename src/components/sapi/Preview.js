@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import ParamPreviewTable from 'components/api/ParamPreviewTable';
+import ParamPreviewTable from 'components/sapi/ParamPreviewTable';
 import withStyles from '@material-ui/core/styles/withStyles';
 import {formatFlag} from "utils";
 

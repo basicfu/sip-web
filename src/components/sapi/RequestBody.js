@@ -6,10 +6,10 @@ import Tab from '@material-ui/core/Tab';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
-import FormEditTable from 'components/api/FormEditTable';
-import PathEditTable from "components/api/PathEditTable";
+import FormEditTable from 'components/sapi/FormEditTable';
+import PathEditTable from "components/sapi/PathEditTable";
 import {formatFlag} from "utils";
-import {UnControlled as CodeMirror} from "react-codemirror2";
+import {Controlled as CodeMirror} from "react-codemirror2";
 import NoSsr from "@material-ui/core/NoSsr";
 
 const styles = {
@@ -49,9 +49,8 @@ if (process.browser) {
 }
 function RequestBody(props) {
   // console.log(props);
-  const { classes } = props;
+  const { classes,reqHeaders,reqBodyType,reqBody,reqHeadersChange,reqBodyTypeChange,reqBodyChange } = props;
   const [tabValue, setTabValue] = React.useState(0);
-  const [radioValue, setRadioValue] = React.useState('json');
   const formData=[
     { key: 'nickname', value: '小明', require: true, description: '昵称' },
     { key: 'test', value: '', require: false, description: '' },
@@ -72,16 +71,18 @@ function RequestBody(props) {
       </Tabs>
       {tabValue === 0 &&
       <Fragment>
-        <RadioGroup value={radioValue} onChange={(e, v) => setRadioValue(v)} row className={classes.radioGroup}>
-          <FormControlLabel value="form" control={<Radio className={classes.radio}/>} label="form" />
+        <RadioGroup value={reqBodyType} onChange={(e, v) => reqBodyTypeChange(v)} row className={classes.radioGroup}>
           <FormControlLabel value="json" control={<Radio className={classes.radio}/>} label="json" />
+          <FormControlLabel value="form" control={<Radio className={classes.radio}/>} label="form" />
           <FormControlLabel value="binary" control={<Radio className={classes.radio}/>} label="binary" />
           <FormControlLabel value="raw" control={<Radio className={classes.radio}/>} label="raw" />
         </RadioGroup>
-        {radioValue === 'form' && <FormEditTable value={form} setValue={setForm} columns={formColumns}/>}
-        {radioValue === 'json' && <NoSsr>
+        {reqBodyType === 'form' && <FormEditTable value={form} setValue={setForm} columns={formColumns}/>}
+        {reqBodyType === 'json' && <NoSsr>
           <CodeMirror
             className={classes.codeMirror}
+            value={reqBody}
+            onBeforeChange={(editor, data, value)=>reqBodyChange(value)}
             options={
               {
                 mode: 'javascript',
@@ -96,8 +97,8 @@ function RequestBody(props) {
           />
         </NoSsr>
         }
-        {radioValue==='binary'&&<input type="file"/>}
-        {radioValue==='raw'&&<input />}
+        {reqBodyType==='binary'&&<input type="file"/>}
+        {reqBodyType==='raw'&&<input />}
       </Fragment>
       }
     </Fragment>

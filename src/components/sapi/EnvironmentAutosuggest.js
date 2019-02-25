@@ -9,13 +9,6 @@ import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 
-const allSuggestions = [
-  { label: 'Afghanistan' },
-  { label: 'Aland Islands' },
-  { label: 'Albania' },
-  { label: 'Algeria' },
-];
-
 function renderInputComponent(inputProps) {
   const {
     classes, inputRef = () => {
@@ -40,18 +33,19 @@ function renderInputComponent(inputProps) {
 }
 
 function renderSuggestion(suggestion, { query, isHighlighted }) {
-  const matches = match(suggestion.label, query);
-  const parts = parse(suggestion.label, matches);
+  const matches = match(suggestion.host, query);
+  const parts = parse(suggestion.host, matches);
   return (
     <MenuItem selected={isHighlighted} component="div">
       <div>
+        [{suggestion.label}]
         {parts.map((part, index) => {
           return part.highlight ? (
-            <span key={String(index)} style={{ fontWeight: 500 }}>
+            <span key={String(index)} style={{ fontWeight: 400, color: '#f00' }}>
               {part.text}
             </span>
           ) : (
-            <strong key={String(index)} style={{ fontWeight: 300 }}>
+            <strong key={String(index)} style={{ fontWeight: 400 }}>
               {part.text}
             </strong>
           );
@@ -61,25 +55,9 @@ function renderSuggestion(suggestion, { query, isHighlighted }) {
   );
 }
 
-function getSuggestions(value) {
-  const inputValue = deburr(value.trim()).toLowerCase();
-  const inputLength = inputValue.length;
-  let count = 0;
-  return inputLength === 0
-    ? allSuggestions
-    : allSuggestions.filter(suggestion => {
-      const keep = count < 5 && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
-
-      if (keep) {
-        count += 1;
-      }
-
-      return true;
-    });
-}
 
 function getSuggestionValue(suggestion) {
-  return suggestion.label;
+  return suggestion.host;
 }
 
 const styles = theme => ({
@@ -92,7 +70,7 @@ const styles = theme => ({
   },
   suggestionsContainerOpen: {
     position: 'absolute',
-    zIndex: 1,
+    zIndex: 1500,
     marginTop: theme.spacing.unit,
     left: 0,
     right: 0,
@@ -112,25 +90,33 @@ const styles = theme => ({
 
 class EnvironmentAutosuggest extends React.Component {
   state = {
-    value: '',
     suggestions: [],
   };
 
   handleSuggestionsFetchRequested = ({ value }) => {
-    this.setState({ suggestions: getSuggestions(value) });
+    const { list } = this.props;
+    const inputValue = deburr(value.trim()).toLowerCase();
+    const inputLength = inputValue.length;
+    let count = 0;
+    const suggestions = inputLength === 0
+      ? list
+      : list.filter(suggestion => {
+        const keep = count < 5 && suggestion.host.slice(0, inputLength).toLowerCase() === inputValue;
+        if (keep) {
+          count += 1;
+        }
+        return true;
+      });
+    this.setState({ suggestions });
   };
 
   handleSuggestionsClearRequested = () => {
     this.setState({ suggestions: [] });
   };
 
-  handleChange = name => (event, { newValue }) => {
-    this.setState({ value: newValue });
-  };
-
   render() {
-    const { classes } = this.props;
-    const { value, suggestions } = this.state;
+    const { classes, value, onChange, placeholder } = this.props;
+    const { suggestions } = this.state;
     return (
       <Autosuggest
         suggestions={suggestions}
@@ -143,9 +129,9 @@ class EnvironmentAutosuggest extends React.Component {
         shouldRenderSuggestions={() => true}
         inputProps={{
           classes,
-          placeholder: 'http://127.0.0.1:80',
+          placeholder,
           value,
-          onChange: this.handleChange(),
+          onChange: (e, { newValue }) => onChange(newValue),
         }}
         theme={{
           container: classes.container,
