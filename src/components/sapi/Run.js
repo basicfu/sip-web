@@ -21,7 +21,7 @@ const drawerWidth = 230;
 
 const styles = theme => ({
   root: {
-    height: '100%',
+    height: 'calc( 100% - 48px )',
   },
   request: {
     padding: 8,
@@ -188,7 +188,7 @@ class Run extends React.Component {
      this.setState({ query });
    };
    return (
-     <div id="sip-cross" className={classes.root}>
+     <div className={classes.root}>
        <div className={classes.alertMessage} style={{ display: hasPlugin ? 'none' : undefined }}>
           <div>当前的接口请求服务需浏览器安装免费sip-cross跨域请求插件，选择下面任意一种安装方式，安装成功后请刷新浏览器：</div>
           <div><a target='_blank' href="http://tmp.static.dmka.cn/sip-cross.crx">[Google商店获取]</a>需翻墙</div>

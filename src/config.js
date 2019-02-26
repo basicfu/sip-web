@@ -2,11 +2,23 @@ const config = {
   app: 'sip',
   router: {
     '/': {},
-    '/login': { target: '/login', sidebar: false, navbar: false },
-    '/menu': {},
-    '/sapi': { target: '/sapi', sidebar: false, navbar: true },
-    '/base/user-template': {},
+    '/login': { sidebar: false, navbar: false },
+    '/sapi/run': { sidebar: false, navbar: true },
+    '/sapi/preview': { sidebar: false, navbar: true },
+    '/sapi/version': { sidebar: false, navbar: true },
+    '/sapi/history': { sidebar: false, navbar: true },
+    '/sapi/setting': { sidebar: false, navbar: true },
+    '/sapi/members': { sidebar: false, navbar: true },
   },
-
+  redirectPath: {},
+  customPath: {
+    '/sapi': '/sapi/run',
+    '/sapi/project/:projectId/interface/:interfaceId/run': '/sapi/run',
+    '/sapi/project/:projectId/interface/:interfaceId/preview': '/sapi/preview',
+    '/sapi/project/:projectId/interface/:interfaceId/version': '/sapi/version',
+    '/sapi/project/:projectId/interface/:interfaceId/history': '/sapi/history',
+    '/sapi/project/:projectId/interface/:interfaceId/setting': '/sapi/setting',
+    '/sapi/project/:projectId/interface/:interfaceId/members': '/sapi/members',
+  },
 };
-export default config;
+module.exports = config;

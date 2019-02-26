@@ -8,6 +8,50 @@ import {
 import dialog from 'utils/dialog';
 
 const modal = {
+  state:{
+    interfaceList: [
+      {
+        id: 1,
+        name: 'SLG1',
+      },
+      {
+        id: 2,
+        name: '梧桐招聘',
+        children: [
+          {
+            id: 3,
+            name: '登录模块',
+            type: 'DIRECTORY',
+            children: [
+              {
+                id: 4,
+                name: 'cesh接口1',
+                type: 'INTERFACE',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 5,
+        name: '测试服务',
+        children: [
+          {
+            id: 6,
+            name: '登录模块',
+            type: 'DIRECTORY',
+            children: [
+              {
+                id: 7,
+                name: 'cesh接口1',
+                type: 'INTERFACE',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
   effects: {
     * all(_, { call, put }) {
       const response = yield call(allMenu);

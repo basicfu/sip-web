@@ -1,5 +1,6 @@
 const express = require('express');
 const next = require('next');
+const config = require('./src/config');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.BABEL_ENV !== 'prod';
@@ -18,7 +19,6 @@ const devProxy = {
 
 app.prepare().then(() => {
   const server = express();
-
   // Set up the proxy.
   if (dev && devProxy) {
     const proxyMiddleware = require('http-proxy-middleware');
@@ -26,20 +26,26 @@ app.prepare().then(() => {
       server.use(proxyMiddleware(context, devProxy[context]));
     });
   }
-
   // Default catch-all handler to allow Next.js to handle all other routes
   // server.all('*', (req, res) => handle(req, res));
-  //
-  server.get('/a', (req, res) => {
-    return app.render(req, res, '/b', req.query);
-  });
-  server.get('/b', (req, res) => {
-    return app.render(req, res, '/test', req.query);
-  });
-
-  // server.get('/posts/:id', (req, res) => {
-  //   return app.render(req, res, '/posts', { id: req.params.id });
-  // });
+  const redirectPath = config.redirectPath;
+  if (redirectPath) {
+    for (const key in redirectPath) {
+      const item = redirectPath[key];
+      server.get(key, (req, res) => {
+        return res.redirect(item);
+      });
+    }
+  }
+  const customPath = config.customPath;
+  if (customPath) {
+    for (const key in customPath) {
+      const item = customPath[key];
+      server.get(key, (req, res) => {
+        return app.render(req, res, item, { id: req.params.id });
+      });
+    }
+  }
 
   server.get('*', (req, res) => {
     return handle(req, res);
