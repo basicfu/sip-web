@@ -1,5 +1,5 @@
-import React, {Fragment} from 'react';
-import {withStyles} from '@material-ui/core/styles';
+import React, { Fragment } from 'react';
+import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import Drawer from '@material-ui/core/Drawer';
 import Button from '@material-ui/core/Button';
@@ -24,8 +24,8 @@ import SearchIcon from '@material-ui/icons/Search';
 import CreateNewFolder from '@material-ui/icons/CreateNewFolderOutlined';
 import Settings from '@material-ui/icons/SettingsOutlined';
 import DirectionsIcon from '@material-ui/icons/Directions';
-import InputAdornment from "@material-ui/core/InputAdornment";
-import TextField from "@material-ui/core/TextField";
+import InputAdornment from '@material-ui/core/InputAdornment';
+import TextField from '@material-ui/core/TextField';
 
 const drawerWidth = 230;
 const styles = theme => ({
@@ -113,18 +113,22 @@ const styles = theme => ({
     //   backgroundColor: '#e6f7ff',
     // }
   },
-  input:{
+  input: {
     width: 'calc( 100% - 106px )',
     margin: '0 10px 0 0',
   },
 });
-const Directory = withStyles(styles)(({classes, id, depth, title, children, projectSelectd}) => {
+const Directory = withStyles(styles)(({ classes, projectId, categoryId, depth, title, children, projectSelectd }) => {
   const [open, setOpen] = React.useState(false);
   const [hover, setHover] = React.useState(false);
   const style = {
     paddingLeft: 8 * (2 + 3 * depth),
   };
-  console.log(projectSelectd);
+  const directoryChange = () => {
+    setOpen(!open);
+    const asUrl = depth === 0 ? `/sapi/project/${projectId}/interface` : `/sapi/project/${projectId}/interface/category/${categoryId}`;
+    Router.push('/sapi/interface', asUrl);
+  };
   return (
     <Fragment>
       <ListItem
@@ -133,20 +137,20 @@ const Directory = withStyles(styles)(({classes, id, depth, title, children, proj
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         // className={classes.item}
-        onClick={() => setOpen(!open)}
+        onClick={() => directoryChange()}
         button
         style={style}
       >
         <ListItemIcon className={classes.listIcon}>
-          {open ? <FolderOpen/> : <Folder/>}
+          {open ? <FolderOpen /> : <Folder />}
         </ListItemIcon>
-        <ListItemText className={classes.listText} primary={title}/>
+        <ListItemText className={classes.listText} primary={title} />
         <IconButton
-          style={{display: depth === 0 && hover ? undefined : 'none'}}
+          style={{ display: depth === 0 && hover ? undefined : 'none' }}
           className={classes.moreOperation}
           onClick={(e) => e.stopPropagation()}
         >
-          <MoreHoriz/>
+          <MoreHoriz />
         </IconButton>
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
@@ -156,61 +160,70 @@ const Directory = withStyles(styles)(({classes, id, depth, title, children, proj
 
   );
 });
-const Interface = withStyles(styles)(({classes, id, depth, title}) => {
+const Interface = withStyles(styles)(({ classes, projectId, interfaceId, depth, title }) => {
+  const [hover, setHover] = React.useState(false);
   const style = {
     paddingLeft: 8 * (2 + 3 * depth),
   };
+  const interfaceChange = () => {
+    Router.push('/sapi/run', `/sapi/project/${projectId}/interface/${interfaceId}/run`);
+  };
   return (
-    <ListItem className={classes.itemLeaf} disableGutters>
-      <Button
-        component={props => (
-          <NextLink passHref href="/sapi/interface" as={`/sapi/interface/${id}`}>
-            <a className={classes.a} {...props}>
-              <label className={classes.menuLabel}>{title}</label>
-            </a>
-          </NextLink>
-        )}
-        className={classNames(classes.buttonLeaf, `depth-${depth}`)}
-        disableRipple
-        style={style}
-      >-
-      </Button>
+    <ListItem
+      // selected={projectSelectd}
+      className={classes.list}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      // className={classes.item}
+      onClick={() => interfaceChange()}
+      button
+      style={style}
+    >
+      <ListItemText className={classes.listText} primary={title} />
+      <IconButton
+        style={{ display: depth === 0 && hover ? undefined : 'none' }}
+        className={classes.moreOperation}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <MoreHoriz />
+      </IconButton>
     </ListItem>
   );
 });
 
 // eslint-disable-next-line react/prop-types
-function renderNavItems({items, depth}) {
-  let projectId = 0;
-  if (process.browser && depth === 0) {
-    const split = Router.asPath.split('/');
-    if (split.length === 4) {
-      projectId = parseInt(split[3], 10);
-    }
-  }
+function renderNavItems({ items, depth, projectId }) {
+  // let projectId = 0;
+  // if (process.browser && depth === 0) {
+  //   const split = Router.asPath.split('/');
+  //   if (split.length === 4) {
+  //     projectId = parseInt(split[3], 10);
+  //   }
+  // }
   return (
-    <List style={{padding: 0}}>
+    <List style={{ padding: 0 }}>
       {items.reduce((children, item) => {
+          const realProjectId = depth === 0 ? item.id : projectId;
           const haveChildren = item.children && item.children.length > 0;
           if (depth === 0 || haveChildren) {
-            console.log(`a${item.id}`);
-            console.log(`b${projectId}`);
             children.push(
               <Directory
                 key={item.id}
-                id={item.id}
+                projectId={realProjectId}
+                categoryId={item.id}
                 depth={depth}
                 title={item.name}
                 projectSelectd={item.id === projectId}
               >
-                {haveChildren && renderNavItems({items: item.children, depth: depth + 1})}
+                {haveChildren && renderNavItems({ items: item.children, depth: depth + 1, projectId: realProjectId })}
               </Directory>,
             );
           } else {
             children.push(
               <Interface
                 key={item.id}
-                id={item.id}
+                projectId={realProjectId}
+                interfaceId={item.id}
                 depth={depth}
                 title={item.name}
               />,
@@ -224,19 +237,19 @@ function renderNavItems({items, depth}) {
   );
 }
 
-function ProjectSidebar({classes, items}) {
+function ProjectSidebar({ classes, items }) {
   return (
     <Fragment>
       <Paper elevation={1}>
-        <IconButton >
+        <IconButton>
           <SearchIcon />
         </IconButton>
-        <InputBase type="search" className={classes.input}/>
-        <IconButton >
+        <InputBase type="search" className={classes.input} />
+        <IconButton>
           <CreateNewFolder />
         </IconButton>
       </Paper>
-      <Divider/>
+      <Divider />
       <Drawer
         className={classes.drawer}
         variant="permanent"
@@ -244,10 +257,28 @@ function ProjectSidebar({classes, items}) {
           paper: classes.drawerPaper,
         }}
       >
-        {renderNavItems({items, depth: 0})}
+        {renderNavItems({ items, depth: 0 })}
       </Drawer>
     </Fragment>
   );
 }
 
 export default withStyles(styles)(ProjectSidebar);
+
+
+//
+// <ListItem className={classes.itemLeaf} disableGutters>
+//   <Button
+//     component={props => (
+//       <NextLink passHref href="/sapi/interface" as={`/sapi/interface/${id}`}>
+//         <a className={classes.a} {...props}>
+//           <label className={classes.menuLabel}>{title}</label>
+//         </a>
+//       </NextLink>
+//     )}
+//     className={classNames(classes.buttonLeaf, `depth-${depth}`)}
+//     disableRipple
+//     style={style}
+//   >-
+//   </Button>
+// </ListItem>
