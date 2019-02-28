@@ -18,7 +18,7 @@ const styles = {
   },
 };
 
-function ProjectRoot({ classes, value, items }) {
+function ProjectRoot({ classes, value }) {
   const handleTabChange = (event, value) => {
     Router.push(`/sapi/${value}`);
   };
@@ -26,7 +26,7 @@ function ProjectRoot({ classes, value, items }) {
   return (
     <div id="sip-cross" className={classes.root}>
       <SplitPane split="vertical" defaultSize={280} minSize={200} maxSize={400} className={classes.bodySplitPane}>
-        <ProjectSidebar items={items} />
+        <ProjectSidebar />
         <div className={classes.content}>
           <Tabs value={value} indicatorColor="primary" textColor="primary" onChange={handleTabChange}>
             <Tab value='interface' className={classes.tab} label="接口" />

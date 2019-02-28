@@ -7,7 +7,7 @@ import Input from 'components/Input';
 import { FieldType, SelectDefault } from 'enum';
 import Select from 'components/Select';
 import IconButton from '@material-ui/core/IconButton';
-import Sync from '../../node_modules/@material-ui/icons/Sync';
+import Sync from '@material-ui/icons/Sync';
 import Tooltip from '@material-ui/core/Tooltip';
 import dialog from 'utils/dialog';
 import Component from 'components/Component';

@@ -28,7 +28,9 @@ export default function request(url, options) {
     headers.call = config.app;
   }
   // 此接口特殊处理
-  if (url === '/api/base/dict/all') {
+  if (url.startsWith('/api/sapi')) {
+    delete headers.call;
+  } else if (url === '/api/base/dict/all') {
     const requestApp = options.body && options.body.app;
     if (requestApp && requestApp !== 'sip') {
       headers.app = requestApp;

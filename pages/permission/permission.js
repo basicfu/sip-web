@@ -10,8 +10,8 @@ import Component from 'components/Component';
 import ResourceDialog from 'components/ResourceDialog';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
-import SaveAlt from '../../node_modules/@material-ui/icons/SaveAlt';
-import ExitToApp from '../../node_modules/@material-ui/icons/ExitToApp';
+import SaveAlt from '@material-ui/icons/SaveAlt';
+import ExitToApp from '@material-ui/icons/ExitToApp';
 import dialog from 'utils/dialog';
 import notify from 'utils/notify';
 

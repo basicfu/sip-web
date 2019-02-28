@@ -1,5 +1,5 @@
 import Checkbox from '@material-ui/core/Checkbox/Checkbox';
-import IndeterminateCheckBoxOutlined from '../../node_modules/@material-ui/icons/IndeterminateCheckBoxOutlined';
+import IndeterminateCheckBoxOutlined from '@material-ui/icons/IndeterminateCheckBoxOutlined';
 import React from 'react';
 
 function CollapseCheckBox(props) {
